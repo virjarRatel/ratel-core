@@ -1,0 +1,21 @@
+apply plugin: 'java-library'
+
+sourceSets {
+    main {
+        resources {
+            srcDir 'ratelextension/src/main/resources'
+        }
+        java {
+            srcDir 'ratelextension/src/main/java'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    compileOnly 'com.google.android:android:4.1.1.4'
+    compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+    compileOnly 'com.android.support:support-annotations:28.0.0'
+    compileOnly project(':base-lib-ratel-api')
+    compileOnly 'com.virjar:sekiro-api:1.0.1'
+}

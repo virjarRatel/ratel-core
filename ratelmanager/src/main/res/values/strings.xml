@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+
+
+    <!-- Navigation drawer items -->
+    <string name="nav_item_install">Framework</string>
+    <string name="nav_item_modules">Modules</string>
+    <string name="nav_item_ratel_apps">RatelApps</string>
+    <string name="nav_item_ratel_certificate">RatelCertificates</string>
+    <string name="nav_item_settings">Settings</string>
+    <string name="nav_item_support">Support</string>
+    <string name="nav_item_about">About</string>
+    <string name="nav_certificate_detail">certificate detail</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <!-- Installer tab -->
+    <string name="done">Done!</string>
+    <string name="framework_active">Ratel Framework (%s) is active.</string>
+    <string name="status">Ratel Status</string>
+    <string name="framework_device_info">Your device</string>
+    <string name="framework_install">Install</string>
+    <string name="verified_boot_deactivated">Verified Boot is deactivated</string>
+    <string name="verified_boot_active">Verified Boot is active</string>
+    <string name="verified_boot_explanation">Verified Boot (dm-verity) prevents the device from booting if the system partition is modified.\n<b>Installing Xposed is not recommended!</b></string>
+    <string name="settings">settings</string>
+    <string name="about">about</string>
+
+    <!-- Modules tab -->
+    <string name="module_is_not_activated_yet">Xposed module is not activated yet</string>
+    <string name="module_is_not_activated_yet_detailed">%s has been installed, but is not activated yet.</string>
+    <string name="activate_and_reboot">Activate and reboot</string>
+    <string name="activate_only">Activate only</string>
+    <string name="module_activated">Xposed module has been activated</string>
+    <string name="module_empty_description">(no description provided)</string>
+    <string name="module_no_ui">This module does not provide a user interface</string>
+    <string name="no_xposed_modules_found">No Xposed modules were found!</string>
+    <string name="no_certificate_imported">no certificate imported!</string>
+    <string name="no_ratel_apps_found">No Ratel apps were found!</string>
+    <string name="xposed_module_list_updated">Xposed module list was updated\nChanges will become active on reboot</string>
+    <string name="xposed_module_updated_notification_title">Xposed module updated</string>
+    <string name="xposed_module_updated_notification">Reboot to activate changes</string>
+    <string name="warning_xposed_min_version">This module requires a newer Xposed version (%d) and thus cannot be activated.</string>
+    <string name="no_min_version_specified">This module does not specify the Xposed version it needs.</string>
+    <string name="warning_min_version_too_low">This module was created for Xposed version %1$d, but due to incompatible changes in version %2$d, it has been disabled.</string>
+    <string name="module_launch">Launch UI</string>
+    <string name="module_download_updates">Download/Updates</string>
+    <string name="module_support">Support</string>
+    <string name="module_app_info">App info</string>
+    <string name="module_uninstall">Uninstall</string>
+
+
+    <!-- Settings tab -->
+    <string name="settings_group_download">Download</string>
+    <string name="settings_enable_downloads">Enable downloads</string>
+    <string name="settings_enable_downloads_summary">Allow Xposed Installer to check for updates and new modules</string>
+    <string name="settings_release_type">Versions to be shown</string>
+    <string name="settings_group_experimental">Experimental</string>
+    <string name="settings_disable_resources">Disabled resource hooks</string>
+    <string name="settings_disable_resources_summary">Workaround for conflicts with theming engines\n<b>WARNING:</b> Modules which try to change resources will not work when this is enabled.</string>
+    <string name="settings_group_app">Application</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_theme_black">Black (useful for AMOLED screens)</string>
+    <string name="settings_default_view">Default view</string>
+    <string name="open_drawer_summ">Open automatically the navigation drawer at startup</string>
+    <string name="open_drawer">Open automatically navigation drawer</string>
+    <string name="skip_xposedminversion_check">Skip \'xposedminversion\' check</string>
+    <string name="skip_xposedminversion_check_summ">Skip \'xposedminversion\' check for modules</string>
+    <string name="chrome_custom_tabs">Chrome Custom Tabs</string>
+    <string name="chrome_custom_tabs_summ">Open links in internal browser</string>
+    <string name="notify_module_update">Enable module update notification</string>
+    <string name="settings_group_user">User</string>
+    <string name="phone_identifier">phone identifier</string>
+
+    <!-- Support tab -->
+    <string name="support_modules_label">Support for modules</string>
+    <string name="support_modules_description">Long-click any module in the modules list and select \"%1$s\".</string>
+    <string name="support_framework_label">Framework/Installer support</string>
+    <string name="support_faq_label">FAQ/known issues</string>
+    <string name="support_donate_label">Donate</string>
+    <string name="support_donate_description">If you would like to say thanks for Ratel, you can donate to virjar here</string>
+
+
+    <!-- About tab -->
+    <string name="about_developers_label">Main developers</string>
+    <string name="about_developers"> <a href="https://github.com/virjar">virjar</a> modified 《Xposed Installer》 from<a href="http://forum.xda-developers.com/member.php?u=4419114"> rovo89</a></string>
+    <string name="about_translator_label">Translator</string>
+    <string name="translator"></string>
+    <string name="about_version_label">Version</string>
+    <string name="about_source_label">Source code</string>
+    <string name="about_libraries_label">Used libraries</string>
+
+
+    <!-- Most of these belong to currently hidden features -->
+    <string name="warning_installed_on_external_storage">This module cannot be loaded because it\'s installed on the SD card, please move it to internal storage.</string>
+    <string name="warning_forward_locked">This module cannot be loaded because it\'s is forward-locked, please contact the module\'s developer.</string>
+    <string name="export_modules">Export enabled modules list</string>
+    <string name="import_modules">Import enabled modules list</string>
+    <string name="view">VIEW</string>
+    <string name="export_">Export…</string>
+    <string name="import_">Import…</string>
+    <string name="export_enabled_modules">Export enabled modules list</string>
+    <string name="import_enabled_modules">Import enabled modules list</string>
+    <string name="export_installed_modules">Export installed modules list</string>
+    <string name="import_installed_modules">Import installed modules list</string>
+    <string name="no_installed_modules">There isn\'t any installed module!</string>
+    <string name="no_backup_found">No backup found</string>
+    <string name="no_enabled_modules">There is any modules enabled</string>
+    <string name="share">Share with…</string>
+    <string name="permissionNotGranted">This feature will not work without permission to write external storage.</string>
+    <string name="add_bookmark">Add bookmark</string>
+    <string name="remove_bookmark">Remove bookmark</string>
+    <string name="bookmarks">Bookmarks</string>
+    <string name="no_bookmark_added">No bookmark added</string>
+    <string name="bookmark_added">Bookmark added</string>
+    <string name="bookmark_removed">Bookmark removed</string>
+    <string name="undo">Undo</string>
+    <string name="file_is_empty">File is empty</string>
+    <string name="install_remove">Install and remove</string>
+    <string name="loading">Loading…</string>
+    <string name="update_download_list">Pulldown to refresh download\'s module list</string>
+
+
+    <string name="import_certificate">import ratel certificate</string>
+    <!-- Certificate detail tab -->
+    <string name="certificate_id_tag">ID</string>
+    <string name="certificate_account_tag">Account</string>
+    <string name="certificate_version_tag">Version</string>
+    <string name="certificate_protocol_version_tag">Protocol</string>
+    <string name="certificate_expire">Expire</string>
+    <string name="certificate_type">CertificateType</string>
+    <string name="certificate_package_list">Packages</string>
+    <string name="certificate_device_list">Devices</string>
+    <string name="certificate_extra">Extra</string>
+    <string name="certificate_payload">PayLoad</string>
+    <string name="certificate">certificate</string>
+
+    <string name="certificate_id_tag2">Certificate ID</string>
+    <!-- engine -->
+    <string name="ratel_engine">ratel Engine</string>
+    <string name="ratel_engine_build_time">Timestamp</string>
+
+    <string name="ratel_build_meta">build param</string>
+    <string name="rate_app_build_time_tag">appBuildTime</string>
+    <string name="rate_app_build_id_tag">appBuildId</string>
+    <string name="ratel_op_panel">operator panel</string>
+    <string name="ratel_multi_account">MultiAccount</string>
+    <string name="ratel_daemon">daemon</string>
+    <string name="ratel_module_status">Module Status</string>
+    <string name="ratel_disable_hotmodule">hotmodule</string>
+    <string name="ratel_force_stop">stop process</string>
+    <string name="ratel_switch_device">switch device</string>
+    <string name="accessibility_service_description">ratelNeedMorePermission</string>
+    <string name="delete">delete</string>
+    <string name="active">active</string>
+    <string name="ratel_disable_api_switch">DisableAPISwitch</string>
+    <string name="ratel_add_devices_str">CreateDevices</string>
+    <string name="add_user">addDevice</string>
+    <string name="nav_item_candicate_apps">AvailbleApp</string>
+</resources>

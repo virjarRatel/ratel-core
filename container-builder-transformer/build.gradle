@@ -1,0 +1,38 @@
+buildscript {
+    repositories {
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+    }
+
+    dependencies {
+        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.4"
+    }
+}
+
+apply plugin: 'java-library'
+apply plugin: "com.github.johnrengelman.shadow"
+
+sourceSets.main.resources.srcDir 'src/main/resources'
+
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    api project(':base-lib-d8')
+    api 'commons-cli:commons-cli:1.4'
+    api 'commons-io:commons-io:2.6'
+    api 'org.apache.ant:ant:1.10.5'
+}
+
+sourceCompatibility = "8"
+targetCompatibility = "8"
+
+jar.enabled = false
+shadowJar {
+    baseName = 'EngineBinTransformer'
+    //classifier是生成jar包的后缀
+    classifier = null
+    version = 1.0
+    manifest {
+        attributes 'Main-Class': 'com.virjar.ratel.rebuilder.transformer.EngineBinTransformer'
+    }
+}
+assemble.dependsOn(shadowJar)

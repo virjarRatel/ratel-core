@@ -1,0 +1,82 @@
+apply plugin: 'com.android.application'
+import com.virjar.ratel.buildsrc.Constants;
+
+android {
+    compileSdkVersion 28
+
+    defaultConfig {
+        applicationId Constants.RATEL_MANAGER_PACKAGE
+        minSdkVersion 19
+        targetSdkVersion 27
+        versionCode 14
+        versionName "1.1.3"
+        archivesBaseName = "RatelManager_${versionName}".replace(' ', '_')
+
+    }
+
+    signingConfigs {
+        release {
+            storeFile rootProject.file('script/hermes_key')
+            storePassword "hermes"
+            keyAlias "hermes"
+            keyPassword "hermes"
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug {
+            pseudoLocalesEnabled true
+        }
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    compileOptions {
+        //base-lib-ratel-api 使用了1.8特性
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+repositories {
+    maven { url 'https://www.jitpack.io' }
+}
+
+dependencies {
+    implementation 'com.android.support:cardview-v7:28.0.0'
+    implementation 'com.android.support:design:28.0.0'
+    implementation 'com.android.support:customtabs:28.0.0'
+    implementation 'com.android.support:support-v13:28.0.0'
+    implementation 'com.afollestad.material-dialogs:commons:0.9.0.2'
+    implementation 'se.emilsjolander:stickylistheaders:2.7.0'
+    implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'de.psdev.licensesdialog:licensesdialog:1.8.1'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+
+    annotationProcessor 'org.projectlombok:lombok:1.18.2'
+    compileOnly 'org.projectlombok:lombok:1.18.2'
+
+    def dbflow_version = "4.2.4"
+    annotationProcessor "com.github.Raizlabs.DBFlow:dbflow-processor:${dbflow_version}"
+    implementation "com.github.Raizlabs.DBFlow:dbflow-core:${dbflow_version}"
+    implementation "com.github.Raizlabs.DBFlow:dbflow:${dbflow_version}"
+    implementation 'com.alibaba:fastjson:1.2.10'
+    implementation 'com.virjar:ratel-base:1.0'
+
+    implementation 'com.jaredrummler:android-processes:1.1.1'
+    implementation project(':managerbridge')
+    implementation project(':base-lib-ratel-api')
+
+    // shizukuk支持adb提权，即在非root模式下拥有shell权限
+    api(group: 'dev.rikka.shizuku', name: "api", version: '11.0.2', ext: 'aar')
+    api(group: 'dev.rikka.shizuku', name: "aidl", version: '11.0.2', ext: 'aar')
+    // add this if you want to support Shizuku
+    api(group: 'dev.rikka.shizuku', name: "provider", version: '11.0.2', ext: 'aar')
+}

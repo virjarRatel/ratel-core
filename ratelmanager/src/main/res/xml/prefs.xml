@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory
+        android:key="group_app"
+        android:title="@string/settings_group_app">
+
+        <com.virjar.ratel.manager.widget.IntegerListPreference
+            android:defaultValue="0"
+            android:entries="@array/theme_texts"
+            android:entryValues="@array/theme_values"
+            android:key="theme"
+            android:summary="%s"
+            android:title="@string/settings_theme"
+            app:useStockLayout="true" />
+
+
+        <com.virjar.ratel.manager.widget.IntegerListPreference
+            android:defaultValue="0"
+            android:entries="@array/default_view_texts"
+            android:entryValues="@array/default_view_values"
+            android:key="default_view"
+            android:summary="%s"
+            android:title="@string/settings_default_view"
+            app:useStockLayout="true" />
+
+
+    </PreferenceCategory>
+
+
+    <PreferenceCategory
+        android:key="group_user"
+        android:title="@string/settings_group_user">
+
+        <EditTextPreference
+            android:defaultValue="none"
+            android:key="phone_identifier"
+            android:title="@string/phone_identifier">
+
+        </EditTextPreference>
+    </PreferenceCategory>
+</PreferenceScreen>

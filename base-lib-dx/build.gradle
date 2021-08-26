@@ -1,0 +1,15 @@
+/**
+ * 这个项目抽取dx工具，他会在多个场景下被不同组件使用。<br>
+ * 1. sandhook工作过程中，可能通过dexmaker创建插桩方法
+ * 2. 构建apk过程，使用dexmaker生成framework插桩配置class代码
+ * 3. 创建dist.zip过程，使用dx工具将jar包(class格式)转化为dex格式。dex格式工具将会在RatelManager调用，实现在本地感染apk功能,(目前该功能使用d8替换，不在使用dx)
+ * 4. RatelToolKit通过DexMaker实现字节码AOP
+ */
+apply plugin: 'java-library'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+}
+
+sourceCompatibility = "7"
+targetCompatibility = "7"

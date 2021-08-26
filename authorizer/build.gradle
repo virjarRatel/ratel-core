@@ -1,0 +1,37 @@
+buildscript {
+    repositories {
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+    }
+
+    dependencies {
+        classpath "com.github.jengelman.gradle.plugins:shadow:5.0.0"
+    }
+}
+
+apply plugin: 'java-library'
+apply plugin: "com.github.johnrengelman.shadow"
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+// https://mvnrepository.com/artifact/commons-codec/commons-codec
+    // compile group: 'commons-codec', name: 'commons-codec', version: '1.13'
+
+    compile 'commons-cli:commons-cli:1.4'
+    compile 'com.alibaba:fastjson:1.2.10'
+    compile 'com.virjar:ratel-base:1.2'
+}
+
+sourceCompatibility = "7"
+targetCompatibility = "7"
+
+
+jar.enabled = false
+shadowJar {
+    baseName = 'ratel-keygen'
+    //classifier是生成jar包的后缀
+    classifier = null
+    version = '1.0.0'
+    manifest {
+        attributes 'Main-Class': 'com.virjar.ratel.authorize.RatelKeygen'
+    }
+}

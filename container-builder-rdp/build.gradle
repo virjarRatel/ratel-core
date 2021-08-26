@@ -1,0 +1,39 @@
+buildscript {
+    repositories {
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+    }
+
+    dependencies {
+        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.4"
+    }
+}
+
+apply plugin: 'java-library'
+apply plugin: "com.github.johnrengelman.shadow"
+
+sourceSets.main.resources.srcDir 'src/main/resources'
+
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    api 'org.smali:smali:2.3.4'
+    api 'org.smali:baksmali:2.3.4'
+    api 'commons-io:commons-io:2.6'
+    api 'commons-cli:commons-cli:1.4'
+    api 'org.apache.commons:commons-lang3:3.7'
+}
+
+sourceCompatibility = "8"
+targetCompatibility = "8"
+
+jar.enabled = false
+shadowJar {
+    baseName = 'RDP'
+    //classifier是生成jar包的后缀
+    classifier = null
+    version = 1.0
+    manifest {
+        attributes 'Main-Class': 'com.virjar.ratel.rdp.RDPBuilder'
+    }
+}
+assemble.dependsOn(shadowJar)

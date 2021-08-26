@@ -1,0 +1,75 @@
+buildscript {
+    repositories {
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        maven {
+            credentials {
+                username '5fb7a10411b2334fb0005fb7'
+                password 'H_]pcyHQL4c7'
+            }
+            url 'https://packages.aliyun.com/maven/repository/2049610-release-qeKbaa/'
+        }
+    }
+
+    dependencies {
+        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.4"
+        classpath 'com.virjar:ratel-base:1.2'
+    }
+}
+
+Constants.devBuild = false
+
+apply from: 'BuilderRepkgBase.gradle'
+
+import com.virjar.ratel.buildsrc.Constants
+import proguard.gradle.ProGuardTask
+
+//runtime apk
+task injectRuntimeAPK(type: Copy) {
+    from '../container-runtime-repkg/build/outputs/apk/release/container-runtime-repkg-release.apk'
+    into 'src/main/resources/'
+    rename {
+        Constants.RATEL_ENGINE_APK
+    }
+}
+injectRuntimeAPK.dependsOn(':container-runtime-repkg:assembleRelease')
+processResources.dependsOn(injectRuntimeAPK)
+
+task proguardFiles(type: ProGuardTask, dependsOn: compileJava) {
+    // 取消混淆的话，注释下一句即可
+    compileJava.dependsOn.add(clean)
+    tasks.jar.dependsOn.add(proguardFiles)
+
+    def javaClassesDir = null;
+    sourceSets.main.output.classesDirs.each {
+        if (it.toString().endsWith("/java/main")) {
+            javaClassesDir = it;
+        }
+    }
+
+
+    println "proguarding"
+
+    printmapping "$buildDir/mapping.txt"
+    configuration 'proguard-rules.pro'
+
+    libraryjars files(configurations.compile.findAll { return true }.collect())
+    libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
+    libraryjars "${System.getProperty('java.home')}/lib/jce.jar"
+    if (javaClassesDir) {
+        injars sourceSets.main.output
+        outjars "$buildDir/libs/${project.name}"
+        delete "$buildDir/libs/${project.name}"
+
+        doLast {
+            delete javaClassesDir
+            copy {
+                from "$buildDir/libs/${project.name}"
+                into javaClassesDir
+            }
+        }
+    } else {
+        print "can not find java classes directory!!"
+    }
+
+}
+

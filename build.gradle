@@ -1,0 +1,81 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+
+    repositories {
+        repositories {
+            maven {
+                name "aliyunCentral"
+                url "https://maven.aliyun.com/repository/central"
+            }
+            maven {
+                name "aliyunGoogle"
+                url "https://maven.aliyun.com/repository/google"
+            }
+            maven {
+                credentials {
+                    username '5fb7a10411b2334fb0005fb7'
+                    password 'H_]pcyHQL4c7'
+                }
+                url 'https://packages.aliyun.com/maven/repository/2049610-release-qeKbaa/'
+            }
+            maven {
+                name "aliyunJCenter"
+                url "https://maven.aliyun.com/repository/jcenter"
+            }
+        }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.4.1'
+        classpath 'net.sf.proguard:proguard-gradle:6.1.1'
+        classpath 'com.virjar:ratel-base:1.2'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        repositories {
+            maven {
+                name "aliyunCentral"
+                url "https://maven.aliyun.com/repository/central"
+            }
+            maven {
+                name "aliyunGoogle"
+                url "https://maven.aliyun.com/repository/google"
+            }
+            maven {
+                credentials {
+                    username '5fb7a10411b2334fb0005fb7'
+                    password 'H_]pcyHQL4c7'
+                }
+                url 'https://packages.aliyun.com/maven/repository/2049610-release-qeKbaa/'
+            }
+
+            maven {
+                name "aliyunJCenter"
+                url "https://maven.aliyun.com/repository/jcenter"
+            }
+            maven {
+                name "contralSnapshot"
+                url "https://oss.sonatype.org/content/repositories/snapshots/"
+            }
+        }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+configurations.all {
+    // check for updates every build
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+ext {
+    ratelEngineVersionCode = 34
+    ratelEngineVersion = "1.5.1"
+}

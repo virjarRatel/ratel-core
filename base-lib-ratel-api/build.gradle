@@ -1,0 +1,22 @@
+apply plugin: 'java-library'
+
+sourceSets {
+    main {
+        resources {
+            srcDir 'ratel-api/src/main/resources'
+        }
+        java {
+            srcDir 'ratel-api/src/main/java'
+        }
+    }
+}
+//sourceSets.main.resources.srcDir 'src/main/resources'
+
+//sourceSets.main.java.srcDir 'java'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    compileOnly 'com.google.android:android:4.1.1.4'
+    compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+    compileOnly 'com.android.support:support-annotations:28.0.0'
+}

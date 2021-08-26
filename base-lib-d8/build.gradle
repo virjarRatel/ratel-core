@@ -1,0 +1,50 @@
+// migrated from https://r8.googlesource.com/r8
+apply plugin: 'java-library'
+ext {
+    guavaVersion = '23.0'
+    fastutilVersion = '7.2.0'
+    asmVersion = '7.1'
+    joptSimpleVersion = '4.6'
+    gsonVersion = '2.7'
+    kotlinExtMetadataJVMVersion = '0.1.0'
+}
+
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation("com.google.guava:guava:$guavaVersion", {
+        exclude group: 'com.google.errorprone'
+        exclude group: 'com.google.code.findbugs'
+        exclude group: 'com.google.j2objc'
+        exclude group: 'org.codehaus.mojo'
+    })
+    implementation group: 'it.unimi.dsi', name: 'fastutil', version: fastutilVersion
+    implementation group: 'org.ow2.asm', name: 'asm', version: asmVersion
+    implementation group: 'org.ow2.asm', name: 'asm-commons', version: asmVersion
+    implementation group: 'org.ow2.asm', name: 'asm-tree', version: asmVersion
+    implementation group: 'org.ow2.asm', name: 'asm-analysis', version: asmVersion
+    implementation group: 'org.ow2.asm', name: 'asm-util', version: asmVersion
+    implementation "net.sf.jopt-simple:jopt-simple:$joptSimpleVersion"
+    implementation "com.google.code.gson:gson:$gsonVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-metadata-jvm:$kotlinExtMetadataJVMVersion"
+}
+
+
+def JDK_VERSION = 1.8
+
+sourceCompatibility = JDK_VERSION
+targetCompatibility = JDK_VERSION
+
+
+
+compileJava {
+    sourceCompatibility = JDK_VERSION
+    targetCompatibility = JDK_VERSION
+    [compileJava]*.options*.encoding = 'UTF-8'
+}
+
+compileTestJava {
+    sourceCompatibility = JDK_VERSION
+    targetCompatibility = JDK_VERSION
+    [compileTestJava]*.options*.encoding = 'UTF-8'
+}

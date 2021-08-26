@@ -1,0 +1,51 @@
+plugins {
+    id 'com.android.library'
+}
+
+
+
+def ABI_ARM64_V8a = "arm64-v8a"
+def ABI_ARMEABI_V7a = "armeabi-v7a"
+android {
+    compileSdkVersion 28
+
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+
+        consumerProguardFiles "consumer-rules.pro"
+        externalNativeBuild {
+            cmake {
+                // 请注意，目前不支持64位 'x86', 'x86_64', 'arm64-v8a'
+                // 受限于sandhook，现在我们也不支持x86了
+                abiFilters  ABI_ARM64_V8a,ABI_ARMEABI_V7a
+                // c++代码阅读，默认使用的64位。如果想要查看32位代码，那么可以暂时关闭64位
+                //abiFilters "armeabi-v7a"
+                arguments "-DLIB_NAME=ratelhide"
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    api 'com.virjar:ratel-base:1.2'
+}

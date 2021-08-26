@@ -1,0 +1,12 @@
+apply plugin: 'java-library'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    compileOnly 'com.google.android:android:4.1.1.4'
+    // 大部分代码同步自 'com.rover12421.AndroidHideApi:android:1.24'
+    // compileOnly 'com.rover12421.AndroidHideApi:android:1.24'
+}
+
+sourceCompatibility = "7"
+targetCompatibility = "7"

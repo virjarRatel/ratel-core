@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    tools:ignore="UseCompoundDrawables,ContentDescription">
+
+    <LinearLayout
+        android:id="@android:id/content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.CardView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="8dp"
+            app:cardBackgroundColor="?attr/list_download_item_color"
+            app:cardUseCompatPadding="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:src="@drawable/ic_certificate" />
+
+
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:divider="@drawable/table_v_divider"
+                    android:orientation="vertical"
+                    android:showDividers="middle|beginning|end">
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:divider="@drawable/table_h_divider"
+                        android:orientation="horizontal"
+                        android:showDividers="middle|beginning|end">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:minHeight="?android:attr/listPreferredItemHeightSmall"
+                            android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+                            android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+                            android:text="@string/certificate_id_tag"
+                            android:textAppearance="?android:attr/textAppearanceListItemSmall" />
+
+                        <TextView
+                            android:id="@+id/certificate_id_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="marquee"
+                            android:lines="2"
+                            android:minHeight="?android:attr/listPreferredItemHeightSmall"
+                            android:minLines="2"
+                            android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+                            android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+                            android:singleLine="false"
+                            android:textAppearance="?android:attr/textAppearanceListItemSmall"
+                            android:textIsSelectable="true" />
+
+
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:divider="@drawable/table_h_divider"
+                        android:orientation="horizontal"
+                        android:showDividers="middle|beginning|end">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:minHeight="?android:attr/listPreferredItemHeightSmall"
+                            android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+                            android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+                            android:text="@string/certificate_account_tag"
+                            android:textAppearance="?android:attr/textAppearanceListItemSmall" />
+
+                        <TextView
+                            android:id="@+id/certificate_account_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:minHeight="?android:attr/listPreferredItemHeightSmall"
+                            android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+                            android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+                            android:textAppearance="?android:attr/textAppearanceListItemSmall"
+                            android:textIsSelectable="true" />
+                    </TableRow>
+
+                    <TableRow
+
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:divider="@drawable/table_h_divider"
+                        android:orientation="horizontal"
+                        android:showDividers="middle|beginning|end">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:minHeight="?android:attr/listPreferredItemHeightSmall"
+                            android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+                            android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+                            android:text="@string/certificate_version_tag"
+                            android:textAppearance="?android:attr/textAppearanceListItemSmall" />
+
+                        <TextView
+                            android:id="@+id/certificate_version_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:minHeight="?android:attr/listPreferredItemHeightSmall"
+                            android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+                            android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+                            android:textAppearance="?android:attr/textAppearanceListItemSmall"
+                            android:textIsSelectable="true" />
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:divider="@drawable/table_h_divider"
+                        android:orientation="horizontal"
+                        android:showDividers="middle|beginning|end">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:minHeight="?android:attr/listPreferredItemHeightSmall"
+                            android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+                            android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+                            android:text="@string/certificate_protocol_version_tag"
+                            android:textAppearance="?android:attr/textAppearanceListItemSmall" />
+
+                        <TextView
+                            android:id="@+id/certificate_protocol_version_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:minHeight="?android:attr/listPreferredItemHeightSmall"
+                            android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+                            android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+                            android:textAppearance="?android:attr/textAppearanceListItemSmall"
+                            android:textIsSelectable="true" />
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:divider="@drawable/table_h_divider"
+                        android:orientation="horizontal"
+                        android:showDividers="middle|beginning|end">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:minHeight="?android:attr/listPreferredItemHeightSmall"
+                            android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+                            android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+                            android:text="@string/certificate_expire"
+                            android:textAppearance="?android:attr/textAppearanceListItemSmall" />
+
+                        <TextView
+                            android:id="@+id/certificate_expire_content"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:minHeight="?android:attr/listPreferredItemHeightSmall"
+                            android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+                            android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+                            android:textAppearance="?android:attr/textAppearanceListItemSmall"
+                            android:textIsSelectable="true" />
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:divider="@drawable/table_h_divider"
+                        android:orientation="horizontal"
+                        android:showDividers="middle|beginning|end">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:minHeight="?android:attr/listPreferredItemHeightSmall"
+                            android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+                            android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+                            android:text="@string/certificate_type"
+                            android:textAppearance="?android:attr/textAppearanceListItemSmall" />
+
+                        <com.virjar.ratel.manager.widget.MyListView
+                            android:id="@+id/certificate_type_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                        </com.virjar.ratel.manager.widget.MyListView>
+
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:divider="@drawable/table_h_divider"
+                        android:orientation="horizontal"
+                        android:showDividers="middle|beginning|end">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:minHeight="?android:attr/listPreferredItemHeightSmall"
+                            android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+                            android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+                            android:text="@string/certificate_package_list"
+                            android:textAppearance="?android:attr/textAppearanceListItemSmall" />
+
+                        <com.virjar.ratel.manager.widget.MyListView
+                            android:id="@+id/certificate_package_list_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                        </com.virjar.ratel.manager.widget.MyListView>
+
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:divider="@drawable/table_h_divider"
+                        android:orientation="horizontal"
+                        android:showDividers="middle|beginning|end">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:minHeight="?android:attr/listPreferredItemHeightSmall"
+                            android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+                            android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+                            android:text="@string/certificate_device_list"
+
+                            android:textAppearance="?android:attr/textAppearanceListItemSmall" />
+
+
+                        <com.virjar.ratel.manager.widget.MyListView
+                            android:id="@+id/certificate_devices_list_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                        </com.virjar.ratel.manager.widget.MyListView>
+
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:divider="@drawable/table_h_divider"
+                        android:orientation="horizontal"
+                        android:showDividers="middle|beginning|end">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:minHeight="?android:attr/listPreferredItemHeightSmall"
+                            android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+                            android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+                            android:text="@string/certificate_extra"
+                            android:textAppearance="?android:attr/textAppearanceListItemSmall" />
+
+                        <TextView
+                            android:id="@+id/certificate_extra_content"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:minHeight="?android:attr/listPreferredItemHeightSmall"
+                            android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+                            android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+                            android:textAppearance="?android:attr/textAppearanceListItemSmall"
+                            android:textIsSelectable="true" />
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:divider="@drawable/table_h_divider"
+                        android:orientation="horizontal"
+                        android:showDividers="middle|beginning|end">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:minHeight="?android:attr/listPreferredItemHeightSmall"
+                            android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+                            android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+                            android:text="@string/certificate_payload"
+                            android:textAppearance="?android:attr/textAppearanceListItemSmall" />
+
+                        <TextView
+                            android:id="@+id/certificate_payload_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:minHeight="?android:attr/listPreferredItemHeightSmall"
+                            android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+                            android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+                            android:textAppearance="?android:attr/textAppearanceListItemSmall"
+                            android:textIsSelectable="true" />
+                    </TableRow>
+                </TableLayout>
+
+
+            </LinearLayout>
+
+
+        </android.support.v7.widget.CardView>
+
+    </LinearLayout>
+
+</ScrollView>

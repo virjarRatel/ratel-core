@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">demoApp</string>
+    <string name="title_activity_alert_dialog_test">AlertDialogTest</string>
+</resources>

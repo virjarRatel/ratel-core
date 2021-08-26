@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Navigation drawer items -->
+    <string name="nav_item_install">框架</string>
+    <string name="nav_item_modules">模块</string>
+    <string name="nav_item_ratel_apps">感染应用</string>
+    <string name="nav_item_ratel_certificate">授权证书</string>
+    <string name="nav_item_settings">设置</string>
+    <string name="nav_item_support">支持</string>
+    <string name="nav_item_about">关于</string>
+    <string name="nav_certificate_detail">证书详情</string>
+    <string name="navigation_drawer_open">打开导航抽屉</string>
+    <string name="navigation_drawer_close">关闭导航抽屉</string>
+
+    <!-- Installer tab -->
+    <string name="framework_active">Ratel (%s) 框架已激活。</string>
+    <string name="settings">设置</string>
+    <string name="about">关于</string>
+
+
+    <!-- Modules tab -->
+    <string name="module_is_not_activated_yet">Xposed 模块未激活</string>
+    <string name="module_is_not_activated_yet_detailed">%s 已安装，但尚未激活。</string>
+    <string name="activate_and_reboot">激活并重启设备</string>
+    <string name="module_activated">Xposed 模块已激活</string>
+    <string name="module_empty_description">（未提供描述）</string>
+    <string name="module_no_ui">该模块未提供用户界面</string>
+    <string name="no_xposed_modules_found">未找到 Xposed 模块！</string>
+    <string name="no_certificate_imported">未导入授权证书！</string>
+    <string name="no_ratel_apps_found">未找到Ratel感染app</string>
+    <string name="xposed_module_updated_notification_title">Xposed 模块已更新</string>
+    <string name="xposed_module_updated_notification">重启设备以激活更新。</string>
+    <string name="warning_xposed_min_version">该模块需要 Xposed 新版（%d），因此无法激活。</string>
+    <string name="no_min_version_specified">该模块未指定需要的 Xposed 版本。</string>
+    <string name="warning_min_version_too_low">该模块在 Xposed %1$d 版下创建，但因为不兼容 %2$d 版中的更改，它已被禁用。</string>
+    <string name="module_launch">开启用户界面</string>
+    <string name="module_download_updates">下载/更新</string>
+    <string name="module_support">支持</string>
+    <string name="module_app_info">应用信息</string>
+    <string name="module_uninstall">卸载</string>
+
+
+    <!-- Settings tab -->
+    <string name="settings_group_download">下载</string>
+    <string name="settings_release_type">将显示的版本</string>
+    <string name="settings_group_experimental">实验性</string>
+    <string name="settings_disable_resources">禁用资源钩子</string>
+    <string name="settings_group_app">应用</string>
+    <string name="settings_theme">主题</string>
+    <string name="settings_theme_light">亮色</string>
+    <string name="settings_theme_dark">暗色</string>
+    <string name="settings_theme_black">黑色（对 AMOLED 屏幕有益）</string>
+    <string name="settings_default_view">默认视图</string>
+    <string name="chrome_custom_tabs">Chrome 自定义标签</string>
+    <string name="chrome_custom_tabs_summ">在内置浏览器中打开链接</string>
+    <string name="notify_module_update">启用模块更新通知</string>
+    <string name="settings_group_user">用户</string>
+    <string name="phone_identifier">手机ID</string>
+
+    <!-- Support tab -->
+    <string name="support_modules_label">模块支持</string>
+    <string name="support_modules_description">在模块列表中长按任何模块并选择“%1$s”</string>
+    <string name="support_framework_label">框架/安装器支持</string>
+    <string name="support_faq_label">常见问题/已知问题</string>
+    <string name="support_donate_label">捐赠</string>
+    <string name="support_donate_description">如果您想感谢 Ratel 作者，可以在此向 virjar 捐赠</string>
+
+
+    <!-- About tab -->
+    <string name="about_developers_label">主要开发者</string>
+    <string name="about_developers"> <a href="https://github.com/virjar">virjar</a> 修改自<a href="http://forum.xda-developers.com/member.php?u=4419114">rovo89</a>的Xposed Installer</string>
+    <string name="about_translator_label">翻译</string>
+    <string name="translator">Phantom</string>
+    <string name="about_version_label">版本</string>
+    <string name="about_source_label">源码</string>
+    <string name="about_libraries_label">使用的库文件</string>
+
+    <!-- Most of these belong to currently hidden features -->
+    <string name="warning_installed_on_external_storage">该模块不能载入，因为它安装在 SD 卡上，请将它移至内部存储。</string>
+    <string name="view">视图</string>
+    <string name="export_">导出…</string>
+    <string name="import_">导入…</string>
+    <string name="export_enabled_modules">导出已启用模块列表</string>
+    <string name="import_enabled_modules">导入已启用模块列表</string>
+    <string name="export_installed_modules">导出已安装模块列表</string>
+    <string name="import_installed_modules">导入已安装模块列表</string>
+    <string name="no_installed_modules">未安装任何模块</string>
+    <string name="no_backup_found">未找到备份</string>
+    <string name="no_enabled_modules">未启用任何模块</string>
+    <string name="share">分享</string>
+    <string name="permissionNotGranted">没有写入外部存储权限该功能将不能工作。</string>
+    <string name="add_bookmark">添加书签</string>
+    <string name="remove_bookmark">移除书签</string>
+    <string name="bookmarks">书签</string>
+    <string name="no_bookmark_added">未添加书签</string>
+    <string name="bookmark_added">书签已添加</string>
+    <string name="bookmark_removed">书签已移除</string>
+    <string name="undo">撤销</string>
+    <string name="file_is_empty">文件为空</string>
+    <string name="install_remove">安装和移除</string>
+    <string name="loading">载入中…</string>
+
+    <string name="import_certificate">导入ratel授权证书</string>
+    <string name="certificate">证书</string>
+    <string name="ratel_build_meta">构建参数</string>
+    <string name="ratel_op_panel">操作面板</string>
+    <string name="ratel_multi_account">一机多号</string>
+    <string name="ratel_daemon">进程守护</string>
+    <string name="ratel_module_status">插件开关</string>
+    <string name="ratel_force_stop">强杀进程</string>
+    <string name="ratel_switch_device">切换设备</string>
+    <string name="accessibility_service_description">ratel权限提升</string>
+    <string name="delete">删除</string>
+    <string name="active">启用当前账号</string>
+    <string name="ratel_disable_api_switch">禁用API切换</string>
+    <string name="ratel_add_devices_str">新增设备</string>
+    <string name="nav_item_candicate_apps">可感染</string>
+    <string name="ratel_disable_hotmodule">禁用热发插件</string>
+</resources>
