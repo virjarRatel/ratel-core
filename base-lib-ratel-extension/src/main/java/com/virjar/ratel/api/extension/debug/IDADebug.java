@@ -66,18 +66,21 @@ public class IDADebug {
     }
 
 
-    private static IDAServerBinLoader binLoader = is64Bit -> {
-        String idaBinName = is64Bit ? DEFAULT_ANDROID_SERVER_7_0_64 : DEFAULT_ANDROID_SERVER_7_0_32;
-        try (InputStream inputStream = IDADebug.class.getResourceAsStream("/assets/" + idaBinName)) {
-            if (inputStream == null) {
-                Log.e(tag, "can not open resource: " + idaBinName);
-                return null;
+    private static IDAServerBinLoader binLoader = new IDAServerBinLoader() {
+        @Override
+        public byte[] loadAndroidServerBin(boolean is64Bit) {
+            String idaBinName = is64Bit ? DEFAULT_ANDROID_SERVER_7_0_64 : DEFAULT_ANDROID_SERVER_7_0_32;
+            try (InputStream inputStream = IDADebug.class.getResourceAsStream("/assets/" + idaBinName)) {
+                if (inputStream == null) {
+                    Log.e(tag, "can not open resource: " + idaBinName);
+                    return null;
+                }
+                return IOUtils.toByteArray(inputStream);
+            } catch (IOException e) {
+                Log.e(tag, "failed to extract ida bin file", e);
             }
-            return IOUtils.toByteArray(inputStream);
-        } catch (IOException e) {
-            Log.e(tag, "failed to extract ida bin file", e);
+            return null;
         }
-        return null;
     };
 
     public interface IDAServerBinLoader {
@@ -101,7 +104,7 @@ public class IDADebug {
         //return VMRuntime.is64Bit.call(VMRuntime.getRuntime.call());
     }
 
-    private static boolean runIdaBinProcess(File binFile, int debugPort) {
+    private static boolean runIdaBinProcess(final File binFile, int debugPort) {
         if (debugPort <= 0) {
             debugPort = 4689;
         }
@@ -110,7 +113,7 @@ public class IDADebug {
                 Log.w(tag, "set executable failed for file:  " + binFile.getAbsolutePath());
             }
         }
-        int finalDebugPort = debugPort;
+        final int finalDebugPort = debugPort;
         new Thread("adi") {
             @Override
             public void run() {
