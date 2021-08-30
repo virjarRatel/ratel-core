@@ -36,3 +36,5 @@
 -keep class org.jf.dexlib2.Opcode{*;}
 
 -keep class com.android.apksig.internal.**{*;}
+
+-dontwarn
