@@ -1,6 +1,4 @@
-//include ':nativehide'
-include ':authorizer',
-        ':managerbridge',
+include ':managerbridge',
         ':base-lib-ratel-api',
         ':base-lib-ratel-extension',
         ':base-lib-stub',

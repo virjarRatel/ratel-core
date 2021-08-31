@@ -41,11 +41,6 @@ set(RATEL_NATIVE_SOURCE
         arthook/offset.cpp
         arthook/arch/arm32.S
         arthook/arch/arm64.S
-        # 加密算法库
-        authorize/DES.cpp
-        authorize/RatelLicence.cpp
-        authorize/Base64.cpp
-        authorize/RSA.cpp
         # xhook from https://github.com/iqiyi/xHook
         xhook/xhook.c
         xhook/xh_core.c

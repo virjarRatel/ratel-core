@@ -78,12 +78,9 @@ echo java -jar ${transformer_jar} -s ${script_dir}/dist/res/${builder_jar_file_n
 java -jar ${transformer_jar} -s ${script_dir}/dist/res/${builder_jar_file_name}
 
 
-# copy keygen
 cd ${root_dir}
 
-./gradlew authorizer:shadowJar
-cp authorizer/build/libs/ratel-keygen-1.0.0.jar ${script_dir}/dist/res/
-cp ${script_dir}/ratel-keygen.sh ${script_dir}/dist/
+
 
 
 #if [ ! -d /opt/ratel/ ] ;then

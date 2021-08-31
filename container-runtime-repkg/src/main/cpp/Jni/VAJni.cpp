@@ -2,7 +2,6 @@
 // VirtualApp Native Project
 //
 
-#include <authorize/RatelLicence.h>
 #include <MapsHideHandler.h>
 #include "VAJni.h"
 #include "Log.h"
@@ -37,8 +36,6 @@ Java_com_virjar_ratel_NativeBridge_bridgeInitNative(JNIEnv *env, jclass jclazz, 
     jstring sandHookClass = queryClassImplName(env, bindData, "SAND_HOOK");
     jstring sandHookClassNeverCallClass = queryClassImplName(env, bindData,
                                                              "SAND_CLASS_NEVER_CALL");
-    jstring authorizerClass = queryClassImplName(env, bindData, "RATEL_AUTHORIZER");
-
     propertiesMockItemClass = strdup(
             ScopeUtfString(
                     queryClassImplName(env, bindData, "RATEL_PROPERTIES_MOCK_ITEM")).c_str());
@@ -67,14 +64,6 @@ Java_com_virjar_ratel_NativeBridge_bridgeInitNative(JNIEnv *env, jclass jclazz, 
     }
 
 
-    if (authorizerClass == nullptr) {
-        return env->NewStringUTF("can not find class define for :RATEL_AUTHORIZER");
-    }
-    if (!registerAuthorizeMethod(env, ScopeUtfString(authorizerClass).c_str())) {
-        return env->NewStringUTF("register Authorizer method failed");
-    }
-
-
     artMethodSizeTestCLass = strdup(
             ScopeUtfString(queryClassImplName(env, bindData, "SAND_METHOD_SIZE_TEST")).c_str());
 
@@ -95,8 +84,6 @@ Java_com_virjar_ratel_NativeBridge_bridgeInitNative(JNIEnv *env, jclass jclazz, 
 
     sandSandHookClass = strdup(ScopeUtfString(sandHookClass).c_str());
 
-
-    loadRatelLicence(env, context, originPkgName);
     return nullptr;
 }
 

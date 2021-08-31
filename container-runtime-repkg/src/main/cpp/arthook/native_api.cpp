@@ -11,7 +11,6 @@
 #include <elf_util.h>
 #include <Jni/VAJni.h>
 #include <Foundation/dlfcn_nougat.h>
-#include <authorize/RatelLicence.h>
 #include "native_api.h"
 #include "arch/arch.h"
 #include "Substrate/SubstrateHook.h"
@@ -123,13 +122,13 @@ void (*class_init_callback)(void *) = nullptr;
 
 void (*backup_fixup_static_trampolines)(void *, void *) = nullptr;
 
-void *(*backup_mark_class_initialized)(void *, void * , uint32_t *) = nullptr;
+void *(*backup_mark_class_initialized)(void *, void *, uint32_t *) = nullptr;
 
 void (*backup_update_methods_code)(void *, ArtMethod *, const void *) = nullptr;
 
-void* (*make_initialized_classes_visibly_initialized_)(void*, void*, bool) = nullptr;
+void *(*make_initialized_classes_visibly_initialized_)(void *, void *, bool) = nullptr;
 
-void* runtime_instance_ = nullptr;
+void *runtime_instance_ = nullptr;
 
 
 void initHideApi(JNIEnv *env) {
@@ -202,10 +201,6 @@ void initHideApi(JNIEnv *env) {
         }
 
     }
-    if (hasCheckLicence != hasCheckLicenceFlag) {
-        //暗桩
-        return;
-    }
 
 
     //init suspend
@@ -270,7 +265,8 @@ void initHideApi(JNIEnv *env) {
         }
     }
 
-    runtime_instance_ = *reinterpret_cast<void**>(getSymCompat(art_lib_path, "_ZN3art7Runtime9instance_E"));
+    runtime_instance_ = *reinterpret_cast<void **>(getSymCompat(art_lib_path,
+                                                                "_ZN3art7Runtime9instance_E"));
 
 }
 
@@ -436,23 +432,23 @@ void replaceFixupStaticTrampolines(void *thiz, void *clazz_ptr) {
     }
 }
 
-void *replaceMarkClassInitialized(void * thiz, void * self, uint32_t * clazz_ptr) {
+void *replaceMarkClassInitialized(void *thiz, void *self, uint32_t *clazz_ptr) {
     auto result = backup_mark_class_initialized(thiz, self, clazz_ptr);
     if (class_init_callback) {
-        class_init_callback(reinterpret_cast<void*>(*clazz_ptr));
+        class_init_callback(reinterpret_cast<void *>(*clazz_ptr));
     }
     return result;
 }
 
-void replaceUpdateMethodsCode(void *thiz, ArtMethod * artMethod, const void *quick_code) {
+void replaceUpdateMethodsCode(void *thiz, ArtMethod *artMethod, const void *quick_code) {
     if (SandHook::TrampolineManager::get().methodHooked(artMethod)) {
         return; //skip
     }
     backup_update_methods_code(thiz, artMethod, quick_code);
 }
 
-void MakeInitializedClassVisibilyInitialized(void* self){
-    if(make_initialized_classes_visibly_initialized_) {
+void MakeInitializedClassVisibilyInitialized(void *self) {
+    if (make_initialized_classes_visibly_initialized_) {
 #ifdef __LP64__
         constexpr size_t OFFSET_classlinker = 472;
 #else
@@ -465,10 +461,10 @@ void MakeInitializedClassVisibilyInitialized(void* self){
 }
 
 bool hookClassInit(void(*callback)(void *)) {
-    if(SDK_INT >= ANDROID_R) {
+    if (SDK_INT >= ANDROID_R) {
         void *symMarkClassInitialized = getSymCompat(art_lib_path,
                                                      "_ZN3art11ClassLinker20MarkClassInitializedEPNS_6ThreadENS_6HandleINS_6mirror5ClassEEE");
-        if (symMarkClassInitialized == nullptr){
+        if (symMarkClassInitialized == nullptr) {
             return false;
         }
 
@@ -479,7 +475,7 @@ bool hookClassInit(void(*callback)(void *)) {
         // Prevent hooked method from resetting entrypoint by visibilyInitialized
         void *symUpdateMethodsCode = getSymCompat(art_lib_path,
                                                   "_ZN3art15instrumentation15Instrumentation21UpdateMethodsCodeImplEPNS_9ArtMethodEPKv");
-        if (symUpdateMethodsCode == nullptr){
+        if (symUpdateMethodsCode == nullptr) {
             return false;
         }
 
@@ -487,8 +483,10 @@ bool hookClassInit(void(*callback)(void *)) {
                 symUpdateMethodsCode, (void *) replaceUpdateMethodsCode,
                 reinterpret_cast<void **>(&backup_update_methods_code));
 
-        make_initialized_classes_visibly_initialized_ = reinterpret_cast<void* (*)(void*, void*, bool)>(
-                getSymCompat(art_lib_path, "_ZN3art11ClassLinker40MakeInitializedClassesVisiblyInitializedEPNS_6ThreadEb"));
+        make_initialized_classes_visibly_initialized_ = reinterpret_cast<void *(*)(void *, void *,
+                                                                                   bool)>(
+                getSymCompat(art_lib_path,
+                             "_ZN3art11ClassLinker40MakeInitializedClassesVisiblyInitializedEPNS_6ThreadEb"));
 
         if (backup_mark_class_initialized && backup_update_methods_code) {
             ALOGE("hook symMarkClassInitialized success");
@@ -498,7 +496,7 @@ bool hookClassInit(void(*callback)(void *)) {
             ALOGE("hook symMarkClassInitialized failed");
             return false;
         }
-    }else{
+    } else {
         void *symFixupStaticTrampolines = getSymCompat(art_lib_path,
                                                        "_ZN3art11ClassLinker22FixupStaticTrampolinesENS_6ObjPtrINS_6mirror5ClassEEE");
         if (symFixupStaticTrampolines == nullptr) {
