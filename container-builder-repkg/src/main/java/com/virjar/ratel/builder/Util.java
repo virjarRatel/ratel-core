@@ -140,7 +140,7 @@ public class Util {
      * 永远为false，我们不能随便删除不支持的架构so文件，目前发现"全球骑士购"app，可能在读取某些so资源，然后导致app闪退
      */
     @Deprecated
-    static boolean isRatelUnSupportArch(String zipEntryName) {
+    public static boolean isRatelUnSupportArch(String zipEntryName) {
         return false;
 //        if (!zipEntryName.startsWith("lib/")) {
 //            return false;

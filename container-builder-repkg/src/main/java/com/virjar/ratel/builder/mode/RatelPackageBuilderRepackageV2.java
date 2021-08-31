@@ -1,4 +1,7 @@
-package com.virjar.ratel.builder;
+package com.virjar.ratel.builder.mode;
+
+import com.virjar.ratel.builder.BuildParamMeta;
+import com.virjar.ratel.builder.Param;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.tools.zip.ZipFile;

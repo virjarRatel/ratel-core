@@ -1,6 +1,10 @@
-package com.virjar.ratel.builder;
+package com.virjar.ratel.builder.mode;
 
 
+import com.virjar.ratel.builder.BuildParamMeta;
+import com.virjar.ratel.builder.Param;
+import com.virjar.ratel.builder.ReNameEntry;
+import com.virjar.ratel.builder.Util;
 import com.virjar.ratel.builder.manifesthandler.AXmlEditorCmdHandler;
 import com.virjar.ratel.builder.manifesthandler.EnableDebug;
 import com.virjar.ratel.builder.manifesthandler.ReplaceApplication;

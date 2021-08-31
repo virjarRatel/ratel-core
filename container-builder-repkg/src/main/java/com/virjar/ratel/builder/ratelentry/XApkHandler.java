@@ -1,4 +1,4 @@
-package ratelentry;
+package com.virjar.ratel.builder.ratelentry;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;

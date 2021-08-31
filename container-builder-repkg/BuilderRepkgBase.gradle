@@ -77,7 +77,7 @@ shadowJar {
     classifier = null
     version = rootProject.ext.ratelEngineVersion
     manifest {
-        attributes 'Main-Class': 'ratelentry.Main'
+        attributes 'Main-Class': 'com.virjar.ratel.builder.ratelentry.Main'
     }
 }
 

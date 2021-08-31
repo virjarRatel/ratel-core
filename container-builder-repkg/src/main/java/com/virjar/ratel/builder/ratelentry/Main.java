@@ -1,4 +1,4 @@
-package ratelentry;
+package com.virjar.ratel.builder.ratelentry;
 
 import com.alibaba.fastjson.JSONObject;
 import com.android.apksig.ApkSigner;
@@ -17,10 +17,10 @@ import com.virjar.ratel.builder.DexMakerOpt;
 import com.virjar.ratel.builder.DexSplitter;
 import com.virjar.ratel.builder.PackageTrie;
 import com.virjar.ratel.builder.Param;
-import com.virjar.ratel.builder.RatelPackageBuilderAppendDex;
-import com.virjar.ratel.builder.RatelPackageBuilderRepackage;
-import com.virjar.ratel.builder.RatelPackageBuilderShell;
-import com.virjar.ratel.builder.RatelPackageBuilderZelda;
+import com.virjar.ratel.builder.mode.RatelPackageBuilderAppendDex;
+import com.virjar.ratel.builder.mode.RatelPackageBuilderRepackage;
+import com.virjar.ratel.builder.mode.RatelPackageBuilderShell;
+import com.virjar.ratel.builder.mode.RatelPackageBuilderZelda;
 import com.virjar.ratel.builder.ReNameEntry;
 import com.virjar.ratel.builder.Util;
 import com.virjar.ratel.buildsrc.Constants;
@@ -104,7 +104,7 @@ public class Main {
             ratelMain(args, null);
             return;
         }
-        XApkHandler xApkHandler = new XApkHandler(new File(args[xApkIndex]));
+        com.virjar.ratel.builder.ratelentry.XApkHandler xApkHandler = new com.virjar.ratel.builder.ratelentry.XApkHandler(new File(args[xApkIndex]));
 
         args[xApkIndex] = xApkHandler.releasedBaseApkTempFile.getAbsolutePath();
         File file = ratelMain(args, xApkHandler);
@@ -116,7 +116,7 @@ public class Main {
         Main.cleanWorkDir();
     }
 
-    private static File ratelMain(String[] args, XApkHandler xApkHandler) throws Exception {
+    private static File ratelMain(String[] args, com.virjar.ratel.builder.ratelentry.XApkHandler xApkHandler) throws Exception {
         restoreConstants();
         final Options options = new Options();
         options.addOption(new Option("t", "tell", false, "tell me the output apk file path"));

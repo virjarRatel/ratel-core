@@ -38,10 +38,10 @@ import external.com.android.dx.merge.DexMerger;
 
 public class BootstrapCodeInjector {
 
-    static File injectCInit(File dexImage,
-                            File workDir,
-                            File bootstrapAPKDecodeDir,
-                            String className, boolean decodeAllSmali) throws IOException {
+    public static File injectCInit(File dexImage,
+                                   File workDir,
+                                   File bootstrapAPKDecodeDir,
+                                   String className, boolean decodeAllSmali) throws IOException {
         File runtimeSmaliDir = makeSureRuntimeSmaliDir(workDir);
         doStaticLink(className, smaliFile(runtimeSmaliDir, Util.descriptorToDot(className)), bootstrapAPKDecodeDir, runtimeSmaliDir, dexImage, decodeAllSmali, true);
         File rebuildDex = new File(workDir, "injected.dex");
@@ -71,11 +71,11 @@ public class BootstrapCodeInjector {
 
     }
 
-    static File injectBootstrapCode(File dexImage,
-                                    File workDir,
-                                    File bootstrapAPKDecodeDir,
-                                    BuildParamMeta buildParamMeta,
-                                    boolean injectLogComponent, boolean decodeAllSmali
+    public static File injectBootstrapCode(File dexImage,
+                                           File workDir,
+                                           File bootstrapAPKDecodeDir,
+                                           BuildParamMeta buildParamMeta,
+                                           boolean injectLogComponent, boolean decodeAllSmali
     ) throws IOException, DexMergeFailedException {
         if (buildParamMeta.apkMeta.getPackageName().equals(Constants.RATEL_MANAGER_PACKAGE)) {
             //rm 进行代码注入

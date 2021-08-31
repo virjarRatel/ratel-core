@@ -1,6 +1,14 @@
-package com.virjar.ratel.builder;
+package com.virjar.ratel.builder.mode;
 
 
+import com.virjar.ratel.builder.BootstrapCodeInjector;
+import com.virjar.ratel.builder.BuildParamMeta;
+import com.virjar.ratel.builder.DexMergeFailedException;
+import com.virjar.ratel.builder.DexSplitter;
+import com.virjar.ratel.builder.Param;
+import com.virjar.ratel.builder.ShellDetector;
+import com.virjar.ratel.builder.SmaliRebuildFailedException;
+import com.virjar.ratel.builder.Util;
 import com.virjar.ratel.builder.manifesthandler.AXmlEditorCmdHandler;
 import com.virjar.ratel.builder.manifesthandler.EnableDebug;
 import com.virjar.ratel.builder.manifesthandler.RequestLegacyExternalStorage;

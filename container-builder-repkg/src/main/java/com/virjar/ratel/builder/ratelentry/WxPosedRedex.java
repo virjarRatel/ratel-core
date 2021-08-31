@@ -1,4 +1,4 @@
-package ratelentry;
+package com.virjar.ratel.builder.ratelentry;
 
 import com.google.common.io.ByteStreams;
 import com.virjar.ratel.builder.PackageTrie;

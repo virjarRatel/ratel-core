@@ -29,7 +29,7 @@
 -dontusemixedcaseclassnames
 
 # ratel 框架入口class
--keep  class ratelentry.Main {
+-keep  class com.virjar.ratel.builder.ratelentry.Main {
     public static void main( java.lang.String[]);
 }
 

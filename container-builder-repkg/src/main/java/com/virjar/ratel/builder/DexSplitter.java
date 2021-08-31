@@ -32,7 +32,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 public class DexSplitter {
-    static File splitDex(File originDex, File workDir, BuildParamMeta buildParamMeta) {
+    public static File splitDex(File originDex, File workDir, BuildParamMeta buildParamMeta) {
 
         Set<String> classes = extractClasses(buildParamMeta);
         classes.add(buildParamMeta.appEntryClass);
