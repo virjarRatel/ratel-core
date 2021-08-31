@@ -15,7 +15,6 @@
  */
 package org.jf.pxb.googlecode.dex2jar.reader.io;
 
-import net.dongliu.apk.parser.utils.Buffers;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -23,7 +22,6 @@ import java.nio.ByteBuffer;
 import java.util.Stack;
 
 /**
- *
  * @author <a href="mailto:pxb1988@gmail.com">Panxiaobo</a>
  * @version $Rev: bc7edba47c4f $
  */
@@ -127,7 +125,7 @@ public class ArrayDataIn extends ByteArrayInputStream implements DataIn {
      * read encoding len.
      * see StringPool.cpp ENCODE_LENGTH
      */
-    public  int readLen() {
+    public int readLen() {
         int len = 0;
         int i = readUByte();
         if ((i & 0x80) != 0) {
@@ -144,7 +142,7 @@ public class ArrayDataIn extends ByteArrayInputStream implements DataIn {
      * read encoding len.
      * see Stringpool.cpp ENCODE_LENGTH
      */
-    public   int readLen16() {
+    public int readLen16() {
         int len = 0;
         int i = readUShortx();
         if ((i & 0x8000) != 0) {

@@ -49,6 +49,8 @@ dependencies {
     compile 'org.antlr:stringtemplate:3.2.1'
     compile 'org.yaml:snakeyaml:1.18:android'
     compile group: 'net.dongliu', name: 'apk-parser', version: '2.6.10'
+    compile project(':base-lib-apksigner')
+    compile project(':base-lib-pxb-axml')
 }
 
 sourceCompatibility = 1.8
