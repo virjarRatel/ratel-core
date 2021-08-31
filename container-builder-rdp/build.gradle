@@ -21,6 +21,8 @@ dependencies {
     api 'commons-io:commons-io:2.6'
     api 'commons-cli:commons-cli:1.4'
     api 'org.apache.commons:commons-lang3:3.7'
+    api project(':base-lib-apksigner')
+
 }
 
 sourceCompatibility = "8"
