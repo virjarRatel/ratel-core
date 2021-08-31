@@ -76,6 +76,6 @@ configurations.all {
 }
 
 ext {
-    ratelEngineVersionCode = 34
-    ratelEngineVersion = "1.5.1"
+    ratelEngineVersionCode = 35
+    ratelEngineVersion = "2.0.0-SNAPSHOT"
 }
