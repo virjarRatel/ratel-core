@@ -8,31 +8,6 @@ ENABLE_LANGUAGE(ASM)
 set(LIBRARY_NAME ${LIB_NAME})
 
 
-set(DobbyHome Dobby)
-include_directories(
-        ${DobbyHome}/include
-        ${DobbyHome}/builtin-plugin
-        ${DobbyHome}/builtin-plugin/SymbolResolver
-        ${DobbyHome}/builtin-plugin/AndroidRestriction
-        ${DobbyHome}/external/logging
-)
-macro(SET_OPTION option value)
-    set(${option} ${value} CACHE INTERNAL "" FORCE)
-endmacro()
-IF (CMAKE_BUILD_TYPE STREQUAL Release)
-    SET_OPTION(DOBBY_DEBUG OFF)
-ELSE ()
-    SET_OPTION(DOBBY_DEBUG ON)
-ENDIF ()
-
-SET_OPTION(DOBBY_GENERATE_SHARED OFF)
-SET_OPTION(DynamicBinaryInstrument ON)
-SET_OPTION(NearBranch ON)
-SET_OPTION(Plugin.SymbolResolver ON)
-add_subdirectory(${DobbyHome} dobby)
-
-include_directories(${DobbyHome}/source)
-
 
 set(RATEL_NATIVE_SOURCE
         Jni/VAJni.cpp
@@ -92,8 +67,7 @@ set(RATEL_NATIVE_SOURCE
         MapHide/pmparser.c
         MapHide/MapsHideHandler.cpp
 
-        ele7enxxh/inlineHook.c
-        ele7enxxh/relocate.c
+
         )
 include_directories(Foundation)
 include_directories(Jni)
@@ -130,7 +104,7 @@ set(RATEL_SOURCE ${RATEL_NATIVE_SOURCE})
 
 add_library(${LIBRARY_NAME} SHARED ${RATEL_SOURCE})
 
-target_link_libraries(${LIBRARY_NAME} log dobby)
+target_link_libraries(${LIBRARY_NAME} log)
 
 
 ## anrdetector
@@ -144,7 +118,7 @@ set(HIDDEN_NATIVE_SOURCE
         MapHide/pmparser.c
         MapHide/MapsHideHandler.cpp
         MapHide/nativeHideJni.cpp
-        Jni/Helper.cpp
+#        Jni/Helper.cpp
         )
 add_library("ratelhide" SHARED ${HIDDEN_NATIVE_SOURCE})
 

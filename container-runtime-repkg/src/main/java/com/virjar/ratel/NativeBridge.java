@@ -60,7 +60,7 @@ public class NativeBridge {
     }
 
 
-    private static native String bridgeInitNative(Map<String, String> bindData, Context context, String originPkgName, boolean useDobby);
+    private static native String bridgeInitNative(Map<String, String> bindData, Context context, String originPkgName);
 
     public static String onGetSystemProperties(String key, String value) {
         return SystemPropertiesFake.onGetSystemProperties(key, value);
@@ -82,7 +82,7 @@ public class NativeBridge {
 
         boolean useDobby = BooleanUtils.toBoolean(RatelConfig.getConfig("RATEL_INLINE_HOOK_DOBBY", "false"));
 
-        String errorMessage = bridgeInitNative(bindData, RatelRuntime.getOriginContext(), RatelRuntime.originPackageName, useDobby);
+        String errorMessage = bridgeInitNative(bindData, RatelRuntime.getOriginContext(), RatelRuntime.originPackageName);
         if (errorMessage == null) {
             return;
         }

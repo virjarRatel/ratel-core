@@ -23,11 +23,10 @@
 #include "Symbol.h"
 #include "Log.h"
 #include "MapsRedirector.h"
-#include "xhook.h"
-//#include "ratel_build_type.h"
 #include "ExecveHandler.h"
 #include "MacAddressFake.h"
 #include <MapsHideHandler.h>
+#include <xhook.h>
 
 #if defined(__LP64__)
 #define LINKER_PATH "/system/bin/linker64"

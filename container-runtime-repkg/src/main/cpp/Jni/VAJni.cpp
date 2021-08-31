@@ -17,7 +17,6 @@ char *sandHookConfigClass;
 char *sandHookPendingHookHandlerClass;
 char *propertiesMockItemClass;
 char *selfExplosionClass;
-bool USE_INLINE_HOOK_DOBBY;
 
 jstring queryClassImplName(JNIEnv *env, jobject bindData, const char *key) {
     jclass mapClass = env->FindClass(JAVA_MAP_CLASS_NAME);
@@ -32,10 +31,8 @@ jstring queryClassImplName(JNIEnv *env, jobject bindData, const char *key) {
 extern "C"
 jstring JNICALL
 Java_com_virjar_ratel_NativeBridge_bridgeInitNative(JNIEnv *env, jclass jclazz, jobject bindData,
-                                                    jobject context, jstring originPkgName,
-                                                    jboolean useDobby) {
+                                                    jobject context, jstring originPkgName) {
 
-    USE_INLINE_HOOK_DOBBY = useDobby;
     jstring ratelNativeClass = queryClassImplName(env, bindData, "RATEL_NATIVE");
     jstring sandHookClass = queryClassImplName(env, bindData, "SAND_HOOK");
     jstring sandHookClassNeverCallClass = queryClassImplName(env, bindData,
@@ -120,7 +117,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *_vm, void *reserved) {
             env->FindClass(RATEL_NATIVE_BRIDGE_CLASS_NAME)));
     static JNINativeMethod bridgeIntMethod[] = {
             //java.util.Map android.content.Context
-            {"bridgeInitNative", "(Ljava/util/Map;Landroid/content/Context;Ljava/lang/String;Z)Ljava/lang/String;", (void *) Java_com_virjar_ratel_NativeBridge_bridgeInitNative}
+            {"bridgeInitNative", "(Ljava/util/Map;Landroid/content/Context;Ljava/lang/String;)Ljava/lang/String;", (void *) Java_com_virjar_ratel_NativeBridge_bridgeInitNative}
     };
     if (env->RegisterNatives(nativeBridgeClass, bridgeIntMethod, 1) < 0) {
         ALOGE("register bridgeInitNative method failed");
