@@ -101,5 +101,5 @@ dependencies {
     api project(':base-lib-ratel-api')
     api project(':managerbridge')
     api project(path: ':base-lib-dx')
-    api project(':nativehide')
+//    api project(':nativehide')
 }

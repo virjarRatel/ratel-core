@@ -145,7 +145,7 @@ void IOUniformer::init_env_before_all() {
         startIOHook(api_level, false);
     }
     //子进程需要进行一次maps hide，否则子进程会有泄漏 libratelnative_64.so
-    doMapsHide();
+    doMapsHide(true);
 }
 
 static inline void

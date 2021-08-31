@@ -137,3 +137,15 @@ target_link_libraries(${LIBRARY_NAME} log dobby)
 add_executable(libratelanr.so
         anr/anrDetector.cpp)
 target_link_libraries(libratelanr.so log)
+
+set(HIDDEN_NATIVE_SOURCE
+        MapHide/hide.cpp
+        MapHide/wrap.cpp
+        MapHide/pmparser.c
+        MapHide/MapsHideHandler.cpp
+        MapHide/nativeHideJni.cpp
+        Jni/Helper.cpp
+        )
+add_library("ratelhide" SHARED ${HIDDEN_NATIVE_SOURCE})
+
+target_link_libraries("ratelhide" log)

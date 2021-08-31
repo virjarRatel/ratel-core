@@ -7,5 +7,5 @@
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_virjar_ratel_nativehide_NativeHide_doHide(JNIEnv *env, jclass clazz) {
-    doMapsHide();
+    doMapsHide(false);
 }

@@ -111,7 +111,7 @@ jclass nativeBridgeClass;
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *_vm, void *reserved) {
     //first time to hidden self
-    doMapsHide();
+    doMapsHide(true);
     vm = _vm;
     JNIEnv *env;
     _vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6);

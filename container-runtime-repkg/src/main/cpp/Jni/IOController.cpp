@@ -217,7 +217,7 @@ Java_com_virjar_ratel_RatelNative_traceFilePath(JNIEnv *env, jclass jclazz, jstr
 extern "C"
 void JNICALL
 Java_com_virjar_ratel_RatelNative_hideMaps(JNIEnv *env, jclass clazz) {
-    doMapsHide();
+    doMapsHide(true);
 }
 
 extern "C"

@@ -109,7 +109,7 @@ static bool filter_for_ratel(const char *mapsLine) {
     return strstr(mapsLine, "ratel_container-driver") != nullptr;
 }
 
-int riru_hide() {
+int riru_hide(bool isMainLib) {
     MLOGI("call riru_hide");
     procmaps_iterator *maps = pmparser_parse(getpid());
     if (maps == nullptr) {
@@ -122,12 +122,21 @@ int riru_hide() {
     size_t data_count = 0;
     procmaps_struct *maps_tmp;
     while ((maps_tmp = pmparser_next(maps)) != nullptr) {
-        if (!start_with(maps_tmp->pathname, "/data/")) {
-            continue;
+        if (isMainLib) {
+            // 主lib中，隐藏除开自己的其他so文件
+            if (!start_with(maps_tmp->pathname, "/data/")) {
+                continue;
+            }
+            if (!filter_for_ratel(maps_tmp->pathname)) {
+                continue;
+            }
+        } else {
+            // 非主lib中，隐藏 libratelnative
+            if (!strstr(maps_tmp->pathname, "libratelnative")) {
+                continue;
+            }
         }
-        if (!filter_for_ratel(maps_tmp->pathname)) {
-            continue;
-        }
+
         MLOGI("find maps relate feature filed:%s", maps_tmp->pathname);
 
         auto start = (uintptr_t) maps_tmp->addr_start;

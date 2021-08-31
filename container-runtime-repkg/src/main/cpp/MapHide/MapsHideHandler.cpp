@@ -5,6 +5,6 @@
 #include "MapsHideHandler.h"
 #include "hide.h"
 
-void doMapsHide() {
-    riru_hide();
+void doMapsHide(bool  isMainLib) {
+    riru_hide(isMainLib);
 }
