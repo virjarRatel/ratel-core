@@ -17,6 +17,7 @@ include ':base-lib-allcommon',
         ':container-builder-repkg',
         ':container-runtime-repkg-bootstrap',
         ':container-builder-transformer',
+        ':container-builder-helper',
         ':container-builder-rdp',
         ':crack-demoapp',
         ':demoapp'

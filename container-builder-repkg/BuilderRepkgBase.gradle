@@ -12,6 +12,7 @@ buildscript {
     }
 }
 import com.virjar.ratel.allcommon.Constants
+import com.virjar.ratel.allcommon.NewConstants
 
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
@@ -162,6 +163,17 @@ task injectRDPJar(type: Copy) {
 
 injectRDPJar.dependsOn(':container-builder-rdp:assemble')
 processResources.dependsOn(injectRDPJar)
+
+task injectBuilderHelperJar(type: Copy) {
+    from '../container-builder-helper/build/libs/BuilderHelper-1.0.jar'
+    into 'src/main/resources/'
+    rename {
+        NewConstants.BUILDER_RESOURCE_LAYOUT.BUILDER_HELPER_NAME
+    }
+}
+
+injectBuilderHelperJar.dependsOn(':container-builder-helper:assemble')
+processResources.dependsOn(injectBuilderHelperJar)
 
 task storeBuildConstantsProperties() {
 

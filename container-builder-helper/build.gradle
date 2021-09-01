@@ -1,0 +1,45 @@
+buildscript {
+    repositories {
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+    }
+
+    dependencies {
+        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.4"
+    }
+}
+
+apply plugin: 'java-library'
+apply plugin: "com.github.johnrengelman.shadow"
+
+sourceSets.main.resources.srcDir 'src/main/resources'
+
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    api project(':base-lib-d8')
+    api project(":base-lib-dx")
+    api 'commons-cli:commons-cli:1.4'
+    api 'commons-io:commons-io:2.6'
+    api 'org.apache.ant:ant:1.10.5'
+    api 'com.google.guava:guava:24.1-jre'
+    api 'org.smali:dexlib2:2.2.7'
+    api 'org.smali:util:2.2.7'
+    api 'org.smali:baksmali:2.2.7'
+    api 'org.smali:smali:2.2.7'
+
+}
+
+sourceCompatibility = "8"
+targetCompatibility = "8"
+
+jar.enabled = false
+shadowJar {
+    baseName = 'BuilderHelper'
+    //classifier是生成jar包的后缀
+    classifier = null
+    version = 1.0
+    manifest {
+        attributes 'Main-Class': 'com.virjar.ratel.builder.helper.Main'
+    }
+}
+assemble.dependsOn(shadowJar)
