@@ -14,7 +14,7 @@ import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.virjar.ratel.buildsrc.Constants;
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.utils.ProcessUtil;
 
 import org.json.JSONArray;

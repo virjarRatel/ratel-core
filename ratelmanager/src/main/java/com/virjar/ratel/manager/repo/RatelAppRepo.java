@@ -6,7 +6,7 @@ import android.content.pm.PackageManager;
 import android.util.Log;
 
 import com.raizlabs.android.dbflow.sql.language.SQLite;
-import com.virjar.ratel.buildsrc.Constants;
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.manager.model.RatelApp;
 
 import java.io.IOException;

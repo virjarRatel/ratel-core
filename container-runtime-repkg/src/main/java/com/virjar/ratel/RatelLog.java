@@ -2,7 +2,7 @@ package com.virjar.ratel;
 
 import android.util.Log;
 
-import com.virjar.ratel.buildsrc.Constants;
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.runtime.RatelRuntime;
 
 

@@ -12,9 +12,9 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.virjar.ratel.RatelNative;
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.api.RatelToolKit;
 import com.virjar.ratel.api.rposed.RposedHelpers;
-import com.virjar.ratel.buildsrc.Constants;
 import com.virjar.ratel.envmock.binder.handlers.IPhoneSubInfoManagerHandler;
 import com.virjar.ratel.envmock.binder.handlers.ISUBManagerHandler;
 import com.virjar.ratel.envmock.binder.handlers.PackageManagerHandler;

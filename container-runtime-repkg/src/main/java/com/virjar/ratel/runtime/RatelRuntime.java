@@ -19,13 +19,13 @@ import android.util.Log;
 
 import com.virjar.ratel.NativeBridge;
 import com.virjar.ratel.RatelNative;
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.api.RatalStartUpCallback;
 import com.virjar.ratel.api.RatelEngine;
 import com.virjar.ratel.api.RatelEngineUpgradeEvent;
 import com.virjar.ratel.api.RatelToolKit;
 import com.virjar.ratel.api.SDK_VERSION_CODES;
 import com.virjar.ratel.api.rposed.RposedHelpers;
-import com.virjar.ratel.buildsrc.Constants;
 import com.virjar.ratel.core.runtime.BuildConfig;
 import com.virjar.ratel.envmock.EnvMockController;
 import com.virjar.ratel.hook.sandcompat.XposedCompat;

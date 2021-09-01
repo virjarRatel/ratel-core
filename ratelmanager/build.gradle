@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
-import com.virjar.ratel.buildsrc.Constants;
-
+import com.virjar.ratel.allcommon.Constants
 android {
     compileSdkVersion 28
 
@@ -68,11 +67,11 @@ dependencies {
     implementation "com.github.Raizlabs.DBFlow:dbflow-core:${dbflow_version}"
     implementation "com.github.Raizlabs.DBFlow:dbflow:${dbflow_version}"
     implementation 'com.alibaba:fastjson:1.2.10'
-    implementation 'com.virjar:ratel-base:1.0'
 
     implementation 'com.jaredrummler:android-processes:1.1.1'
     implementation project(':managerbridge')
     implementation project(':base-lib-ratel-api')
+    implementation (name: 'base-lib-allcommon', ext: 'jar')
 
     // shizukuk支持adb提权，即在非root模式下拥有shell权限
     api(group: 'dev.rikka.shizuku', name: "api", version: '11.0.2', ext: 'aar')

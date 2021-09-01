@@ -11,11 +11,11 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.api.RatelEngine;
 import com.virjar.ratel.api.rposed.RC_MethodHook;
 import com.virjar.ratel.api.rposed.RposedBridge;
 import com.virjar.ratel.api.rposed.RposedHelpers;
-import com.virjar.ratel.buildsrc.Constants;
 import com.virjar.ratel.runtime.RatelConfig;
 import com.virjar.ratel.runtime.RatelEnvironment;
 import com.virjar.ratel.runtime.RatelRuntime;

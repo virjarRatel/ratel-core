@@ -25,7 +25,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.virjar.ratel.buildsrc.Constants;
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.manager.BuildConfig;
 import com.virjar.ratel.manager.ManagerInitiazer;
 import com.virjar.ratel.manager.R;

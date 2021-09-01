@@ -4,12 +4,12 @@ import android.content.Context;
 import android.os.Build;
 import android.util.Log;
 
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.api.RatelToolKit;
 import com.virjar.ratel.api.SuffixTrimUtils;
 import com.virjar.ratel.api.inspect.ClassLoadMonitor;
 import com.virjar.ratel.api.rposed.RC_MethodHook;
 import com.virjar.ratel.api.rposed.RposedHelpers;
-import com.virjar.ratel.buildsrc.Constants;
 import com.virjar.ratel.runtime.MultiUserManager;
 import com.virjar.ratel.runtime.RatelEnvironment;
 import com.virjar.ratel.runtime.RatelRuntime;

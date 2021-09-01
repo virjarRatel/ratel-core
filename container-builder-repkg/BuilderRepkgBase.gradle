@@ -1,19 +1,17 @@
+
 buildscript {
     repositories {
-        maven {
-            credentials {
-                username '5fb7a10411b2334fb0005fb7'
-                password 'H_]pcyHQL4c7'
+        repositories {
+            flatDir {
+                dir rootProject.file('base-lib-allcommon-lib')
             }
-            url 'https://packages.aliyun.com/maven/repository/2049610-release-qeKbaa/'
         }
     }
-
     dependencies {
-        classpath 'com.virjar:ratel-base:1.2'
+        classpath (name: 'base-lib-allcommon', ext: 'jar')
     }
 }
-import com.virjar.ratel.buildsrc.Constants
+import com.virjar.ratel.allcommon.Constants
 
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
@@ -33,7 +31,6 @@ dependencies {
     //android版本的fastjson要小很多，可以节约500k的大小
     compile 'com.alibaba:fastjson:1.1.71.android'
     compile 'commons-cli:commons-cli:1.4'
-    compile 'com.virjar:ratel-base:1.2'
     compile project(':base-lib-dx')
     // https://mvnrepository.com/artifact/org.apache.ant/ant
     //这个里面代码太大了，为了精简最终apk，我们只把zip模块代码抽离出来
@@ -51,6 +48,7 @@ dependencies {
     compile group: 'net.dongliu', name: 'apk-parser', version: '2.6.10'
     compile project(':base-lib-apksigner')
     compile project(':base-lib-pxb-axml')
+    compile (name: 'base-lib-allcommon', ext: 'jar')
 }
 
 sourceCompatibility = 1.8

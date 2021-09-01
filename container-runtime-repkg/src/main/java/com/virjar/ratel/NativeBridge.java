@@ -4,7 +4,7 @@ import android.content.Context;
 import android.support.annotation.Keep;
 import android.util.Log;
 
-import com.virjar.ratel.buildsrc.Constants;
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.core.runtime.BuildConfig;
 import com.virjar.ratel.envmock.PropertiesMockItem;
 import com.virjar.ratel.envmock.SystemPropertiesFake;

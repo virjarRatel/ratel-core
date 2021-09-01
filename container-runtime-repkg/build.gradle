@@ -1,4 +1,4 @@
-import com.virjar.ratel.buildsrc.Constants
+import com.virjar.ratel.allcommon.Constants
 
 apply plugin: 'com.android.application'
 
@@ -97,9 +97,9 @@ dependencies {
     api 'com.android.support:support-annotations:28.0.0'
 
     compileOnly project(':base-lib-stub')
-    api 'com.virjar:ratel-base:1.2'
     api project(':base-lib-ratel-api')
     api project(':managerbridge')
     api project(path: ':base-lib-dx')
+    implementation (name: 'base-lib-allcommon', ext: 'jar')
 //    api project(':nativehide')
 }

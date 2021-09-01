@@ -9,7 +9,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
 
-import com.virjar.ratel.buildsrc.Constants;
 import com.virjar.ratel.manager.BuildConfig;
 import com.virjar.ratel.manager.RatelManagerApp;
 import com.virjar.ratel.manager.ShellStartActivityService;

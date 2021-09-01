@@ -1,9 +1,11 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-
     repositories {
         repositories {
+            flatDir {
+                dir rootProject.file('base-lib-allcommon-lib')
+            }
             maven {
                 name "aliyunCentral"
                 url "https://maven.aliyun.com/repository/central"
@@ -11,13 +13,6 @@ buildscript {
             maven {
                 name "aliyunGoogle"
                 url "https://maven.aliyun.com/repository/google"
-            }
-            maven {
-                credentials {
-                    username '5fb7a10411b2334fb0005fb7'
-                    password 'H_]pcyHQL4c7'
-                }
-                url 'https://packages.aliyun.com/maven/repository/2049610-release-qeKbaa/'
             }
             maven {
                 name "aliyunJCenter"
@@ -28,8 +23,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.4.1'
         classpath 'net.sf.proguard:proguard-gradle:6.1.1'
-        classpath 'com.virjar:ratel-base:1.2'
-
+        classpath (name: 'base-lib-allcommon', ext: 'jar')
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -38,6 +32,9 @@ buildscript {
 allprojects {
     repositories {
         repositories {
+            flatDir {
+                dir rootProject.file('base-lib-allcommon-lib')
+            }
             maven {
                 name "aliyunCentral"
                 url "https://maven.aliyun.com/repository/central"
@@ -45,13 +42,6 @@ allprojects {
             maven {
                 name "aliyunGoogle"
                 url "https://maven.aliyun.com/repository/google"
-            }
-            maven {
-                credentials {
-                    username '5fb7a10411b2334fb0005fb7'
-                    password 'H_]pcyHQL4c7'
-                }
-                url 'https://packages.aliyun.com/maven/repository/2049610-release-qeKbaa/'
             }
 
             maven {

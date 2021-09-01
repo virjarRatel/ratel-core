@@ -1,9 +1,9 @@
 package com.virjar.ratel.builder.ratelentry;
 
 import com.google.common.io.ByteStreams;
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.builder.PackageTrie;
 import com.virjar.ratel.builder.Util;
-import com.virjar.ratel.buildsrc.Constants;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;

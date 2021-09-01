@@ -14,11 +14,11 @@ import android.telephony.CellInfoWcdma;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.api.RatelToolKit;
 import com.virjar.ratel.api.SuffixTrimUtils;
 import com.virjar.ratel.api.rposed.RposedBridge;
 import com.virjar.ratel.api.rposed.RposedHelpers;
-import com.virjar.ratel.buildsrc.Constants;
 import com.virjar.ratel.hook.RatelHookFlagMethodCallback;
 import com.virjar.ratel.runtime.RatelConfig;
 import com.virjar.ratel.runtime.RatelEnvironment;

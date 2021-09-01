@@ -3,9 +3,9 @@ package com.virjar.ratel.runtime.apibridge;
 import android.content.Context;
 import android.util.Log;
 
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.api.HookProvider;
 import com.virjar.ratel.api.rposed.RC_MethodHook;
-import com.virjar.ratel.buildsrc.Constants;
 import com.virjar.ratel.hook.ContextAttachCollector;
 import com.virjar.ratel.hook.sandcompat.XposedCompat;
 

@@ -32,7 +32,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.virjar.ratel.buildsrc.Constants;
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.manager.AppDaemonTaskManager;
 import com.virjar.ratel.manager.R;
 import com.virjar.ratel.manager.RatelManagerApp;

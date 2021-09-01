@@ -9,7 +9,7 @@ import android.util.Log;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
-import com.virjar.ratel.buildsrc.Constants;
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.manager.ManagerInitiazer;
 import com.virjar.ratel.manager.model.RatelModule;
 import com.virjar.ratel.manager.model.SchedulerTask;

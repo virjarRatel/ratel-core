@@ -1,4 +1,5 @@
-include ':managerbridge',
+include ':base-lib-allcommon',
+        ':managerbridge',
         ':base-lib-ratel-api',
         ':base-lib-ratel-extension',
         ':base-lib-stub',

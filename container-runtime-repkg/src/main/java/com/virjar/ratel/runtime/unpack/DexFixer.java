@@ -18,8 +18,8 @@ package com.virjar.ratel.runtime.unpack;
 
 import android.util.Log;
 
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.api.ui.util.Constant;
-import com.virjar.ratel.buildsrc.Constants;
 
 import java.io.File;
 import java.io.FileInputStream;

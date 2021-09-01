@@ -17,7 +17,7 @@ import android.util.Log;
 import com.jaredrummler.android.processes.AndroidProcesses;
 import com.jaredrummler.android.processes.models.AndroidAppProcess;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
-import com.virjar.ratel.buildsrc.Constants;
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.manager.AppDaemonTaskManager;
 import com.virjar.ratel.manager.BuildConfig;
 import com.virjar.ratel.manager.ManagerInitiazer;

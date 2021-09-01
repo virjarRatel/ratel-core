@@ -10,6 +10,8 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.virjar.ratel.allcommon.Constants;
+import com.virjar.ratel.allcommon.StandardEncryptor;
 import com.virjar.ratel.builder.AndroidJarUtil;
 import com.virjar.ratel.builder.BootstrapCodeInjector;
 import com.virjar.ratel.builder.BuildParamMeta;
@@ -23,8 +25,6 @@ import com.virjar.ratel.builder.mode.RatelPackageBuilderShell;
 import com.virjar.ratel.builder.mode.RatelPackageBuilderZelda;
 import com.virjar.ratel.builder.ReNameEntry;
 import com.virjar.ratel.builder.Util;
-import com.virjar.ratel.buildsrc.Constants;
-import com.virjar.ratel.buildsrc.StandardEncryptor;
 
 import net.dongliu.apk.parser.ApkFile;
 import net.dongliu.apk.parser.ApkParsers;

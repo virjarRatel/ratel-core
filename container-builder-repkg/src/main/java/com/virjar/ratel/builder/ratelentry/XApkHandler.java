@@ -3,7 +3,7 @@ package com.virjar.ratel.builder.ratelentry;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.virjar.ratel.buildsrc.Constants;
+import com.virjar.ratel.allcommon.Constants;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;

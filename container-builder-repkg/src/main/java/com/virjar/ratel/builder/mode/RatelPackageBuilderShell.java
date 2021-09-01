@@ -1,10 +1,10 @@
 package com.virjar.ratel.builder.mode;
 
 
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.builder.BuildParamMeta;
 import com.virjar.ratel.builder.Param;
 import com.virjar.ratel.builder.Util;
-import com.virjar.ratel.buildsrc.Constants;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.io.IOUtils;

@@ -1,20 +1,12 @@
-import com.virjar.ratel.buildsrc.Constants
+import com.virjar.ratel.allcommon.Constants
 
 buildscript {
     repositories {
         maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
-        maven {
-            credentials {
-                username '5fb7a10411b2334fb0005fb7'
-                password 'H_]pcyHQL4c7'
-            }
-            url 'https://packages.aliyun.com/maven/repository/2049610-release-qeKbaa/'
-        }
     }
 
     dependencies {
         classpath "com.github.jengelman.gradle.plugins:shadow:2.0.4"
-        classpath "com.virjar:ratel-base:1.2"
     }
 }
 

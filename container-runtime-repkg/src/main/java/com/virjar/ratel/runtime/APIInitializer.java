@@ -6,11 +6,11 @@ import android.util.Log;
 
 import com.virjar.ratel.RatelNative;
 import com.virjar.ratel.RatelVersion;
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.api.DexMakerProxyBuilder;
 import com.virjar.ratel.api.DexMakerProxyBuilderHelper;
 import com.virjar.ratel.api.FingerPrintModel;
 import com.virjar.ratel.api.RatelToolKit;
-import com.virjar.ratel.buildsrc.Constants;
 import com.virjar.ratel.envmock.SdcardFake;
 import com.virjar.ratel.manager.bridge.IRatelManagerClientRegister;
 import com.virjar.ratel.runtime.apibridge.ContentProviderFakeRegisterImpl;

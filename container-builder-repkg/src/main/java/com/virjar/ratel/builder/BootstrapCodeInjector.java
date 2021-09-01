@@ -3,7 +3,7 @@ package com.virjar.ratel.builder;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.virjar.ratel.buildsrc.Constants;
+import com.virjar.ratel.allcommon.Constants;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;

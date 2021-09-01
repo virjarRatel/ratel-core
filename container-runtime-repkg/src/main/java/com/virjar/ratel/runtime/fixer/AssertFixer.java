@@ -14,9 +14,9 @@ import android.util.Log;
 import android.view.Display;
 
 import com.virjar.ratel.RatelNative;
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.api.rposed.RC_MethodHook;
 import com.virjar.ratel.api.rposed.RposedHelpers;
-import com.virjar.ratel.buildsrc.Constants;
 import com.virjar.ratel.runtime.RatelEnvironment;
 import com.virjar.ratel.runtime.RatelRuntime;
 import com.virjar.ratel.utils.BuildCompat;

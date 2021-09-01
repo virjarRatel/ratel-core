@@ -2,7 +2,8 @@ package com.virjar.ratel.hook.sandcompat.utils;
 
 import android.util.Log;
 
-import com.virjar.ratel.buildsrc.Constants;
+
+import com.virjar.ratel.allcommon.Constants;
 
 import java.lang.reflect.Member;
 

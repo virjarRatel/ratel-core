@@ -2,7 +2,7 @@ package com.virjar.ratel.hook.sandcompat.hookstub;
 
 import android.util.Log;
 
-import com.virjar.ratel.buildsrc.Constants;
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.sandhook.SandHook;
 import com.virjar.ratel.sandhook.SandHookMethodResolver;
 import com.virjar.ratel.sandhook.utils.ParamWrapper;

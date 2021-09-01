@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSONObject;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
-import com.virjar.ratel.buildsrc.StandardEncryptor;
+import com.virjar.ratel.allcommon.StandardEncryptor;
 import com.virjar.ratel.manager.RatelManagerApp;
 import com.virjar.ratel.manager.model.RatelCertificate;
 import com.virjar.ratel.manager.model.RatelLicenceContainer;
