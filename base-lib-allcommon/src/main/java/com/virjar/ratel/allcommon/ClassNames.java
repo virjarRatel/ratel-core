@@ -5,16 +5,27 @@ package com.virjar.ratel.allcommon;
  * 所以className在这里管理，如果未来ratel存在对抗，需要修改className，那么需要同步修改这张表
  */
 public enum ClassNames {
+    //构建工具链优化器入口
     BUILDER_HELPER_MAIN("com.virjar.ratel.builder.helper.Main"),
+    //重打包构建工具入口
     BUILDER_MAIN("com.virjar.ratel.builder.ratelentry.Main"),
+
+    // dex重编Android代码植入入口
     INJECT_REBUILD_BOOTSTRAP("com.virjar.ratel.inject.template.rebuild.BootStrap"),
     INJECT_REBUILD_BOOTSTRAP_CINT("com.virjar.ratel.inject.template.rebuild.BootStrapWithStaticInit"),
 
+    // AndroidManifest入口替换代码植入入口
+    INJECT_APPEND_APPLICATION("com.virjar.ratel.inject.template.append.RatelMultiDexApplication"),
 
+    // app包名rename模式功能入口
+    INJECT_ZELDA_APPLICATION("com.virjar.ratel.inject.template.zelda.RatelZeldaApplication"),
+
+    // magisk和aosp源码自定义模式代码入口
+    INJECT_KRATOS_BOOTSTRAP("com.virjar.ratel.inject.template.kratos.KratosBootstrap"),
+
+    // smali工具类集合
     INJECT_TOOL_SMALI_LOG("com.virjar.ratel.inject.template.RatelSmaliLog"),
     INJECT_TOOL_EVENT_NOTIFIER("com.virjar.ratel.inject.template.EventNotifier"),
-
-
     ;
 
     ClassNames(String className) {
