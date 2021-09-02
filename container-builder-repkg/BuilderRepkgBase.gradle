@@ -118,7 +118,7 @@ task injectBuilderHelperJar(type: Copy) {
     from '../container-builder-helper/build/libs/BuilderHelper-1.0.jar'
     into 'src/main/resources/'
     rename {
-        NewConstants.BUILDER_RESOURCE_LAYOUT.BUILDER_HELPER_NAME2.NAME
+        NewConstants.BUILDER_RESOURCE_LAYOUT.BUILDER_HELPER_NAME.NAME
     }
 }
 

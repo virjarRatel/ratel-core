@@ -77,7 +77,7 @@ public class OptimizeBuilderResource {
         Enumeration<ZipEntry> entries = zipFile.getEntries();
         while (entries.hasMoreElements()) {
             ZipEntry zipEntry = entries.nextElement();
-            if (NewConstants.BUILDER_RESOURCE_LAYOUT.BUILDER_HELPER_NAME2.getNAME().equals(zipEntry.getName())) {
+            if (NewConstants.BUILDER_RESOURCE_LAYOUT.BUILDER_HELPER_NAME.getNAME().equals(zipEntry.getName())) {
                 // 对于jar包本身，在构建工具完成优化之后，则不在需要helper了，此时需要把helper干掉
                 // 但是在开发环境下，由于需要支持AndroidStudio的单步调试，这个时候需要把helper包含在其中，使用helper在调试的时候进行binder resource handling
                 continue;
