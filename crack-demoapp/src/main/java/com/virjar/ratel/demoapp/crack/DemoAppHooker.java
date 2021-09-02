@@ -117,8 +117,8 @@ public class DemoAppHooker implements IRposedHookLoadPackage {
         }
     }
 
-    private static void switchTo18782165597() {
-        RatelToolKit.virtualEnv.switchEnv("18782165597");
+    private static void switchTo18788885597() {
+        RatelToolKit.virtualEnv.switchEnv("18788885597");
     }
 
 
@@ -235,7 +235,7 @@ public class DemoAppHooker implements IRposedHookLoadPackage {
                     Log.i(tag, "无法定位登陆WebView...");
                     return false;
                 }
-                WebViewHelper.JsCallFuture jsCallFuture = new WebViewHelper(webView).typeByXpath("//input[@data-componentname='phoneNumber']", "18782165597");
+                WebViewHelper.JsCallFuture jsCallFuture = new WebViewHelper(webView).typeByXpath("//input[@data-componentname='phoneNumber']", "18788885597");
 
 
                 jsCallFuture.success()

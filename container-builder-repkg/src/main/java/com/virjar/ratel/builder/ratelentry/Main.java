@@ -10,7 +10,9 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.virjar.ratel.allcommon.ClassNames;
 import com.virjar.ratel.allcommon.Constants;
+import com.virjar.ratel.allcommon.NewConstants;
 import com.virjar.ratel.allcommon.StandardEncryptor;
 import com.virjar.ratel.builder.AndroidJarUtil;
 import com.virjar.ratel.builder.BootstrapCodeInjector;
@@ -93,6 +95,7 @@ import javax.xml.parsers.ParserConfigurationException;
 public class Main {
 
     public static void main(String[] args) throws Exception {
+        ClassNames.BUILDER_MAIN.check(Main.class);
         int xApkIndex = -1;
         for (int i = 0; i < args.length; i++) {
             if (args[i].endsWith(".xapk")) {
@@ -256,54 +259,8 @@ public class Main {
 
 
         System.out.println("clean working directory:" + workDir.getAbsolutePath());
-        File driverAPKFile = new File(workDir, Constants.RATEL_ENGINE_APK);
-        System.out.println("release ratel container apk ,into :" + driverAPKFile.getAbsolutePath());
-        copyAndClose(Main.class.getClassLoader().getResourceAsStream(Constants.RATEL_ENGINE_APK), new FileOutputStream(driverAPKFile));
 
-        File ratelRuntimeJarFile = new File(workDir, Constants.RATEL_ENGINE_JAR);
-        System.out.println("transform ratel runtime apk to jar format:" + ratelRuntimeJarFile.getAbsolutePath());
-        AndroidJarUtil.transformApkToAndroidJar(driverAPKFile, ratelRuntimeJarFile, new PackageTrie()
-                //混淆模式下，需要保留的class
-                .addToTree("com.virjar")
-                .addToTree("external.org.apache")
-                .addToTree("external.okio")
-                //正常模式下，需要保留的class
-                .addToTree("mirror")
-                .addToTree("de.schlichtherle.util")
-                .addToTree("net.kk.plus.preference")
-                .addToTree("external.com.android.dx")
-                .addToTree("external.com.android.dex")
-                .addToTree("external.com.android.multidex")
-        );
-
-        File xposedBridgeAPKFile = new File(workDir, Constants.xposedApiBridgeAPKFileName);
-        System.out.println("release xposed bridge apk info:" + xposedBridgeAPKFile.getAbsolutePath());
-        copyAndClose(Main.class.getClassLoader().getResourceAsStream(Constants.xposedApiBridgeAPKFileName), new FileOutputStream(xposedBridgeAPKFile));
-        File xposedBridgeJarFile = new File(workDir, Constants.xposedApiBridgeJarFileName);
-        System.out.println("transform xposedBridge apk to jar format:" + xposedBridgeJarFile.getAbsolutePath());
-        AndroidJarUtil.transformApkToAndroidJar(xposedBridgeAPKFile, xposedBridgeJarFile, new PackageTrie().addToTree("de.robv.android.xposed").addToTree("android.app.AndroidAppHelper"));
-
-        File bootstrapAPKFile = new File(workDir, Constants.bootstrapAPKPath);
-        System.out.println("release ratel bootstrap apk ,into :" + bootstrapAPKFile.getAbsolutePath());
-        copyAndClose(Main.class.getClassLoader().getResourceAsStream(Constants.bootstrapAPKPath), new FileOutputStream(bootstrapAPKFile));
-
-
-        File multiDexBootstrapAPKFile = new File(workDir, Constants.ratelMultiDexBootstrapApkPath);
-        System.out.println("release multi apk bootstrap apk into: " + multiDexBootstrapAPKFile.getAbsolutePath());
-        copyAndClose(Main.class.getClassLoader().getResourceAsStream(Constants.ratelMultiDexBootstrapApkPath), new FileOutputStream(multiDexBootstrapAPKFile));
-        File multiDexBootstrapJarFile = new File(workDir, Constants.ratelMultiDexBootstrapJarPath);
-        System.out.println("transform multi apk bootstrap apk to jar format:" + multiDexBootstrapJarFile.getAbsolutePath());
-        AndroidJarUtil.transformApkToAndroidJar(multiDexBootstrapAPKFile, multiDexBootstrapJarFile, new PackageTrie().addToTree("com.virjar"));
-
-
-        File zeldaBootstrapAPKFile = new File(workDir, Constants.ratelZeldaBootstrapApkPath);
-        System.out.println("release zelda apk bootstrap apk into: " + zeldaBootstrapAPKFile.getAbsolutePath());
-        copyAndClose(Main.class.getClassLoader().getResourceAsStream(Constants.ratelZeldaBootstrapApkPath), new FileOutputStream(zeldaBootstrapAPKFile));
-        File zeldaBootstrapJarFile = new File(workDir, Constants.ratelZeldaBootstrapJarPath);
-        System.out.println("transform zelda apk bootstrap apk to jar format:" + zeldaBootstrapJarFile.getAbsolutePath());
-        //只能保留 com.virjar
-        AndroidJarUtil.transformApkToAndroidJar(zeldaBootstrapAPKFile, zeldaBootstrapJarFile, new PackageTrie().addToTree("com.virjar"));
-
+        BindingResourceManager.extract(workDir);
 
         File signatureKeyFile = new File(workDir, Constants.ratelDefaultApkSignatureKey);
         System.out.println("release ratel default apk signature key into : " + signatureKeyFile.getAbsolutePath());
@@ -391,7 +348,7 @@ public class Main {
             Util.copyAssets(zos, param.xposedApk, Constants.xposedBridgeApkFileName);
         }
 
-        Util.copyAssets(zos, xposedBridgeJarFile, Constants.xposedApiBridgeJarFileName);
+        Util.copyAssets(zos, BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.XPOSED_BRIDGE_JAR_FILE), Constants.xposedApiBridgeJarFileName);
         //请注意，shell模式下，不需要copy driver的资源
 
         ratelBuildProperties.setProperty(Constants.hasEmbedXposedModuleKey, String.valueOf(param.xposedApk != null));
@@ -407,7 +364,7 @@ public class Main {
         if (param.xposedApk != null) {
             Util.copyLibrary(zos, supportArch, param.xposedApk);
         }
-        Util.copyLibrary(zos, supportArch, new File(workDir, Constants.RATEL_ENGINE_APK));
+        Util.copyLibrary(zos, supportArch, BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.RUNTIME_JAR_FILE));
 //        } else {
 //            // xapk模式下，so不能植入到主包,而是置入到分包
 //            if (param.xposedApk != null) {
@@ -418,7 +375,7 @@ public class Main {
 //        }
 
         //so文件需要插入到asset目录，因为 execve 注入会依赖so，且依赖多个版本
-        insertRatelNativeLib(zos, new File(workDir, Constants.RATEL_ENGINE_APK));
+        insertRatelNativeLib(zos, BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.RUNTIME_JAR_FILE));
 
         //add dexmaker opt file if exist
         File dexMakerOptFile = DexMakerOpt.genDexMakerOptFile(workDir());
@@ -884,7 +841,7 @@ public class Main {
         System.out.println(outApk.getAbsolutePath() + " has been Signed");
     }
 
-    private static boolean useV1Sign(BuildParamMeta buildParamMeta){
+    private static boolean useV1Sign(BuildParamMeta buildParamMeta) {
         // targetSdkVersion为安卓11的必须使用v2签名
         // 安卓7之前使用v1签名
         return buildParamMeta != null && NumberUtils.toInt(buildParamMeta.apkMeta.getMinSdkVersion(), 24) <= 23 && NumberUtils.toInt(buildParamMeta.apkMeta.getTargetSdkVersion()) < 30;

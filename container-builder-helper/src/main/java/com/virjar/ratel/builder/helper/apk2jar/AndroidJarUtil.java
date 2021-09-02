@@ -54,6 +54,12 @@ public class AndroidJarUtil {
                             //清除无意义的class，因为我们使用了Android的打包工具链，存在一些android本身的class，这些class对于我们来说没有意义
                             zipOutputStream.write(cleanClasses(zipFile.getInputStream(zipEntry), packageTrie));
                         }
+                    } else if (zipEntry.getName().startsWith("lib/")
+                        // || zipEntry.getName().startsWith("assets/")
+                    ) {
+                        zipOutputStream.putNextEntry(new ZipEntry(zipEntry.getName()));
+                        // lib资源需要迁移过去，因为我们构建的时候需要lib资源
+                        zipOutputStream.write(IOUtils.toByteArray(zipFile.getInputStream(zipEntry)));
                     }
                 }
             }

@@ -3,6 +3,7 @@ package com.virjar.ratel.builder;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.virjar.ratel.allcommon.ClassNames;
 import com.virjar.ratel.allcommon.Constants;
 
 import org.apache.commons.io.FileUtils;
@@ -92,15 +93,17 @@ public class BootstrapCodeInjector {
 
 
         File runtimeSmaliDir = makeSureRuntimeSmaliDir(workDir);
-        FileUtils.copyFile(
-                new File(bootstrapAPKDecodeDir, "smali/com/virjar/container_runtimer_repkg_bootstrap/BootStrap.smali"),
-                new File(runtimeSmaliDir, "com/virjar/container_runtimer_repkg_bootstrap/BootStrap.smali")
+        String bootStrapSmaliFilePath = Util.classNameToSmaliPath(ClassNames.INJECT_REBUILD_BOOTSTRAP.getClassName());
+
+        FileUtils.copyFile(new File(bootstrapAPKDecodeDir, bootStrapSmaliFilePath),
+                new File(runtimeSmaliDir, bootStrapSmaliFilePath)
         );
         if (injectLogComponent) {
             System.out.println("inject ratel SmaliLog component!!");
+            String logSmaliFilePath = Util.classNameToSmaliPath(ClassNames.INJECT_TOOL_SMALI_LOG.getClassName());
             FileUtils.copyFile(
-                    new File(bootstrapAPKDecodeDir, "smali/com/virjar/container_runtimer_repkg_bootstrap/RatelSmaliLog.smali"),
-                    new File(runtimeSmaliDir, "com/virjar/container_runtimer_repkg_bootstrap/RatelSmaliLog.smali")
+                    new File(bootstrapAPKDecodeDir, logSmaliFilePath),
+                    new File(runtimeSmaliDir, logSmaliFilePath)
             );
         }
 
@@ -291,9 +294,11 @@ public class BootstrapCodeInjector {
                                         File bootstrapAPKDecodeDir, File runtimeSmaliDir, File dexImage,
                                         boolean decodeAllSmali, boolean force
     ) throws IOException {
+        String bootStrapCintSmaliFilePath = Util.classNameToSmaliPath(ClassNames.INJECT_REBUILD_BOOTSTRAP_CINT.getClassName());
+        String bootStrapCintNativeName = ClassNames.INJECT_REBUILD_BOOTSTRAP_CINT.getClassName().replaceAll("\\.", "/");
         FileUtils.copyFile(
-                new File(bootstrapAPKDecodeDir, "smali/com/virjar/container_runtimer_repkg_bootstrap/BootStrapWithStaticInit.smali"),
-                new File(runtimeSmaliDir, "com/virjar/container_runtimer_repkg_bootstrap/BootStrapWithStaticInit.smali")
+                new File(bootstrapAPKDecodeDir, bootStrapCintSmaliFilePath),
+                new File(runtimeSmaliDir, bootStrapCintSmaliFilePath)
         );
 
         if (decodeAllSmali) {
@@ -339,7 +344,7 @@ public class BootstrapCodeInjector {
                 newCodeLines.add("    .line 0");
             }
             newCodeLines.add(".locals 0");
-            newCodeLines.add("    invoke-static {}, Lcom/virjar/container_runtimer_repkg_bootstrap/BootStrapWithStaticInit;->startup()V");
+            newCodeLines.add("    invoke-static {}, L" + bootStrapCintNativeName + ";->startup()V");
             newCodeLines.add("    ");
             newCodeLines.add("    return-void");
             newCodeLines.add(".end method");
@@ -357,7 +362,7 @@ public class BootstrapCodeInjector {
             if (hasLineDeclared) {
                 newCodeLines.add("    .line 0");
             }
-            newCodeLines.add("    invoke-static {}, Lcom/virjar/container_runtimer_repkg_bootstrap/BootStrapWithStaticInit;->startup()V");
+            newCodeLines.add("    invoke-static {}, L" + bootStrapCintNativeName + ";->startup()V");
             newCodeLines.add("    ");
 
             //copy after
@@ -489,6 +494,7 @@ public class BootstrapCodeInjector {
         } else {
             baksmali(applicationClassName, DexFileFactory.loadDexFile(dexImage, Opcodes.getDefault()), runtimeSmaliDir);
         }
+        String bootStrapNativeName = ClassNames.INJECT_REBUILD_BOOTSTRAP.getClassName().replaceAll("\\.", "/");
 
         boolean findAttacheBaseContextMethod = false;
         for (DexBackedMethod dexBackedMethod : dexClass.getMethods()) {
@@ -556,14 +562,14 @@ public class BootstrapCodeInjector {
                 if (hasLineDeclared) {
                     newCodeLines.add("    .line 2");
                 }
-                newCodeLines.add("    invoke-static {v8, v2}, Lcom/virjar/container_runtimer_repkg_bootstrap/BootStrap;->startUp(Landroid/content/Context;Landroid/content/Context;)V");
+                newCodeLines.add("    invoke-static {v8, v2}, L" + bootStrapNativeName + ";->startUp(Landroid/content/Context;Landroid/content/Context;)V");
                 newCodeLines.add("    ");
 
             } else {
                 if (hasLineDeclared) {
                     newCodeLines.add("    .line 0");
                 }
-                newCodeLines.add("    invoke-static {p1, p0}, Lcom/virjar/container_runtimer_repkg_bootstrap/BootStrap;->startUp(Landroid/content/Context;Landroid/content/Context;)V");
+                newCodeLines.add("    invoke-static {p1, p0}, L" + bootStrapNativeName + ";->startUp(Landroid/content/Context;Landroid/content/Context;)V");
                 newCodeLines.add("    ");
 
             }
@@ -586,7 +592,7 @@ public class BootstrapCodeInjector {
                     "    .param p1, \"base\"    # Landroid/content/Context;\n" +
                     "\n" +
                     "    .line 12\n" +
-                    "    invoke-static {p1,p0}, Lcom/virjar/container_runtimer_repkg_bootstrap/BootStrap;->startUp(Landroid/content/Context;Landroid/content/Context;)V\n" +
+                    "    invoke-static {p1,p0}, L" + bootStrapNativeName + ";->startUp(Landroid/content/Context;Landroid/content/Context;)V\n" +
                     "\n" +
                     "    .line 13\n" +
                     "    invoke-super {p0, p1}, " + superclass + "->attachBaseContext(Landroid/content/Context;)V\n" +

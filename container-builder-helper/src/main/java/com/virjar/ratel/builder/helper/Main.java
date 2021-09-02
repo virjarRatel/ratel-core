@@ -1,5 +1,6 @@
 package com.virjar.ratel.builder.helper;
 
+import com.virjar.ratel.allcommon.ClassNames;
 import com.virjar.ratel.builder.helper.apk2jar.APK2Jar;
 import com.virjar.ratel.builder.helper.bro.OptimizeBuilderResource;
 
@@ -14,6 +15,7 @@ public class Main {
      * 本模块干的都是脏活儿累活儿，他不需要考虑资源大小问题，因为他最终不会出现在发布版本的构建工具中
      */
     public static void main(String[] args) throws Exception {
+        ClassNames.BUILDER_HELPER_MAIN.check(Main.class);
         if (args.length == 0) {
             showHelpMessage();
             return;

@@ -14,5 +14,5 @@
 ```
 
 ## 单步调试
-将命令行参数放到``container-builder-repkg/src/main/java/ratelentry/Main.java``,然后单步调试main函数的执行流程即可
+将命令行参数放到``container-builder-repkg/src/main/java/com/virjar/ratel/builder/ratelentry/Main.java``,然后单步调试main函数的执行流程即可
 

@@ -2,6 +2,7 @@ package com.virjar.ratel.builder;
 
 import com.google.common.base.Defaults;
 import com.google.common.base.Splitter;
+import com.virjar.ratel.allcommon.ClassNames;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -47,6 +48,12 @@ public class Util {
                 return "UNKNOWN";
         }
     }
+
+    public static String classNameToSmaliPath(String className) {
+        String nativeName = className.replaceAll("\\.", "/");
+        return nativeName + ".smali";
+    }
+
 
     /**
      * Converts a type descriptor to human-readable "dotted" form.  For

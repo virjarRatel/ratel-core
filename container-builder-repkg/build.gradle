@@ -1,3 +1,4 @@
+import com.virjar.ratel.allcommon.NewConstants
 import com.virjar.ratel.allcommon.Constants
 
 buildscript {
@@ -19,7 +20,7 @@ task injectRuntimeAPK(type: Copy) {
     from '../container-runtime-repkg/build/outputs/apk/debug/container-runtime-repkg-debug.apk'
     into 'src/main/resources/'
     rename {
-        Constants.RATEL_ENGINE_APK
+        NewConstants.BUILDER_RESOURCE_LAYOUT.RUNTIME_APK_FILE.NAME
     }
 }
 injectRuntimeAPK.dependsOn(':container-runtime-repkg:assembleDebug')

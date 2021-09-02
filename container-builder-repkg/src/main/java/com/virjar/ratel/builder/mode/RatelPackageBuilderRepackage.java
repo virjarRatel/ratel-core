@@ -2,6 +2,7 @@ package com.virjar.ratel.builder.mode;
 
 
 import com.virjar.ratel.allcommon.Constants;
+import com.virjar.ratel.allcommon.NewConstants;
 import com.virjar.ratel.builder.BootstrapCodeInjector;
 import com.virjar.ratel.builder.BuildParamMeta;
 import com.virjar.ratel.builder.DexMergeFailedException;
@@ -13,6 +14,7 @@ import com.virjar.ratel.builder.Util;
 import com.virjar.ratel.builder.manifesthandler.AXmlEditorCmdHandler;
 import com.virjar.ratel.builder.manifesthandler.EnableDebug;
 import com.virjar.ratel.builder.manifesthandler.RequestLegacyExternalStorage;
+import com.virjar.ratel.builder.ratelentry.BindingResourceManager;
 
 import net.dongliu.apk.parser.utils.Pair;
 
@@ -40,18 +42,15 @@ import java.util.List;
 import java.util.Properties;
 import java.util.regex.Matcher;
 
-import brut.androlib.AndrolibException;
-import brut.androlib.ApkDecoder;
-import brut.directory.DirectoryException;
 
 public class RatelPackageBuilderRepackage {
     public static void handleTask(File workDir, Param param, BuildParamMeta buildParamMeta,
                                   Properties ratelBuildProperties,
                                   ZipOutputStream zos, CommandLine cmd
 
-    ) throws IOException, AndrolibException, DirectoryException {
+    ) throws IOException {
         File bootstrapDecodeDir = new File(workDir, "ratel_bootstrap_apk");
-        decodeBootstrapAPK(new File(workDir, Constants.bootstrapAPKPath), bootstrapDecodeDir);
+        decodeBootstrapAPK(bootstrapDecodeDir);
 
 
         System.out.println("work dir: " + workDir.getCanonicalPath());
@@ -198,7 +197,7 @@ public class RatelPackageBuilderRepackage {
         //close
         originAPKZip.close();
 
-        Util.copyAssets(zos, new File(workDir, Constants.RATEL_ENGINE_JAR), Constants.RATEL_ENGINE_JAR);
+        Util.copyAssets(zos, BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.RUNTIME_JAR_FILE), Constants.RATEL_ENGINE_JAR);
     }
 
 
@@ -220,21 +219,25 @@ public class RatelPackageBuilderRepackage {
     }
 
 
-    private static void decodeBootstrapAPK(File bootstrapAPK, File outDir) throws AndrolibException, IOException, DirectoryException {
-        System.out.println("decode oringin apk:" + bootstrapAPK.getAbsolutePath() + "...");
-        ApkDecoder decoder = new ApkDecoder();
-        decoder.setApkFile(bootstrapAPK);
+    private static void decodeBootstrapAPK(File outDir) throws IOException {
+        File templateZip = BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.TEMPLATE_SMALI_ZIP_FILE);
+        try (ZipFile zipFile = new ZipFile(templateZip)) {
+            Enumeration<ZipEntry> entries = zipFile.getEntries();
+            while (entries.hasMoreElements()) {
+                ZipEntry zipEntry = entries.nextElement();
+                if (zipEntry.isDirectory()) {
+                    FileUtils.forceMkdir(new File(outDir, zipEntry.getName()));
+                    continue;
+                }
+                File file = new File(outDir, zipEntry.getName());
+                FileUtils.forceMkdirParent(file);
+                try (InputStream inputStream = zipFile.getInputStream(zipEntry)) {
+                    FileUtils.writeByteArrayToFile(file, IOUtils.toByteArray(inputStream));
+                }
+            }
+        }
 
-        decoder.setOutDir(outDir);
-        //不对源码进行解码
-        decoder.setDecodeResources(ApkDecoder.DECODE_RESOURCES_NONE);
-        decoder.setDecodeSources(ApkDecoder.DECODE_SOURCES_SMALI);
-        // decoder.setKeepBrokenResources(true);
-        decoder.setForceDelete(true);
-        decoder.setForceDecodeManifest(ApkDecoder.FORCE_DECODE_MANIFEST_NONE);
-        decoder.setDecodeAssets(ApkDecoder.DECODE_ASSETS_NONE);
-        decoder.decode();
-        decoder.close();
+
     }
 
 

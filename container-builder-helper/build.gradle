@@ -1,3 +1,5 @@
+import com.virjar.ratel.allcommon.ClassNames
+
 buildscript {
     repositories {
         maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
@@ -26,6 +28,7 @@ dependencies {
     api 'org.smali:util:2.2.7'
     api 'org.smali:baksmali:2.2.7'
     api 'org.smali:smali:2.2.7'
+    api(name: 'base-lib-allcommon', ext: 'jar')
 
 }
 
@@ -39,7 +42,7 @@ shadowJar {
     classifier = null
     version = 1.0
     manifest {
-        attributes 'Main-Class': 'com.virjar.ratel.builder.helper.Main'
+        attributes 'Main-Class': ClassNames.BUILDER_HELPER_MAIN.className
     }
 }
 assemble.dependsOn(shadowJar)

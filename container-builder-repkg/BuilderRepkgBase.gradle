@@ -1,4 +1,3 @@
-
 buildscript {
     repositories {
         repositories {
@@ -8,7 +7,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath (name: 'base-lib-allcommon', ext: 'jar')
+        classpath(name: 'base-lib-allcommon', ext: 'jar')
     }
 }
 import com.virjar.ratel.allcommon.Constants
@@ -49,7 +48,7 @@ dependencies {
     compile group: 'net.dongliu', name: 'apk-parser', version: '2.6.10'
     compile project(':base-lib-apksigner')
     compile project(':base-lib-pxb-axml')
-    compile (name: 'base-lib-allcommon', ext: 'jar')
+    compile(name: 'base-lib-allcommon', ext: 'jar')
 }
 
 sourceCompatibility = 1.8
@@ -144,7 +143,7 @@ task injectXposedBridgeAPK(type: Copy) {
     from '../base-lib-xposed-bridge/build/outputs/apk/release/base-lib-xposed-bridge-release.apk'
     into 'src/main/resources/'
     rename {
-        Constants.xposedApiBridgeAPKFileName
+        NewConstants.BUILDER_RESOURCE_LAYOUT.XPOSED_BRIDGE_APK_FILE.NAME
     }
 }
 
@@ -164,16 +163,31 @@ task injectRDPJar(type: Copy) {
 injectRDPJar.dependsOn(':container-builder-rdp:assemble')
 processResources.dependsOn(injectRDPJar)
 
+// 构建工具的优化器
 task injectBuilderHelperJar(type: Copy) {
     from '../container-builder-helper/build/libs/BuilderHelper-1.0.jar'
     into 'src/main/resources/'
     rename {
-        NewConstants.BUILDER_RESOURCE_LAYOUT.BUILDER_HELPER_NAME
+        NewConstants.BUILDER_RESOURCE_LAYOUT.BUILDER_HELPER_NAME2.NAME
     }
 }
 
 injectBuilderHelperJar.dependsOn(':container-builder-helper:assemble')
 processResources.dependsOn(injectBuilderHelperJar)
+
+// 注入代码模版工程
+task injectTemplateApk(type: Copy) {
+    from '../container-inject-template/build/outputs/apk/release/container-inject-template-release.apk'
+    into 'src/main/resources/'
+    rename {
+        NewConstants.BUILDER_RESOURCE_LAYOUT.TEMPLATE_APK_FILE.NAME
+    }
+}
+
+injectTemplateApk.dependsOn(':container-inject-template:assembleRelease')
+processResources.dependsOn(injectTemplateApk)
+
+
 
 task storeBuildConstantsProperties() {
 
