@@ -71,12 +71,10 @@ mv ratel-engine-obt-${engineVersionCode}.zip ../
 cp ${script_dir}/monthly_temp.txt ${script_dir}/dist/res/monthly_temp.txt
 
 cd ${root_dir}
-./gradlew container-builder-transformer:assemble
-transformer_jar=`pwd`/container-builder-transformer/build/libs/EngineBinTransformer-1.0.jar
+transformer_jar=${root_dir}/container-builder-helper/build/libs/BuilderHelper-1.0.jar
 echo transform ratel builder format from jar to dex with transformer_jar ${transformer_jar}
 echo java -jar ${transformer_jar} -s ${script_dir}/dist/res/${builder_jar_file_name}
-java -jar ${transformer_jar} -s ${script_dir}/dist/res/${builder_jar_file_name}
-
+java -jar ${transformer_jar} TRANSFORM_BUILDER_JAR -s ${script_dir}/dist/res/${builder_jar_file_name}
 
 cd ${root_dir}
 

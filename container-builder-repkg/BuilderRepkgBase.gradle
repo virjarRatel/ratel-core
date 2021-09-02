@@ -79,56 +79,6 @@ shadowJar {
     }
 }
 
-// bootstrap module apk
-task injectBootstrapAPK(type: Copy) {
-    from '../container-runtime-repkg-bootstrap/build/outputs/apk/release/container-runtime-repkg-bootstrap-release.apk'
-    into 'src/main/resources/'
-    rename {
-        Constants.bootstrapAPKPath
-    }
-}
-
-injectBootstrapAPK.dependsOn(':container-runtime-repkg-bootstrap:assembleRelease')
-processResources.dependsOn(injectBootstrapAPK)
-
-//multi dex bootstrap apk
-task injectMultDexBootstrapApk(type: Copy) {
-    from '../container-multi-dex-bootstrap/build/outputs/apk/release/container-multi-dex-bootstrap-release.apk'
-    into 'src/main/resources/'
-    rename {
-        Constants.ratelMultiDexBootstrapApkPath
-    }
-}
-injectMultDexBootstrapApk.dependsOn(':container-multi-dex-bootstrap:assembleRelease')
-processResources.dependsOn(injectMultDexBootstrapApk)
-
-
-//zelda bootstrap apk
-task injectZeldaBootstrapApk(type: Copy) {
-    from '../container-zelda-bootstrap/build/outputs/apk/release/container-zelda-bootstrap-release.apk'
-    into 'src/main/resources/'
-    rename {
-        Constants.ratelZeldaBootstrapApkPath
-    }
-}
-injectZeldaBootstrapApk.dependsOn(':container-zelda-bootstrap:assembleRelease')
-processResources.dependsOn(injectZeldaBootstrapApk)
-
-//// xc_method_wrapper apk
-//task injectXCMethodWrapperAPK(type: Copy) {
-//    from '../container-xc-method-wrapper/build/outputs/apk/release/container-xc-method-wrapper-release.apk'
-//    into 'src/main/resources/'
-//    rename {
-//        'ratel_xcMethodWrapper.apk'
-//    }
-//}
-//
-//injectXCMethodWrapperAPK.dependsOn(':container-xc-method-wrapper:assembleRelease')
-//processResources.dependsOn(injectXCMethodWrapperAPK)
-//这个是兼容将xposed路由到原生xposed的实现（非Rposed路由Xposed，是在存在Xposed的机器上面运行Xposed模块，并和Ratel兼容），
-//在当前RatelAPI分支下，这个功能较难实现，并且这个功能在ratel设计之后仅有一两次尝试性质的使用。所以这个功能直接废弃
-
-
 //dexmaker-opt
 task injectDexMakerOptSource(type: Copy) {
     from '../script/dex_maker_opt.zip'

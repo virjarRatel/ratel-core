@@ -1,5 +1,5 @@
-import com.virjar.ratel.allcommon.NewConstants
 import com.virjar.ratel.allcommon.Constants
+import com.virjar.ratel.allcommon.NewConstants
 
 buildscript {
     repositories {
