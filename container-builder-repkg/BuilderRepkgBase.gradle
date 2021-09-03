@@ -32,9 +32,7 @@ dependencies {
     compile 'com.alibaba:fastjson:1.1.71.android'
     compile 'commons-cli:commons-cli:1.4'
     compile project(':base-lib-dx')
-    // https://mvnrepository.com/artifact/org.apache.ant/ant
-    //这个里面代码太大了，为了精简最终apk，我们只把zip模块代码抽离出来
-    //compile group: 'org.apache.ant', name: 'ant', version: '1.10.5'
+    compile group: 'org.apache.ant', name: 'ant', version: '1.10.5'
     compile 'xmlunit:xmlunit:1.6'
     compile 'xpp3:xpp3:1.1.4c'
     compile 'commons-cli:commons-cli:1.4'
