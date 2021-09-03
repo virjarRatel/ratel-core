@@ -10,6 +10,9 @@ public enum ClassNames {
     //重打包构建工具入口
     BUILDER_MAIN("com.virjar.ratel.builder.ratelentry.Main"),
 
+    // 平头哥配套smali重打包方案入口
+    RDP_MAIN("com.virjar.ratel.rdp.RDPBuilder"),
+
     // dex重编Android代码植入入口
     INJECT_REBUILD_BOOTSTRAP("com.virjar.ratel.inject.template.rebuild.BootStrap"),
     INJECT_REBUILD_BOOTSTRAP_CINT("com.virjar.ratel.inject.template.rebuild.BootStrapWithStaticInit"),

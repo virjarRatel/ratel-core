@@ -71,11 +71,16 @@ mv ratel-engine-obt-${engineVersionCode}.zip ../
 cp ${script_dir}/monthly_temp.txt ${script_dir}/dist/res/monthly_temp.txt
 
 cd ${root_dir}
-transformer_jar=${root_dir}/container-builder-helper/build/libs/BuilderHelper-1.0.jar
-echo transform ratel builder format from jar to dex with transformer_jar ${transformer_jar}
-echo java -jar ${transformer_jar} -s ${script_dir}/dist/res/${builder_jar_file_name}
-java -jar ${transformer_jar} TRANSFORM_BUILDER_JAR -s ${script_dir}/dist/res/${builder_jar_file_name}
+builder_helper_jar=${root_dir}/container-builder-helper/build/libs/BuilderHelper-1.0.jar
 
+# jar包内置资源的优化
+java -jar ${builder_helper_jar} OPTIMIZE_BUILDER_RESOURCE -i ${script_dir}/dist/res/${builder_jar_file_name}  -o ${script_dir}/dist/res/${builder_jar_file_name}
+
+# jar包代码本身代码优化
+
+
+# jar包工具链转化为dex
+java -jar ${builder_helper_jar} TRANSFORM_BUILDER_JAR -s ${script_dir}/dist/res/${builder_jar_file_name}
 cd ${root_dir}
 
 

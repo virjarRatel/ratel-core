@@ -45,8 +45,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
-import brut.androlib.src.SmaliBuilder;
-import brut.directory.ExtFile;
 
 public class RDPBuilder {
     //TODO RDP之后，需要修改序列号
@@ -138,7 +136,7 @@ public class RDPBuilder {
             if (fileName != null) {
                 File tempDex = new File(tempDir, fileName);
                 System.out.println("build smali dir: " + smaliDir.getAbsolutePath());
-                SmaliBuilder.build(new ExtFile(smaliDir), tempDex, Opcodes.getDefault().api);
+                SmaliBuilder.build(smaliDir, tempDex, Opcodes.getDefault().api, false);
                 addZipData(tempDex, zipOutputStream, fileName, zipEntryMap);
             }
         }

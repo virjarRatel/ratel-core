@@ -3,6 +3,7 @@ package com.virjar.ratel.builder.helper;
 import com.virjar.ratel.allcommon.ClassNames;
 import com.virjar.ratel.builder.helper.apk2jar.APK2Jar;
 import com.virjar.ratel.builder.helper.bro.OptimizeBuilderResource;
+import com.virjar.ratel.builder.helper.proguard.OptimizeBuilderClass;
 
 public class Main {
     /***
@@ -36,6 +37,9 @@ public class Main {
                 break;
             case "OPTIMIZE_BUILDER_RESOURCE":
                 OptimizeBuilderResource.main(subArgs);
+                break;
+            case "OPTIMIZE_BUILDER_CLASS":
+                OptimizeBuilderClass.main(subArgs);
                 break;
             case "-H":
             case "-h":
