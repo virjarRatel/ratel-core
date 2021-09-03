@@ -648,7 +648,9 @@ public class Main {
                     FileUtils.deleteDirectory(smaliDir);
                     smaliDir.mkdirs();
                     System.out.println("Baksmaling " + entryName + "...");
-                    DexBackedDexFile dexFile = DexFileFactory.loadDexEntry(outputApkFile, entryName, true, Opcodes.getDefault());
+                    DexBackedDexFile dexFile = DexFileFactory.loadDexEntry(outputApkFile,
+                            entryName, true, Opcodes.getDefault()
+                    ).getDexFile();
                     BootstrapCodeInjector.baksmali(null, dexFile, smaliDir);
                 } else {
                     File destResourceFile = new File(rawResource, entryName);

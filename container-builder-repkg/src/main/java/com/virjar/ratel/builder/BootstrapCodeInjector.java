@@ -5,6 +5,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.virjar.ratel.allcommon.ClassNames;
 import com.virjar.ratel.allcommon.Constants;
+import com.virjar.ratel.builder.utils.SDK_VERSION_CODES;
+import com.virjar.ratel.builder.utils.SmaliBuilder;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -28,10 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import brut.androlib.meta.MetaInfo;
-import brut.androlib.res.data.ResConfigFlags;
-import brut.androlib.src.SmaliBuilder;
-import brut.directory.ExtFile;
 import external.com.android.dex.Dex;
 import external.com.android.dx.command.dexer.DxContext;
 import external.com.android.dx.merge.CollisionPolicy;
@@ -48,12 +46,12 @@ public class BootstrapCodeInjector {
         File rebuildDex = new File(workDir, "injected.dex");
         System.out.println("create inject entry dex info :" + rebuildDex.getAbsolutePath());
         try {
-            SmaliBuilder.build(new ExtFile(runtimeSmaliDir), rebuildDex, Opcodes.getDefault().api, !decodeAllSmali);
+            SmaliBuilder.build(runtimeSmaliDir, rebuildDex, Opcodes.getDefault().api, !decodeAllSmali);
         } catch (Exception e) {
             throw new SmaliRebuildFailedException(e);
         } finally {
             //这里可能build失败，上游会有失败复原机制，所以这里需要把工作空间清理干净
-            FileUtils.cleanDirectory(runtimeSmaliDir);
+            //FileUtils.cleanDirectory(runtimeSmaliDir);
         }
         System.out.println("last dex time" + dexImage.lastModified());
         System.out.println("path " + dexImage.getAbsolutePath() + ",update last dex time" + dexImage.lastModified());
@@ -112,7 +110,7 @@ public class BootstrapCodeInjector {
         File rebuildDex = new File(workDir, "injected.dex");
         System.out.println("create inject entry dex info :" + rebuildDex.getAbsolutePath());
         try {
-            SmaliBuilder.build(new ExtFile(runtimeSmaliDir), rebuildDex, Opcodes.getDefault().api, !decodeAllSmali);
+            SmaliBuilder.build(runtimeSmaliDir, rebuildDex, Opcodes.getDefault().api, !decodeAllSmali);
         } catch (Exception e) {
             throw new SmaliRebuildFailedException(e);
         } finally {
@@ -135,25 +133,17 @@ public class BootstrapCodeInjector {
     }
 
 
-    public static int getMinSdkVersionFromAndroidCodename(MetaInfo meta, String sdkVersion) {
-        int sdkNumber = mapSdkShorthandToVersion(sdkVersion);
-
-        if (sdkNumber == ResConfigFlags.SDK_BASE) {
-            return Integer.parseInt(meta.sdkInfo.get("minSdkVersion"));
-        }
-        return sdkNumber;
-    }
 
     private static int mapSdkShorthandToVersion(String sdkVersion) {
         switch (sdkVersion.toUpperCase()) {
             case "M":
-                return ResConfigFlags.SDK_MNC;
+                return SDK_VERSION_CODES.M;
             case "N":
-                return ResConfigFlags.SDK_NOUGAT;
+                return SDK_VERSION_CODES.N;
             case "O":
-                return ResConfigFlags.SDK_OREO;
+                return SDK_VERSION_CODES.O;
             case "P":
-                return ResConfigFlags.SDK_P;
+                return SDK_VERSION_CODES.P;
             default:
                 return Integer.parseInt(sdkVersion);
         }
