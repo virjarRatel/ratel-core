@@ -1,5 +1,6 @@
 package com.virjar.ratel.builder.helper.bro;
 
+import com.beust.jcommander.internal.Sets;
 import com.google.common.io.Files;
 import com.virjar.ratel.allcommon.NewConstants;
 import com.virjar.ratel.builder.helper.apk2jar.APK2Jar;
@@ -12,6 +13,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.tools.ant.util.StringUtils;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 import org.apache.tools.zip.ZipOutputStream;
@@ -29,6 +31,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class OptimizeBuilderResource {
@@ -70,6 +73,12 @@ public class OptimizeBuilderResource {
     }
 
     private static void writeDataToNewJar(ZipOutputStream zos, ZipFile zipFile, Map<NewConstants.BUILDER_RESOURCE_LAYOUT, byte[]> optimizeData) throws IOException {
+        Set<String> filterResources = Sets.newHashSet();
+        for (NewConstants.BUILDER_RESOURCE_LAYOUT layout : NewConstants.BUILDER_RESOURCE_LAYOUT.values()) {
+            if (layout.isRaw()) {
+                filterResources.add(layout.getNAME());
+            }
+        }
         HashMap<String, byte[]> data = new HashMap<>();
         for (NewConstants.BUILDER_RESOURCE_LAYOUT layout : optimizeData.keySet()) {
             data.put(layout.getNAME(), optimizeData.get(layout));
@@ -77,9 +86,7 @@ public class OptimizeBuilderResource {
         Enumeration<ZipEntry> entries = zipFile.getEntries();
         while (entries.hasMoreElements()) {
             ZipEntry zipEntry = entries.nextElement();
-            if (NewConstants.BUILDER_RESOURCE_LAYOUT.BUILDER_HELPER_NAME.getNAME().equals(zipEntry.getName())) {
-                // 对于jar包本身，在构建工具完成优化之后，则不在需要helper了，此时需要把helper干掉
-                // 但是在开发环境下，由于需要支持AndroidStudio的单步调试，这个时候需要把helper包含在其中，使用helper在调试的时候进行binder resource handling
+            if (filterResources.contains(zipEntry.getName())) {
                 continue;
             }
             zos.putNextEntry(new ZipEntry(zipEntry));

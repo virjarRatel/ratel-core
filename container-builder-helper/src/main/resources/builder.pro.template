@@ -6,7 +6,7 @@
 
 # ratel 框架入口class
 -keep  class ${{BUILDER_MAIN}} {
-    public static void main( java.lang.String[]);
+    public static void main(java.lang.String[]);
 }
 
 -keep class org.jf.dexlib2.Opcode{*;}
@@ -14,5 +14,8 @@
 -keep class com.android.apksig.internal.**{*;}
 
 -dontwarn
-# 开源环境，我们只做优化，不做混淆
+# 开源环境，我们不做混淆
 -dontobfuscate
+# proguard应该是有bug，如果开启了优化，则会直接报错，具体原因不明
+# 不过目前我们主要工作是执行代码压缩，这样可以让我们的jar包更小
+-dontoptimize
