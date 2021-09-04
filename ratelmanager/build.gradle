@@ -78,4 +78,9 @@ dependencies {
     api(group: 'dev.rikka.shizuku', name: "aidl", version: '11.0.2', ext: 'aar')
     // add this if you want to support Shizuku
     api(group: 'dev.rikka.shizuku', name: "provider", version: '11.0.2', ext: 'aar')
+
+    // 悬浮窗框架：https://github.com/getActivity/XToast
+    implementation 'com.github.getActivity:XToast:8.1'
+    // 权限请求框架：https://github.com/getActivity/XXPermissions
+    implementation 'com.github.getActivity:XXPermissions:11.6'
 }
