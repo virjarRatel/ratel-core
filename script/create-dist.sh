@@ -77,19 +77,19 @@ java -jar ${builder_helper_jar} OPTIMIZE_BUILDER_RESOURCE -i ${script_dir}/dist/
 # jar包代码本身代码优化
 java -jar ${builder_helper_jar} OPTIMIZE_BUILDER_CLASS -i ${script_dir}/dist/res/${builder_jar_file_name}
 
-## jar包工具链转化为dex
-#java -jar ${builder_helper_jar} TRANSFORM_BUILDER_JAR -s ${script_dir}/dist/res/${builder_jar_file_name}
-#cd ${root_dir}
-#
-#
-#
-#
-##if [ ! -d /opt/ratel/ ] ;then
-##    mkdir /opt/ratel/
-##fi
-### 这里，放到系统指定目录，然后配置好环境变量，就可以直接命令行调用ratel了
-##cp -r ${script_dir}/dist/* /opt/ratel/
-#
-#cd ${script_dir}/dist/
-#zip -r dist.zip ./*
-#mv dist.zip ../
+# jar包工具链转化为dex
+java -jar ${builder_helper_jar} TRANSFORM_BUILDER_JAR -s ${script_dir}/dist/res/${builder_jar_file_name}
+cd ${root_dir}
+
+
+
+
+#if [ ! -d /opt/ratel/ ] ;then
+#    mkdir /opt/ratel/
+#fi
+## 这里，放到系统指定目录，然后配置好环境变量，就可以直接命令行调用ratel了
+#cp -r ${script_dir}/dist/* /opt/ratel/
+
+cd ${script_dir}/dist/
+zip -r dist.zip ./*
+mv dist.zip ../

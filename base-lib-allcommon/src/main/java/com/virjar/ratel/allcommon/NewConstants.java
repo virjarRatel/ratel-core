@@ -27,7 +27,7 @@ public interface NewConstants {
         /**
          * appendDex模式下，直接使用dex文件
          */
-        TEMPLATE_DEX_FILE(LAYOUT_BASE.NAME + "/template.dex", false),
+        TEMPLATE_DEX_FILE(LAYOUT_BASE.NAME + "/template.dex.bin", false),
 
         /**
          * template需要解成smali
