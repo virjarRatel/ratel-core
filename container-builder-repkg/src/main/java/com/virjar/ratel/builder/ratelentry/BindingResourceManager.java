@@ -65,10 +65,13 @@ public class BindingResourceManager {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         try (ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
             for (NewConstants.BUILDER_RESOURCE_LAYOUT layout : NewConstants.BUILDER_RESOURCE_LAYOUT.values()) {
-                if (layout.isRaw() && !layout.isDir()) {
+                if (!layout.isDir()) {
                     zipOutputStream.putNextEntry(new ZipEntry(layout.getNAME()));
                     InputStream inputStream = classLoader.getResourceAsStream(layout.getNAME());
                     if (inputStream == null) {
+                        if (!layout.isOnlyDev()) {
+                            continue;
+                        }
                         throw new IOException("can not find resource: " + layout.getNAME());
                     }
                     IOUtils.copy(inputStream, zipOutputStream);
@@ -77,6 +80,7 @@ public class BindingResourceManager {
         }
         File tempFile = File.createTempFile("fake-binding-resource-builder", ".jar");
         FileUtils.writeByteArrayToFile(tempFile, byteArrayOutputStream.toByteArray());
+        FileUtils.copyFile(tempFile, new File("/Users/nenglianjituan/Desktop/temp/fake-binding-resource-builder.jar"));
 
         File helperJar = new File(workDir, NewConstants.BUILDER_RESOURCE_LAYOUT.BUILDER_HELPER_NAME.getNAME());
         FileUtils.forceMkdirParent(helperJar);

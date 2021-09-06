@@ -105,7 +105,7 @@ public class Main {
             ratelMain(args, null);
             return;
         }
-        com.virjar.ratel.builder.ratelentry.XApkHandler xApkHandler = new com.virjar.ratel.builder.ratelentry.XApkHandler(new File(args[xApkIndex]));
+        XApkHandler xApkHandler = new XApkHandler(new File(args[xApkIndex]));
 
         args[xApkIndex] = xApkHandler.releasedBaseApkTempFile.getAbsolutePath();
         File file = ratelMain(args, xApkHandler);
@@ -117,7 +117,7 @@ public class Main {
         Main.cleanWorkDir();
     }
 
-    private static File ratelMain(String[] args, com.virjar.ratel.builder.ratelentry.XApkHandler xApkHandler) throws Exception {
+    private static File ratelMain(String[] args, XApkHandler xApkHandler) throws Exception {
         restoreConstants();
         final Options options = new Options();
         options.addOption(new Option("t", "tell", false, "tell me the output apk file path"));
@@ -138,15 +138,11 @@ public class Main {
         DefaultParser parser = new DefaultParser();
 
 
-        //else if (str.startsWith("-P") && str.length() > 2) {
-        //                System.out.println("skip gradle build param:{ " + str + " }");
-        //            }
-
         ArrayList<String> originParam = new ArrayList<String>();
 
         for (String str : args) {
             if (str.startsWith("-P") && str.length() > 2) {
-                //nothing
+                //this is gradle param,need be skip
             } else {
                 originParam.add(str);
             }
@@ -260,9 +256,7 @@ public class Main {
 
         BindingResourceManager.extract(workDir);
 
-        File signatureKeyFile = new File(workDir, Constants.ratelDefaultApkSignatureKey);
-        System.out.println("release ratel default apk signature key into : " + signatureKeyFile.getAbsolutePath());
-        copyAndClose(Main.class.getClassLoader().getResourceAsStream(Constants.ratelDefaultApkSignatureKey), new FileOutputStream(signatureKeyFile));
+        File signatureKeyFile = BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.DEFAULT_SIGN_KEY);
 
         //load engine properties from engine build output config
         ratelBuildProperties.load(Main.class.getClassLoader().getResourceAsStream(Constants.ratelEngineProperties));
@@ -704,32 +698,21 @@ public class Main {
         System.out.println("zip align output apk: " + outApk);
         //use different executed binary file with certain OS platforms
         String osName = System.getProperty("os.name").toLowerCase();
-        String zipalignBinPath;
-        boolean isLinux = false;
+        File zipalignBinPath;
         if (osName.startsWith("Mac OS".toLowerCase())) {
-            zipalignBinPath = "zipalign/mac/zipalign";
+            zipalignBinPath = BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.ZIP_ALIGN_MAC);//"zipalign/mac/zipalign";
         } else if (osName.startsWith("Windows".toLowerCase())) {
-            zipalignBinPath = "zipalign/windows/zipalign.exe";
+            zipalignBinPath = BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.ZIP_ALIGN_WINDOWS);
         } else {
-            zipalignBinPath = "zipalign/linux/zipalign";
-            isLinux = true;
-        }
-        File unzipDestFile = new File(theWorkDir, zipalignBinPath);
-        unzipDestFile.getParentFile().mkdirs();
-        copyAndClose(Main.class.getClassLoader().getResourceAsStream(zipalignBinPath), new FileOutputStream(unzipDestFile));
-        if (isLinux) {
-            String libCPlusPlusPath = "zipalign/linux/lib64/libc++.so";
-            File libCPlusPlusFile = new File(theWorkDir, libCPlusPlusPath);
-            libCPlusPlusFile.getParentFile().mkdirs();
-            copyAndClose(Main.class.getClassLoader().getResourceAsStream(libCPlusPlusPath), new FileOutputStream(libCPlusPlusFile));
+            zipalignBinPath = BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.ZIP_ALIGN_LINUX);
         }
 
-        unzipDestFile.setExecutable(true);
+        zipalignBinPath.setExecutable(true);
 
         File tmpOutputApk = File.createTempFile("zipalign", ".apk");
         tmpOutputApk.deleteOnExit();
 
-        String command = unzipDestFile.getAbsolutePath() + " -f -p  4 " + outApk.getAbsolutePath() + " " + tmpOutputApk.getAbsolutePath();
+        String command = zipalignBinPath.getAbsolutePath() + " -f -p  4 " + outApk.getAbsolutePath() + " " + tmpOutputApk.getAbsolutePath();
         System.out.println("zip align apk with command: " + command);
 
         String[] envp = new String[]{"LANG=zh_CN.UTF-8", "LANGUAGE=zh_CN.UTF-8"};

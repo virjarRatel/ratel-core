@@ -5,13 +5,14 @@ package com.virjar.ratel.allcommon;
  */
 public interface NewConstants {
 
+
     /**
      * builder的资源文件名称定义
      */
     enum BUILDER_RESOURCE_LAYOUT {
         LAYOUT_BASE("build-asset", true, true),
         BUILDER_HELPER_NAME(LAYOUT_BASE.NAME + "/builder-helper.jar.bin", true),
-       // BUILDER_HELPER_NAME2(LAYOUT_BASE.NAME + "/builder-helper.jar.bin", true),
+        // BUILDER_HELPER_NAME2(LAYOUT_BASE.NAME + "/builder-helper.jar.bin", true),
 
         RUNTIME_APK_FILE(LAYOUT_BASE.NAME + "/runtime.apk", true),
         RUNTIME_JAR_FILE(LAYOUT_BASE.NAME + "/runtime.jar", false),
@@ -33,28 +34,43 @@ public interface NewConstants {
          * template需要解成smali
          */
         TEMPLATE_SMALI_ZIP_FILE(LAYOUT_BASE.NAME + "/template-smali.zip.bin", false),
+
+
+        /**
+         * zip align对应的资源数据
+         */
+        ZIP_ALIGN_BASE(LAYOUT_BASE.NAME + "/zipalign", true, true),
+        ZIP_ALIGN_LINUX(ZIP_ALIGN_BASE.NAME + "/linux/zipalign", false),
+        // Linux上面，如果是64位，则需要手动添加c++的函数库
+        ZIP_ALIGN_LINUX_LIB_CPP(ZIP_ALIGN_BASE.NAME + "/linux/lib64/libc++.so", false),
+        ZIP_ALIGN_WINDOWS(ZIP_ALIGN_BASE.NAME + "/windows/zipalign.exe", false),
+        ZIP_ALIGN_MAC(ZIP_ALIGN_BASE.NAME + "/mac/zipalign", false),
+
+        // 签名使用的默认证书
+        DEFAULT_SIGN_KEY(LAYOUT_BASE.NAME + "/hermes_key", false),
+
         ;
 
         private final String NAME;
-        private final boolean raw;
+        private final boolean onlyDev;
         private final boolean dir;
 
-        BUILDER_RESOURCE_LAYOUT(String NAME, boolean raw, boolean dir) {
+        BUILDER_RESOURCE_LAYOUT(String NAME, boolean onlyDev, boolean dir) {
             this.NAME = NAME;
-            this.raw = raw;
+            this.onlyDev = onlyDev;
             this.dir = dir;
         }
 
-        BUILDER_RESOURCE_LAYOUT(String NAME, boolean raw) {
-            this(NAME, raw, false);
+        BUILDER_RESOURCE_LAYOUT(String NAME, boolean onlyDev) {
+            this(NAME, onlyDev, false);
         }
 
         public String getNAME() {
             return NAME;
         }
 
-        public boolean isRaw() {
-            return raw;
+        public boolean isOnlyDev() {
+            return onlyDev;
         }
 
         public boolean isDir() {

@@ -13,7 +13,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.tools.ant.util.StringUtils;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 import org.apache.tools.zip.ZipOutputStream;
@@ -30,6 +29,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -58,7 +58,7 @@ public class OptimizeBuilderResource {
             optimizeData = handleJarInput(zipFile);
 
             if (output.endsWith("/")) {
-                writeDataToDir(output, optimizeData);
+                writeDataToDir(output, zipFile, optimizeData);
                 return;
             }
             if (!output.endsWith(".jar")) {
@@ -75,7 +75,7 @@ public class OptimizeBuilderResource {
     private static void writeDataToNewJar(ZipOutputStream zos, ZipFile zipFile, Map<NewConstants.BUILDER_RESOURCE_LAYOUT, byte[]> optimizeData) throws IOException {
         Set<String> filterResources = Sets.newHashSet();
         for (NewConstants.BUILDER_RESOURCE_LAYOUT layout : NewConstants.BUILDER_RESOURCE_LAYOUT.values()) {
-            if (layout.isRaw()) {
+            if (layout.isOnlyDev()) {
                 filterResources.add(layout.getNAME());
             }
         }
@@ -105,13 +105,32 @@ public class OptimizeBuilderResource {
         }
     }
 
-    private static void writeDataToDir(String output, Map<NewConstants.BUILDER_RESOURCE_LAYOUT, byte[]> optimizeData) throws IOException {
+    private static void writeDataToDir(String output, ZipFile zipFile, Map<NewConstants.BUILDER_RESOURCE_LAYOUT, byte[]> optimizeData) throws IOException {
         //释放到文件夹下，这个时候应该是调试模式下，
         File dir = new File(output);
+        Set<String> released = new HashSet<>();
         for (NewConstants.BUILDER_RESOURCE_LAYOUT resource : optimizeData.keySet()) {
             final File file = new File(dir, resource.getNAME());
             FileUtils.forceMkdirParent(file);
             FileUtils.writeByteArrayToFile(file, optimizeData.get(resource));
+            released.add(resource.getNAME());
+        }
+
+        for (NewConstants.BUILDER_RESOURCE_LAYOUT resource : NewConstants.BUILDER_RESOURCE_LAYOUT.values()) {
+            if (resource.isDir() || resource.isOnlyDev()) {
+                continue;
+            }
+            if (released.contains(resource.getNAME())) {
+                continue;
+            }
+
+            ZipEntry entry = zipFile.getEntry(resource.getNAME());
+            if (entry == null) {
+                continue;
+            }
+            File file = new File(dir, resource.getNAME());
+            FileUtils.forceMkdirParent(file);
+            FileUtils.copyInputStreamToFile(zipFile.getInputStream(entry), file);
         }
     }
 
