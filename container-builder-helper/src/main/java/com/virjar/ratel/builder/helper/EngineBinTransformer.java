@@ -1,6 +1,7 @@
 package com.virjar.ratel.builder.helper;
 
 import com.android.tools.r8.D8;
+import com.virjar.ratel.allcommon.NewConstants;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -81,6 +82,15 @@ public class EngineBinTransformer {
         migrateResourceFromJar(sourcePath, destinationFile);
     }
 
+    private static final Set<String> notMigrateFilter = new HashSet<String>() {{
+        add("AndroidManifest.xml");
+        add("resources.arsc");
+        // dex模式运行在Android的，所以可以删除mac和windows的资源
+        add(NewConstants.BUILDER_RESOURCE_LAYOUT.ZIP_ALIGN_MAC.getNAME());
+        add(NewConstants.BUILDER_RESOURCE_LAYOUT.ZIP_ALIGN_WINDOWS.getNAME());
+
+    }};
+
     private static void migrateResourceFromJar(File sourcePath, File destinationFile) throws IOException {
         ZipFile sourceZipFile = new ZipFile(sourcePath);
         File tempFile = File.createTempFile("temp-dex", ".jar");
@@ -102,10 +112,7 @@ public class EngineBinTransformer {
             if (zipEntry.getName().endsWith(".java")) {
                 continue;
             }
-            if (zipEntry.getName().equals("AndroidManifest.xml")) {
-                continue;
-            }
-            if (zipEntry.getName().equals("resources.arsc")) {
+            if (notMigrateFilter.contains(zipEntry.getName())) {
                 continue;
             }
             if (addedEntry.contains(zipEntry.getName())) {
