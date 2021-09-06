@@ -1,6 +1,7 @@
 package com.virjar.ratel.builder.mode;
 
 
+import com.virjar.ratel.allcommon.ClassNames;
 import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.builder.BuildParamMeta;
 import com.virjar.ratel.builder.Param;
@@ -235,10 +236,10 @@ public class RatelPackageBuilderZelda {
         if (buildParamMeta.cmd.hasOption('d')) {
             axmlVisitor = new EnableDebug(axmlVisitor);
         }
-        axmlVisitor = AXmlEditorCmdHandler.handleCmd(axmlVisitor,buildParamMeta.axmlEditorCommand);
+        axmlVisitor = AXmlEditorCmdHandler.handleCmd(axmlVisitor, buildParamMeta.axmlEditorCommand);
 
         axmlVisitor = new ReplacePackage(axmlVisitor, buildParamMeta.newPkgName);
-        axmlVisitor = new ReplaceApplication(axmlVisitor, Constants.containerZeldaBootstrapClass);
+        axmlVisitor = new ReplaceApplication(axmlVisitor, ClassNames.INJECT_ZELDA_APPLICATION.getClassName());
         //axmlVisitor = new ManifestHandlers.ReplaceApplication(axmlVisitor, buildParamMeta);
         axmlVisitor = new ZeldaManifestHandlers.FixRelativeClassName(axmlVisitor, buildParamMeta);
         axmlVisitor = new ZeldaManifestHandlers.ReNameProviderAuthorities(axmlVisitor, buildParamMeta);

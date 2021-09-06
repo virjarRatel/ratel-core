@@ -1,7 +1,9 @@
 package com.virjar.ratel.builder.mode;
 
 
+import com.virjar.ratel.allcommon.ClassNames;
 import com.virjar.ratel.allcommon.Constants;
+import com.virjar.ratel.allcommon.NewConstants;
 import com.virjar.ratel.builder.BuildParamMeta;
 import com.virjar.ratel.builder.Param;
 import com.virjar.ratel.builder.ReNameEntry;
@@ -131,7 +133,7 @@ public class RatelPackageBuilderAppendDex {
 
         axmlVisitor = AXmlEditorCmdHandler.handleCmd(axmlVisitor, buildParamMeta.axmlEditorCommand);
 
-        axmlVisitor = new ReplaceApplication(axmlVisitor, Constants.containerMultiDexBootstrapClass);
+        axmlVisitor = new ReplaceApplication(axmlVisitor, ClassNames.INJECT_APPEND_APPLICATION.getClassName());
         if (NumberUtils.toInt(buildParamMeta.apkMeta.getTargetSdkVersion()) >= 29) {
             // android 10,无法访问内存卡，临时放开
             axmlVisitor = new RequestLegacyExternalStorage(axmlVisitor);
