@@ -12,7 +12,7 @@ public class Main {
      *  1. 将构建工具从jar包格式转变为dex格式(给ratelManager使用)
      *  2. 优化构建工具jar包中的资源文件：如apk格式文件转换为jar格式（消除冗余的资源文件和冗余的class,我们的框架运行的时候只会使用到java代码，但是Android的构建工具将会产生apk文件，包含很多Android自带的class和自带的资源文件等）
      *  3. 产生smali模版文件，Ratel在改包过程，将会进行代码注入，这些注入代码是使用java书写，然后使用smali工具转化为smali文件，再注入到app中。这个转换过程只需要执行一次。（开发环境则需要每次执行）
-     *
+     *  4. 优化jar的代码，进一步减少文件大小
      * 本模块干的都是脏活儿累活儿，他不需要考虑资源大小问题，因为他最终不会出现在发布版本的构建工具中
      */
     public static void main(String[] args) throws Exception {

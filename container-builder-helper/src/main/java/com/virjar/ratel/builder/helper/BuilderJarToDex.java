@@ -168,24 +168,4 @@ public class BuilderJarToDex {
         fileOutputStream.close();
         return tempFile;
     }
-
-    private static File cleanJavaXClass(File sourceJarFile) throws IOException {
-        File tempFile = File.createTempFile(sourceJarFile.getName(), ".jar");
-        tempFile.deleteOnExit();
-        ZipFile originZipFile = new ZipFile(sourceJarFile);
-        ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(tempFile));
-        Enumeration<? extends ZipEntry> entries = originZipFile.getEntries();
-        while (entries.hasMoreElements()) {
-            ZipEntry zipEntry = entries.nextElement();
-            //这里有个玩意儿,在Android里面有实现，所以需要干掉，要不然执行会失败。d8却不会失败了
-            if (zipEntry.getName().startsWith("javax/xml")) {
-                continue;
-            }
-            zipOutputStream.putNextEntry(new ZipEntry(zipEntry));
-            zipOutputStream.write(IOUtils.toByteArray(originZipFile.getInputStream(zipEntry)));
-        }
-        originZipFile.close();
-        zipOutputStream.close();
-        return tempFile;
-    }
 }
