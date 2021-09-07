@@ -47,10 +47,10 @@ public class RatelPackageBuilderAppendDex {
             }
             //i will edit androidManifest.xml ,so skip it now
             if (entryName.equals(Constants.manifestFileName) &&
-                    !Constants.RATEL_MANAGER_PACKAGE.equals(buildParamMeta.apkMeta.getPackageName())) {
+                    !Constants.RATEL_MANAGER_PACKAGE.equals(context.infectApk.apkMeta.getPackageName())) {
                 zos.putNextEntry(new ZipEntry(originEntry));
                 System.out.println("edit androidManifest.xml entry");
-                zos.write(editManifestWithAXmlEditor(IOUtils.toByteArray(originAPKZip.getInputStream(originEntry)), cmd, buildParamMeta));
+                zos.write(editManifestWithAXmlEditor(IOUtils.toByteArray(originAPKZip.getInputStream(originEntry)), cmd, buildParamMeta,context));
                 continue;
             }
             zos.putNextEntry(new ZipEntry(originEntry));
@@ -65,7 +65,7 @@ public class RatelPackageBuilderAppendDex {
         System.out.println("apk build success!!");
 
         if (buildParamMeta.originApplicationClass != null) {
-            buildParamMeta.ratelBuildProperties.setProperty(Constants.KEY_ORIGIN_APPLICATION_NAME, buildParamMeta.originApplicationClass);
+            context.ratelBuildProperties.setProperty(Constants.KEY_ORIGIN_APPLICATION_NAME, buildParamMeta.originApplicationClass);
         }
     }
 
@@ -113,7 +113,7 @@ public class RatelPackageBuilderAppendDex {
         driverApkZipFile.close();
     }
 
-    private static byte[] editManifestWithAXmlEditor(byte[] manifestFileData, CommandLine cmd, BuildParamMeta buildParamMeta) throws IOException {
+    private static byte[] editManifestWithAXmlEditor(byte[] manifestFileData, CommandLine cmd, BuildParamMeta buildParamMeta, BuilderContext context) throws IOException {
 
         AxmlReader rd = new AxmlReader(manifestFileData);
         AxmlWriter wr = new AxmlWriter();
@@ -122,18 +122,18 @@ public class RatelPackageBuilderAppendDex {
         if (cmd.hasOption('d')) {
             axmlVisitor = new EnableDebug(axmlVisitor);
         }
-        if (NumberUtils.toInt(buildParamMeta.apkMeta.getTargetSdkVersion()) >= 30) {
+        if (NumberUtils.toInt(context.infectApk.apkMeta.getTargetSdkVersion()) >= 30) {
             // axmlVisitor = new AddQueriesForPackage(axmlVisitor, Constants.RATEL_MANAGER_PACKAGE);
             // android11 包可见性，导致插件没有办法通过PMS获取，所以先使用query_all_package
-            if (!buildParamMeta.axmlEditorCommand.contains("add_permission_android.permission.QUERY_ALL_PACKAGES")) {
-                buildParamMeta.axmlEditorCommand.add("add_permission_android.permission.QUERY_ALL_PACKAGES");
+            if (!context.axmlEditorCommand.contains("add_permission_android.permission.QUERY_ALL_PACKAGES")) {
+                context.axmlEditorCommand.add("add_permission_android.permission.QUERY_ALL_PACKAGES");
             }
         }
 
-        axmlVisitor = AXmlEditorCmdHandler.handleCmd(axmlVisitor, buildParamMeta.axmlEditorCommand);
+        axmlVisitor = AXmlEditorCmdHandler.handleCmd(axmlVisitor, context.axmlEditorCommand);
 
         axmlVisitor = new ReplaceApplication(axmlVisitor, ClassNames.INJECT_APPEND_APPLICATION.getClassName());
-        if (NumberUtils.toInt(buildParamMeta.apkMeta.getTargetSdkVersion()) >= 29) {
+        if (NumberUtils.toInt(context.infectApk.apkMeta.getTargetSdkVersion()) >= 29) {
             // android 10,无法访问内存卡，临时放开
             axmlVisitor = new RequestLegacyExternalStorage(axmlVisitor);
         }

@@ -2,6 +2,7 @@ package com.virjar.ratel.builder.manifesthandler;
 
 
 import com.virjar.ratel.builder.BuildParamMeta;
+import com.virjar.ratel.builder.ratelentry.BuilderContext;
 
 import org.jf.pxb.android.axml.AxmlVisitor;
 import org.jf.pxb.android.axml.NodeVisitor;
@@ -204,10 +205,12 @@ public class ZeldaManifestHandlers {
     public static class FixRelativeClassName extends AxmlVisitor {
 
         private BuildParamMeta zeldaBuildContext;
+        private BuilderContext builderContext;
 
-        public FixRelativeClassName(AxmlVisitor av, BuildParamMeta zeldaBuildContext) {
+        public FixRelativeClassName(AxmlVisitor av, BuildParamMeta zeldaBuildContext,BuilderContext builderContext) {
             super(av);
             this.zeldaBuildContext = zeldaBuildContext;
+            this.builderContext = builderContext;
         }
 
         @Override
@@ -236,7 +239,7 @@ public class ZeldaManifestHandlers {
                                     if ("name".equals(name) && obj instanceof String) {
                                         String componentName = obj.toString();
                                         if (componentName.startsWith(".")) {
-                                            obj = zeldaBuildContext.apkMeta.getPackageName() + componentName;
+                                            obj = builderContext.infectApk.apkMeta.getPackageName() + componentName;
                                         }
                                         zeldaBuildContext.declaredComponentClassNames.add(obj.toString());
                                     }

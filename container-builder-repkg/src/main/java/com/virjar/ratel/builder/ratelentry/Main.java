@@ -54,7 +54,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -62,7 +61,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.ByteBuffer;
@@ -140,29 +138,7 @@ public class Main {
             return null;
         }
 
-        File rawOriginApk = context.infectApk.file;
-        boolean hasRatelWrapper = extractOriginApkFromRatelApkIfNeed(context);
-
-        Properties ratelBuildProperties = parseManifestMetaData(context);
-
-        //reload properties if has additional params
-        if (context.propertiesConfig.size() > 0) {
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(byteArrayOutputStream);
-            BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
-
-            for (String config : context.propertiesConfig) {
-                bufferedWriter.write(config);
-                bufferedWriter.newLine();
-            }
-
-            bufferedWriter.close();
-            outputStreamWriter.close();
-            byteArrayOutputStream.close();
-
-            ratelBuildProperties.load(byteArrayOutputStream.toInputStream());
-        }
-
+        context.prepare();
 
         theWorkDir = context.theWorkDir;
         File workDir = cleanWorkDir();
@@ -173,16 +149,10 @@ public class Main {
 
         BindingResourceManager.extract(workDir);
 
-        File signatureKeyFile = BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.DEFAULT_SIGN_KEY);
-
-        //load engine properties from engine build output config
-        ratelBuildProperties.load(Main.class.getClassLoader().getResourceAsStream(Constants.ratelEngineProperties));
-
-        Util.setupRatelSupportArch(ratelBuildProperties.getProperty("ratel_support_abis", "arm64-v8a,armeabi-v7a"));
+        Util.setupRatelSupportArch(context.ratelBuildProperties.getProperty("ratel_support_abis", "arm64-v8a,armeabi-v7a"));
 
         //inject bootstrap code into origin apk
         BuildParamMeta buildParamMeta = parseManifest(context.infectApk.file);
-        buildParamMeta.axmlEditorCommand = context.axmlEditorCommand;
 
         Set<String> supportArch;
         if (xApkHandler != null) {
@@ -213,17 +183,14 @@ public class Main {
         System.out.println("build serialNo: " + serialNo);
         buildParamMeta.serialNo = serialNo;
         buildParamMeta.buildTimestamp = String.valueOf(System.currentTimeMillis());
-        ratelBuildProperties.setProperty(Constants.serialNoKey, serialNo);
-        ratelBuildProperties.setProperty(Constants.buildTimestampKey, buildParamMeta.buildTimestamp);
+        context.ratelBuildProperties.setProperty(Constants.serialNoKey, serialNo);
+        context.ratelBuildProperties.setProperty(Constants.buildTimestampKey, buildParamMeta.buildTimestamp);
 
         if (StringUtils.isNotBlank(buildParamMeta.androidAppComponentFactory)) {
             //暂时把这个带过来
-            ratelBuildProperties.setProperty(Constants.android_AppComponentFactoryKey, buildParamMeta.androidAppComponentFactory);
+            context.ratelBuildProperties.setProperty(Constants.android_AppComponentFactoryKey, buildParamMeta.androidAppComponentFactory);
         }
 
-        buildParamMeta.cmd = context.cmd;
-        buildParamMeta.apkMeta = context.infectApk.apkMeta;
-        buildParamMeta.ratelBuildProperties = ratelBuildProperties;
 
         //create new apk file
         ZipOutputStream zos = new ZipOutputStream(context.outFile);
@@ -238,7 +205,7 @@ public class Main {
                     //其他模式下，可以不存在 entry application
                     throw new RuntimeException("unsupported apk , no entry point application or entry point launch activity found");
                 }
-                RatelPackageBuilderRepackage.handleTask(workDir, context, buildParamMeta, ratelBuildProperties, zos, context.cmd);
+                RatelPackageBuilderRepackage.handleTask(workDir, context, buildParamMeta, context.ratelBuildProperties, zos, context.cmd);
                 break;
             case Constants.RATEL_ENGINE_ENUM_SHELL:
                 RatelPackageBuilderShell.handleTask(workDir, context, buildParamMeta, context.cmd, zos);
@@ -260,13 +227,13 @@ public class Main {
         Util.copyAssets(zos, BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.XPOSED_BRIDGE_JAR_FILE), Constants.xposedApiBridgeJarFileName);
         //请注意，shell模式下，不需要copy driver的资源
 
-        ratelBuildProperties.setProperty(Constants.hasEmbedXposedModuleKey, String.valueOf(context.xpModuleApk != null));
+        context.ratelBuildProperties.setProperty(Constants.hasEmbedXposedModuleKey, String.valueOf(context.xpModuleApk != null));
         if (context.xpModuleApk != null) {
             ApkFile xposedApkFile = context.xpModuleApk.apkFile;
-            ratelBuildProperties.setProperty(Constants.xposedModuleApkPackageNameKey, xposedApkFile.getApkMeta().getPackageName());
+            context.ratelBuildProperties.setProperty(Constants.xposedModuleApkPackageNameKey, xposedApkFile.getApkMeta().getPackageName());
         }
 
-        ratelBuildProperties.setProperty("supportArch", Joiner.on(",").join(supportArch));
+        context.ratelBuildProperties.setProperty("supportArch", Joiner.on(",").join(supportArch));
         // if (xApkHandler == null || xApkHandler.originAPKSupportArch().isEmpty()) {
         // 普通模式，以及xapkso在主包的情况。so需要copy到主包
         // now copy native library
@@ -319,10 +286,10 @@ public class Main {
                 certificateContent = parse.getString("payload");
 
                 //setup certificate information
-                ratelBuildProperties.setProperty("ratel_certificate_id", parse.getString("licenceId"));
-                ratelBuildProperties.setProperty("ratel_certificate_version", parse.getString("licenceVersion"));
-                ratelBuildProperties.setProperty("ratel_certificate_expire", String.valueOf(parse.getLongValue("expire")));
-                ratelBuildProperties.setProperty("ratel_certificate_account", parse.getString("account"));
+                context.ratelBuildProperties.setProperty("ratel_certificate_id", parse.getString("licenceId"));
+                context.ratelBuildProperties.setProperty("ratel_certificate_version", parse.getString("licenceVersion"));
+                context.ratelBuildProperties.setProperty("ratel_certificate_expire", String.valueOf(parse.getLongValue("expire")));
+                context.ratelBuildProperties.setProperty("ratel_certificate_account", parse.getString("account"));
             } catch (Exception e) {
                 //ignore
                 e.printStackTrace();
@@ -339,7 +306,7 @@ public class Main {
 
         zos.putNextEntry(new ZipEntry("assets/" + Constants.ratelConfigFileName));
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        ratelBuildProperties.store(byteArrayOutputStream, "auto generated by ratel repakcage builder");
+        context.ratelBuildProperties.store(byteArrayOutputStream, "auto generated by ratel repakcage builder");
         zos.write(byteArrayOutputStream.toByteArray());
 
 
@@ -347,22 +314,23 @@ public class Main {
         // FileUtils.deleteDirectory(workDir);
         System.out.println("the new apk file ：" + context.outFile.getAbsolutePath());
 
-        if (hasRatelWrapper) {
+        if (context.hasRatelWrapper) {
             // if this is a rebuilded apk,we can insert addson resource (such as dex/assets) with RDP|APKTool
             // we need merge this resource into the final apk
-            mergeAddsOnFiles(rawOriginApk, context.infectApk.file, context.outFile);
+            mergeAddsOnFiles(context.rawOriginApk, context.infectApk.file, context.outFile);
         }
 
         if (context.cmd.hasOption('s') && !context.cmd.hasOption('D')) {
             //do not need signature apk if create a decompile project
+            File signatureKeyFile = BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.DEFAULT_SIGN_KEY);
             try {
-                if (useV1Sign(buildParamMeta)) {
+                if (useV1Sign(context)) {
                     //7.0之前，走V1签名，所以要先签名再对齐
-                    signatureApk(context.outFile, signatureKeyFile, buildParamMeta);
+                    signatureApk(context.outFile, signatureKeyFile, context);
                     zipalign(context.outFile, workDir);
                 } else {
                     zipalign(context.outFile, workDir);
-                    signatureApk(context.outFile, signatureKeyFile, buildParamMeta);
+                    signatureApk(context.outFile, signatureKeyFile, context);
                 }
             } catch (Exception e) {
                 // we need remove final output apk if sign failed,because of out shell think a illegal apk format file as task success flag,
@@ -373,10 +341,10 @@ public class Main {
         }
 
 
-        ratelBuildProperties.store(new FileOutputStream(new File(context.outFile.getParentFile(), "ratelConfig.properties")), "auto generated by virjar@ratel");
+        context.ratelBuildProperties.store(new FileOutputStream(new File(context.outFile.getParentFile(), "ratelConfig.properties")), "auto generated by virjar@ratel");
 
         if (context.cmd.hasOption('D')) {
-            createRatelDecompileProject(context.outFile, context, context.cmd, ratelBuildProperties);
+            createRatelDecompileProject(context.outFile, context, context.cmd, context.ratelBuildProperties);
         }
 
         if (xApkHandler == null) {
@@ -669,7 +637,7 @@ public class Main {
         }.start();
     }
 
-    public static void signatureApk(File outApk, File keyStoreFile, BuildParamMeta buildParamMeta) throws Exception {
+    public static void signatureApk(File outApk, File keyStoreFile, BuilderContext buildParamMeta) throws Exception {
         System.out.println("auto sign apk with ratel KeyStore");
         File tmpOutputApk = File.createTempFile("apksigner", ".apk");
         tmpOutputApk.deleteOnExit();
@@ -742,30 +710,10 @@ public class Main {
         System.out.println(outApk.getAbsolutePath() + " has been Signed");
     }
 
-    private static boolean useV1Sign(BuildParamMeta buildParamMeta) {
+    private static boolean useV1Sign(BuilderContext buildParamMeta) {
         // targetSdkVersion为安卓11的必须使用v2签名
         // 安卓7之前使用v1签名
-        return buildParamMeta != null && NumberUtils.toInt(buildParamMeta.apkMeta.getMinSdkVersion(), 24) <= 23 && NumberUtils.toInt(buildParamMeta.apkMeta.getTargetSdkVersion()) < 30;
-    }
-
-    private static boolean extractOriginApkFromRatelApkIfNeed(BuilderContext context) throws IOException {
-        java.util.zip.ZipEntry zipEntry = context.infectApk.zipFile.getEntry("assets/ratel_serialNo.txt");
-        if (zipEntry == null) {
-            //就是一个普通的apk
-            return false;
-        }
-
-        File tempFile = File.createTempFile(context.infectApk.file.getName(), ".apk");
-        System.out.println("this is a ratel repkg apk file, extract origin into : " + tempFile.getAbsolutePath() + " and process it");
-        FileUtils.forceDeleteOnExit(tempFile);
-
-        ZipEntry originApkEntry = context.infectApk.zipFile.getEntry("assets/" + Constants.originAPKFileName);
-        try (final InputStream inputStream = context.infectApk.zipFile.getInputStream(originApkEntry)) {
-            FileUtils.copyInputStreamToFile(inputStream, tempFile);
-        }
-        context.infectApk.close();
-        context.infectApk = BuilderContextParser.parseApkFile(tempFile);
-        return true;
+        return buildParamMeta != null && NumberUtils.toInt(buildParamMeta.infectApk.apkMeta.getMinSdkVersion(), 24) <= 23 && NumberUtils.toInt(buildParamMeta.infectApk.apkMeta.getTargetSdkVersion()) < 30;
     }
 
 
@@ -787,36 +735,6 @@ public class Main {
         zipFile.close();
 
         return ret;
-    }
-
-
-    //解析MainfestMetaData的数据
-    private static Properties parseManifestMetaData(BuilderContext context) throws IOException, ParserConfigurationException, SAXException {
-        Properties metaDataProperties = new Properties();
-        if (context.xpModuleApk == null) {
-            return metaDataProperties;
-        }
-
-        Document document = loadDocument(new ByteArrayInputStream(context.infectApk.manifestXml.getBytes()));
-        Element applicationElement = (Element) document.getElementsByTagName("application").item(0);
-
-        NodeList applicationChildNodes = applicationElement.getChildNodes();
-
-        for (int i = 0; i < applicationChildNodes.getLength(); i++) {
-            Node node = applicationChildNodes.item(i);
-            if (!(node instanceof Element)) {
-                continue;
-            }
-
-            Element element = (Element) node;
-
-            if ("meta-data".equals(element.getTagName())) {
-                String key = element.getAttribute("android:name");
-                String value = element.getAttribute("android:value");
-                metaDataProperties.setProperty(key, value);
-            }
-        }
-        return metaDataProperties;
     }
 
 

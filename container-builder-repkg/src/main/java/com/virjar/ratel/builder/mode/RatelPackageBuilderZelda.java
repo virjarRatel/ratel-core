@@ -40,7 +40,7 @@ public class RatelPackageBuilderZelda {
                                   CommandLine cmd, ZipOutputStream zos
     ) throws IOException {
 
-        genMeta(buildParamMeta);
+        genMeta(buildParamMeta, context);
 
         ZipFile originAPKZip = context.infectApk.zipFile;
         Enumeration<ZipEntry> entries = originAPKZip.getEntries();
@@ -58,7 +58,7 @@ public class RatelPackageBuilderZelda {
             //i will edit androidManifest.xml ,so skip it now
             if (entryName.equals(Constants.manifestFileName)) {
                 zos.putNextEntry(new ZipEntry(originEntry));
-                zos.write(editManifestWithAXmlEditor(IOUtils.toByteArray(originAPKZip.getInputStream(originEntry)), cmd, buildParamMeta));
+                zos.write(editManifestWithAXmlEditor(IOUtils.toByteArray(originAPKZip.getInputStream(originEntry)), cmd, buildParamMeta, context));
                 continue;
             }
             if (entryName.equals(Constants.CONSTANTS_RESOURCES_ARSC)) {
@@ -74,34 +74,34 @@ public class RatelPackageBuilderZelda {
 
 
         storeDeclaredComponentClassNames(zos, buildParamMeta);
-        storeZeldaProperties(buildParamMeta);
+        storeZeldaProperties(buildParamMeta, context);
 
         Util.copyAssets(zos, new File(workDir, Constants.RATEL_ENGINE_JAR), Constants.RATEL_ENGINE_JAR);
         System.out.println("copy ratel engine dex resources");
         appendDex(zos, context.infectApk.file, new File(workDir, Constants.ratelZeldaBootstrapJarPath));
     }
 
-    private static void storeZeldaProperties(BuildParamMeta buildParamMeta) {
-        buildParamMeta.ratelBuildProperties.setProperty(Constants.KEY_ORIGIN_PKG_NAME, buildParamMeta.apkMeta.getPackageName());
-        buildParamMeta.ratelBuildProperties.setProperty(Constants.KEY_ORIGIN_APPLICATION_NAME, buildParamMeta.originApplicationClass);
-        buildParamMeta.ratelBuildProperties.setProperty(Constants.KEY_NEW_PKG_NAME, buildParamMeta.newPkgName);
-        buildParamMeta.ratelBuildProperties.setProperty(Constants.kEY_SUFFER_KEY, buildParamMeta.sufferKey);
+    private static void storeZeldaProperties(BuildParamMeta buildParamMeta, BuilderContext builderContext) {
+        builderContext.ratelBuildProperties.setProperty(Constants.KEY_ORIGIN_PKG_NAME, builderContext.infectApk.apkMeta.getPackageName());
+        builderContext.ratelBuildProperties.setProperty(Constants.KEY_ORIGIN_APPLICATION_NAME, buildParamMeta.originApplicationClass);
+        builderContext.ratelBuildProperties.setProperty(Constants.KEY_NEW_PKG_NAME, buildParamMeta.newPkgName);
+        builderContext.ratelBuildProperties.setProperty(Constants.kEY_SUFFER_KEY, buildParamMeta.sufferKey);
     }
 
 
-    private static void genMeta(BuildParamMeta buildParamMeta) {
-        if (buildParamMeta.apkMeta.getPackageName().equals(buildParamMeta.newPkgName)) {
-            throw new IllegalStateException("you should set a new package name,not: " + buildParamMeta.apkMeta.getPackageName());
+    private static void genMeta(BuildParamMeta buildParamMeta, BuilderContext builderContext) {
+        if (builderContext.infectApk.apkMeta.getPackageName().equals(buildParamMeta.newPkgName)) {
+            throw new IllegalStateException("you should set a new package name,not: " + builderContext.infectApk.apkMeta.getPackageName());
         }
         if (Constants.devBuild) {
-            buildParamMeta.sufferKey = "debug" + buildParamMeta.apkMeta.getVersionCode();
+            buildParamMeta.sufferKey = "debug" + builderContext.infectApk.apkMeta.getVersionCode();
         } else {
             buildParamMeta.sufferKey = Util.randomChars(8);
         }
         buildParamMeta.sufferKey = "zElDa." + buildParamMeta.sufferKey;
         if (StringUtils.isBlank(buildParamMeta.newPkgName)) {
             buildParamMeta.newPkgName = "virjar.zelda."
-                    + StringUtils.substring(buildParamMeta.apkMeta.getPackageName().replaceAll("\\.", ""), 0, 20)
+                    + StringUtils.substring(builderContext.infectApk.apkMeta.getPackageName().replaceAll("\\.", ""), 0, 20)
                     + "."
                     + buildParamMeta.sufferKey;
 
@@ -221,7 +221,7 @@ public class RatelPackageBuilderZelda {
         }
     }
 
-    private static byte[] editManifestWithAXmlEditor(byte[] manifestFileData, CommandLine cmd, BuildParamMeta buildParamMeta) throws IOException {
+    private static byte[] editManifestWithAXmlEditor(byte[] manifestFileData, CommandLine cmd, BuildParamMeta buildParamMeta, BuilderContext context) throws IOException {
 
         AxmlReader rd = new AxmlReader(manifestFileData);
 
@@ -233,15 +233,15 @@ public class RatelPackageBuilderZelda {
 
         AxmlVisitor axmlVisitor = wr;
 
-        if (buildParamMeta.cmd.hasOption('d')) {
+        if (context.cmd.hasOption('d')) {
             axmlVisitor = new EnableDebug(axmlVisitor);
         }
-        axmlVisitor = AXmlEditorCmdHandler.handleCmd(axmlVisitor, buildParamMeta.axmlEditorCommand);
+        axmlVisitor = AXmlEditorCmdHandler.handleCmd(axmlVisitor, context.axmlEditorCommand);
 
         axmlVisitor = new ReplacePackage(axmlVisitor, buildParamMeta.newPkgName);
         axmlVisitor = new ReplaceApplication(axmlVisitor, ClassNames.INJECT_ZELDA_APPLICATION.getClassName());
         //axmlVisitor = new ManifestHandlers.ReplaceApplication(axmlVisitor, buildParamMeta);
-        axmlVisitor = new ZeldaManifestHandlers.FixRelativeClassName(axmlVisitor, buildParamMeta);
+        axmlVisitor = new ZeldaManifestHandlers.FixRelativeClassName(axmlVisitor, buildParamMeta, context);
         axmlVisitor = new ZeldaManifestHandlers.ReNameProviderAuthorities(axmlVisitor, buildParamMeta);
         axmlVisitor = new ZeldaManifestHandlers.ReNamePermissionDeclare(axmlVisitor, buildParamMeta);
 

@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.virjar.ratel.allcommon.ClassNames;
 import com.virjar.ratel.allcommon.Constants;
+import com.virjar.ratel.builder.ratelentry.BuilderContext;
 import com.virjar.ratel.builder.utils.SDK_VERSION_CODES;
 import com.virjar.ratel.builder.utils.SmaliBuilder;
 
@@ -74,9 +75,10 @@ public class BootstrapCodeInjector {
                                            File workDir,
                                            File bootstrapAPKDecodeDir,
                                            BuildParamMeta buildParamMeta,
+                                           BuilderContext context,
                                            boolean injectLogComponent, boolean decodeAllSmali
     ) throws IOException, DexMergeFailedException {
-        if (buildParamMeta.apkMeta.getPackageName().equals(Constants.RATEL_MANAGER_PACKAGE)) {
+        if (context.infectApk.apkMeta.getPackageName().equals(Constants.RATEL_MANAGER_PACKAGE)) {
             //rm 进行代码注入
             File rebuildDex = new File(workDir, "not_inject_for_rm.dex");
             FileUtils.copyFile(dexImage, rebuildDex);

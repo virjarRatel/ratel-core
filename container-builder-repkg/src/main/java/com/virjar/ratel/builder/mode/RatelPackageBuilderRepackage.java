@@ -117,7 +117,7 @@ public class RatelPackageBuilderRepackage {
         boolean hasSplitDex = false;
         for (int i = 0; i < 4; i++) {
             try {
-                entryDexImageFile = BootstrapCodeInjector.injectBootstrapCode(dexImage, workDir, bootstrapDecodeDir, buildParamMeta, injectLogComponent, decodeAllSmali);
+                entryDexImageFile = BootstrapCodeInjector.injectBootstrapCode(dexImage, workDir, bootstrapDecodeDir, buildParamMeta, context, injectLogComponent, decodeAllSmali);
                 break;
             } catch (SmaliRebuildFailedException e) {
                 if (decodeAllSmali) {
@@ -158,10 +158,10 @@ public class RatelPackageBuilderRepackage {
             //i will edit androidManifest.xml ,so skip it now
             if (originEntry.getName().equals(Constants.manifestFileName)) {
                 zos.putNextEntry(new ZipEntry(originEntry));
-                boolean isTargetAndroidR = NumberUtils.toInt(buildParamMeta.apkMeta.getTargetSdkVersion()) >= 30;
-                zos.write(handleManifestEditor(buildParamMeta, IOUtils.toByteArray(originAPKZip.getInputStream(originEntry))
+                boolean isTargetAndroidR = NumberUtils.toInt(context.infectApk.apkMeta.getTargetSdkVersion()) >= 30;
+                zos.write(handleManifestEditor(context, buildParamMeta, IOUtils.toByteArray(originAPKZip.getInputStream(originEntry))
                         , cmd.hasOption('d')
-                        , buildParamMeta.axmlEditorCommand, isTargetAndroidR
+                        , context.axmlEditorCommand, isTargetAndroidR
                 ));
                 continue;
             }
@@ -241,7 +241,7 @@ public class RatelPackageBuilderRepackage {
     }
 
 
-    private static byte[] handleManifestEditor(BuildParamMeta buildParamMeta, byte[] manifestFileData, boolean enableDebug,
+    private static byte[] handleManifestEditor(BuilderContext builderContext, BuildParamMeta buildParamMeta, byte[] manifestFileData, boolean enableDebug,
                                                List<String> xmlEditCmd, boolean isTargetAndroidR
     ) throws IOException {
         AxmlReader rd = new AxmlReader(manifestFileData);
@@ -258,7 +258,7 @@ public class RatelPackageBuilderRepackage {
         }
         axmlVisitor = AXmlEditorCmdHandler.handleCmd(axmlVisitor, xmlEditCmd);
 
-        if (NumberUtils.toInt(buildParamMeta.apkMeta.getTargetSdkVersion()) >= 29) {
+        if (NumberUtils.toInt(builderContext.infectApk.apkMeta.getTargetSdkVersion()) >= 29) {
             // android 10,无法访问内存卡，临时放开
             axmlVisitor = new RequestLegacyExternalStorage(axmlVisitor);
         }
