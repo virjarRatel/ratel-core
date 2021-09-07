@@ -80,8 +80,6 @@ public class BindingResourceManager {
         }
         File tempFile = File.createTempFile("fake-binding-resource-builder", ".jar");
         FileUtils.writeByteArrayToFile(tempFile, byteArrayOutputStream.toByteArray());
-        FileUtils.copyFile(tempFile, new File("/Users/nenglianjituan/Desktop/temp/fake-binding-resource-builder.jar"));
-
         File helperJar = new File(workDir, NewConstants.BUILDER_RESOURCE_LAYOUT.BUILDER_HELPER_NAME.getNAME());
         FileUtils.forceMkdirParent(helperJar);
 
