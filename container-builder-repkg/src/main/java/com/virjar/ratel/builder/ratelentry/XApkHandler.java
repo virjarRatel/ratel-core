@@ -91,7 +91,7 @@ class XApkHandler {
             File releaseApkFile = new File(xapkWorking, zipEntryName);
 
             System.out.println("resign apk: " + zipEntryName);
-            Main.signatureApk(releaseApkFile, signatureKeyFile,null);
+            HelperZipAndSign.signatureApk(releaseApkFile, signatureKeyFile, null);
 
             zipOutputStream.putNextEntry(new ZipEntry(zipEntry));
             FileInputStream fileInputStream = new FileInputStream(releaseApkFile);
@@ -248,7 +248,7 @@ class XApkHandler {
             zipOutputStream.close();
             Files.move(saveApk.toPath(), targetApk.toPath(), StandardCopyOption.REPLACE_EXISTING);
             //操作完成后需要对齐
-            Main.zipalign(targetApk, Main.workDir());
+            HelperZipAndSign.zipalign(targetApk, Main.workDir());
         }
     }
 }
