@@ -7,7 +7,7 @@ cd `dirname $0`
 script_dir=`pwd`
 cd ..
 
-rdp_jar=${script_dir}/RDP-1.0.jar
+rdp_jar=${script_dir}/rdp.jar
 
 if [ -f ${rdp_jar} ] ;then
     echo "use ${rdp_jar}"

@@ -10,7 +10,7 @@ set script_dir=%~dp0
 :: goto work directory
 cd /d "%script_dir%"
 
-set rdp_jar=%script_dir%\RDP-1.0.jar
+set rdp_jar=%script_dir%\rdp.jar
 
 java -jar %rdp_jar%  %*
 
