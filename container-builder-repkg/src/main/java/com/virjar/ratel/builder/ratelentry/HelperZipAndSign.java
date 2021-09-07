@@ -19,14 +19,15 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
 public class HelperZipAndSign {
-    static void zipAndSign(BuilderContext context, File signatureKeyFile, File workDir) throws Exception {
+    static void zipAndSign(BuilderContext context) throws Exception {
+        File signatureKeyFile = BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.DEFAULT_SIGN_KEY);
         try {
             if (useV1Sign(context)) {
                 //7.0之前，走V1签名，所以要先签名再对齐
                 signatureApk(context.outFile, signatureKeyFile, context);
-                zipalign(context.outFile, workDir);
+                zipalign(context.outFile, context.theWorkDir);
             } else {
-                zipalign(context.outFile, workDir);
+                zipalign(context.outFile, context.theWorkDir);
                 signatureApk(context.outFile, signatureKeyFile, context);
             }
         } catch (Exception e) {

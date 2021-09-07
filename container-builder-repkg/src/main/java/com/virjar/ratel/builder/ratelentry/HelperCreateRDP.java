@@ -24,12 +24,14 @@ import static com.virjar.ratel.builder.ratelentry.Main.copyAndClose;
 public class HelperCreateRDP {
     private final static String SMALI_DIRNAME = "smali";
 
-    static void createRatelDecompileProject(File outputApkFile, BuilderContext context, CommandLine cmd, Properties ratelBuildProperties) throws IOException {
+    static void createRatelDecompileProject(BuilderContext context) throws IOException {
         ApkMeta apkMeta = context.infectApk.apkMeta;
+        File outputApkFile = context.outFile;
+        Properties ratelBuildProperties = context.ratelBuildProperties;
         //1. first calculate an output project directory
         File outProject;
-        if (cmd.hasOption('o')) {
-            outProject = new File(cmd.getOptionValue('o'));
+        if (context.cmd.hasOption('o')) {
+            outProject = new File(context.cmd.getOptionValue('o'));
         } else {
             outProject = new File(
                     apkMeta.getPackageName() + "_" + apkMeta.getVersionName() + "_" + apkMeta.getVersionCode() + "_ratel_decompile");
