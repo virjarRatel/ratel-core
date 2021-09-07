@@ -11,6 +11,7 @@ import org.apache.tools.zip.ZipFile;
 import org.apache.tools.zip.ZipOutputStream;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -163,7 +164,9 @@ public class Util {
 
     public static void copyAssets(ZipOutputStream zos, File from, String name) throws IOException {
         zos.putNextEntry(new ZipEntry("assets/" + name));
-        zos.write(FileUtils.readFileToByteArray(from));
+        try (FileInputStream fileInputStream = new FileInputStream(from)) {
+            IOUtils.copy(fileInputStream, zos);
+        }
     }
 
     public static final Pattern classesIndexPattern = Pattern.compile("classes(\\d+)\\.dex");
