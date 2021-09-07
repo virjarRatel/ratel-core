@@ -3,15 +3,14 @@ package com.virjar.ratel.builder.mode;
 
 import com.virjar.ratel.allcommon.ClassNames;
 import com.virjar.ratel.allcommon.Constants;
-import com.virjar.ratel.allcommon.NewConstants;
 import com.virjar.ratel.builder.BuildParamMeta;
-import com.virjar.ratel.builder.Param;
 import com.virjar.ratel.builder.ReNameEntry;
 import com.virjar.ratel.builder.Util;
 import com.virjar.ratel.builder.manifesthandler.AXmlEditorCmdHandler;
 import com.virjar.ratel.builder.manifesthandler.EnableDebug;
 import com.virjar.ratel.builder.manifesthandler.ReplaceApplication;
 import com.virjar.ratel.builder.manifesthandler.RequestLegacyExternalStorage;
+import com.virjar.ratel.builder.ratelentry.BuilderContext;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.io.IOUtils;
@@ -29,11 +28,11 @@ import java.util.Enumeration;
 import java.util.regex.Matcher;
 
 public class RatelPackageBuilderAppendDex {
-    public static void handleTask(File workDir, Param param, BuildParamMeta buildParamMeta,
+    public static void handleTask(File workDir, BuilderContext context, BuildParamMeta buildParamMeta,
                                   CommandLine cmd, ZipOutputStream zos
     ) throws IOException {
 
-        ZipFile originAPKZip = new ZipFile(param.originApk);
+        ZipFile originAPKZip = context.infectApk.zipFile;
         Enumeration<ZipEntry> entries = originAPKZip.getEntries();
         while (entries.hasMoreElements()) {
             ZipEntry originEntry = entries.nextElement();
@@ -62,7 +61,7 @@ public class RatelPackageBuilderAppendDex {
 
         Util.copyAssets(zos, new File(workDir, Constants.RATEL_ENGINE_JAR), Constants.RATEL_ENGINE_JAR);
         System.out.println("copy ratel engine dex resources");
-        appendDex(zos, param.originApk, new File(workDir, Constants.ratelMultiDexBootstrapJarPath));
+        appendDex(zos, context.infectApk.file, new File(workDir, Constants.ratelMultiDexBootstrapJarPath));
         System.out.println("apk build success!!");
 
         if (buildParamMeta.originApplicationClass != null) {

@@ -18,7 +18,6 @@ import com.virjar.ratel.builder.BootstrapCodeInjector;
 import com.virjar.ratel.builder.BuildParamMeta;
 import com.virjar.ratel.builder.DexMakerOpt;
 import com.virjar.ratel.builder.DexSplitter;
-import com.virjar.ratel.builder.Param;
 import com.virjar.ratel.builder.ReNameEntry;
 import com.virjar.ratel.builder.Util;
 import com.virjar.ratel.builder.mode.RatelPackageBuilderAppendDex;
@@ -28,16 +27,14 @@ import com.virjar.ratel.builder.mode.RatelPackageBuilderZelda;
 
 import net.dongliu.apk.parser.ApkFile;
 import net.dongliu.apk.parser.ApkParsers;
+import net.dongliu.apk.parser.bean.ApkMeta;
 import net.dongliu.apk.parser.bean.DexClass;
 import net.dongliu.apk.parser.exception.ParserException;
 import net.dongliu.apk.parser.parser.DexParser;
 import net.dongliu.apk.parser.struct.AndroidConstants;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
@@ -72,7 +69,6 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
@@ -118,115 +114,44 @@ public class Main {
     }
 
     private static File ratelMain(String[] args, XApkHandler xApkHandler) throws Exception {
+        System.out.println("ratel build param: " + Joiner.on(" ").join(args));
+
         restoreConstants();
-        final Options options = new Options();
-        options.addOption(new Option("t", "tell", false, "tell me the output apk file path"));
-        options.addOption(new Option("o", "output", true, "the output apk path or output project path"));
-        options.addOption(new Option("d", "debug", false, "add debuggable flag on androidManifest.xml "));
-        options.addOption(new Option("w", "workdir", true, "set a ratel working dir"));
-        options.addOption(new Option("p", "hookProvider", true, "no use , a deprecate flag,which ratel framework integrate sandhook"));
-        options.addOption(new Option("e", "engine", true, "the ratel engine,now support appendDex|rebuildDex|shell"));
-        options.addOption(new Option("h", "help", false, "print help message"));
-        options.addOption(new Option("c", "certificate", true, "authorizer certificate file"));
-        options.addOption(new Option("x", "extract", false, "extract origin apk from a ratel output apks"));
-        options.addOption(new Option("l", "log", false, "add log component,we can call it from apktool baksmali"));
-        options.addOption(new Option("s", "signature", false, "signature apk with ratel default KeyStore"));
-        options.addOption(new Option("D", "decompile", false, "create a RDP(ratel decompile project) like \"apktool output project\"," +
-                "this project only contains smali files and with capability to bypass signature check with ratel framework"));
 
-
-        DefaultParser parser = new DefaultParser();
-
-
-        ArrayList<String> originParam = new ArrayList<String>();
-
-        for (String str : args) {
-            if (str.startsWith("-P") && str.length() > 2) {
-                //this is gradle param,need be skip
-            } else {
-                originParam.add(str);
+        try (BuilderContext context = BuilderContextParser.parse(args, xApkHandler != null)) {
+            if (context.cmd.hasOption('h')) {
+                HelpFormatter hf = new HelpFormatter();
+                hf.setWidth(110);
+                hf.printHelp("ratel", BuilderContextParser.setupOptions());
+                return null;
             }
-        }
 
-
-        CommandLine cmd = parser.parse(options, originParam.toArray(new String[]{}), false);
-
-        if (cmd.hasOption('h')) {
-            HelpFormatter hf = new HelpFormatter();
-            hf.setWidth(110);
-            hf.printHelp("ratel", options);
-            return null;
-        }
-
-        if (cmd.hasOption('w')) {
-            theWorkDir = new File(cmd.getOptionValue('w'));
-        }
-
-        List<String> argList = cmd.getArgList();
-
-        List<String> reserved = new ArrayList<>();
-        List<String> propertiesConfig = new ArrayList<>();
-        List<String> axmlEditorCommand = new ArrayList<>();
-        String AXML_EDITOR_CMD_PREFFIX = "ratel_axml_";
-        for (String str : argList) {
-            if (str.startsWith(Constants.ratelPropertiesSuffix)) {
-                propertiesConfig.add(str.substring(Constants.ratelPropertiesSuffix.length()));
-            } else if (str.startsWith(AXML_EDITOR_CMD_PREFFIX)) {
-                axmlEditorCommand.add(str.substring(AXML_EDITOR_CMD_PREFFIX.length()));
-            } else {
-                reserved.add(str);
+            if (context.cmd.hasOption('t')) {
+                System.out.println(context.outFile.getAbsolutePath());
+                return null;
             }
+            return ratelMain(context, xApkHandler);
         }
+    }
 
-        String[] reservedArgs = reserved.toArray(new String[0]);
-
-        Param param = Param.parseAndCheck(reservedArgs);
-        if (param == null) {
-            //参数检查失败
+    private static File ratelMain(BuilderContext context, XApkHandler xApkHandler) throws Exception {
+        if (context.cmd.hasOption('x')) {
+            extractOriginAPk(context);
             return null;
         }
 
+        File rawOriginApk = context.infectApk.file;
+        boolean hasRatelWrapper = extractOriginApkFromRatelApkIfNeed(context);
 
-        //工作目录准备
-        File outFile;
-        if (cmd.hasOption('D')) {
-            outFile = File.createTempFile("ratel_decompile_temp", ".apk");
-            outFile.deleteOnExit();
-        } else if (cmd.hasOption('o')) {
-            outFile = new File(cmd.getOptionValue('o'));
-        } else {
-            String base = param.originApkMeta.getPackageName() + "_" + param.originApkMeta.getVersionName() + "_" + param.originApkMeta.getVersionCode();
-            if (xApkHandler != null) {
-                outFile = new File(base + "_ratel.xapk");
-            } else {
-                outFile = new File(base + "_ratel.apk");
-            }
-        }
-
-
-        if (cmd.hasOption('t')) {
-            System.out.println(outFile.getAbsolutePath());
-            return null;
-        }
-
-        if (cmd.hasOption('x')) {
-            extractOriginAPk(param, outFile);
-            return null;
-        }
-
-        File rawOriginApk = param.originApk;
-        boolean hasRatelWrapper = extractOriginApkFromRatelApkIfNeed(param);
-
-        //解读Meta信息，获取preferHookProviderKey
-        Properties ratelBuildProperties = parseManifestMetaData(param.xposedApk);
+        Properties ratelBuildProperties = parseManifestMetaData(context);
 
         //reload properties if has additional params
-        if (propertiesConfig.size() > 0) {
+        if (context.propertiesConfig.size() > 0) {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(byteArrayOutputStream);
             BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
 
-            for (String config : propertiesConfig) {
+            for (String config : context.propertiesConfig) {
                 bufferedWriter.write(config);
                 bufferedWriter.newLine();
             }
@@ -238,21 +163,13 @@ public class Main {
             ratelBuildProperties.load(byteArrayOutputStream.toInputStream());
         }
 
-        if (cmd.hasOption('h')) {
-            ratelBuildProperties.setProperty(Constants.preferHookProviderKey, StringUtils.trimToEmpty(cmd.getOptionValue('h')));
-        }
 
-        System.out.println("ratel build param: " + Joiner.on(" ").join(args));
-
+        theWorkDir = context.theWorkDir;
         File workDir = cleanWorkDir();
-
         if (xApkHandler != null) {
             System.out.println("release split apks");
             xApkHandler.releaseApks();
         }
-
-
-        System.out.println("clean working directory:" + workDir.getAbsolutePath());
 
         BindingResourceManager.extract(workDir);
 
@@ -264,23 +181,23 @@ public class Main {
         Util.setupRatelSupportArch(ratelBuildProperties.getProperty("ratel_support_abis", "arm64-v8a,armeabi-v7a"));
 
         //inject bootstrap code into origin apk
-        BuildParamMeta buildParamMeta = parseManifest(param.originApk);
-        buildParamMeta.axmlEditorCommand = axmlEditorCommand;
+        BuildParamMeta buildParamMeta = parseManifest(context.infectApk.file);
+        buildParamMeta.axmlEditorCommand = context.axmlEditorCommand;
 
         Set<String> supportArch;
         if (xApkHandler != null) {
             // xapk 模式下，首先解码外部的apk，外部为空，可以尝试内部apk
             supportArch = xApkHandler.originAPKSupportArch();
             if (supportArch.isEmpty()) {
-                supportArch = originAPKSupportArch(param.originApk);
+                supportArch = originAPKSupportArch(context.infectApk.file);
             }
         } else {
-            supportArch = originAPKSupportArch(param.originApk);
+            supportArch = originAPKSupportArch(context.infectApk.file);
         }
 
         String engine = Constants.RATEL_ENGINE_ENUM_REBUILD;
-        if (cmd.hasOption('e')) {
-            engine = cmd.getOptionValue('e');
+        if (context.cmd.hasOption('e')) {
+            engine = context.cmd.getOptionValue('e');
         } else {
             //auto
             if (buildParamMeta.originApplicationClass == null) {
@@ -304,30 +221,30 @@ public class Main {
             ratelBuildProperties.setProperty(Constants.android_AppComponentFactoryKey, buildParamMeta.androidAppComponentFactory);
         }
 
-        buildParamMeta.cmd = cmd;
-        buildParamMeta.apkMeta = param.originApkMeta;
+        buildParamMeta.cmd = context.cmd;
+        buildParamMeta.apkMeta = context.infectApk.apkMeta;
         buildParamMeta.ratelBuildProperties = ratelBuildProperties;
 
         //create new apk file
-        ZipOutputStream zos = new ZipOutputStream(outFile);
+        ZipOutputStream zos = new ZipOutputStream(context.outFile);
         zos.setEncoding("UTF8");
 
         switch (engine) {
             case Constants.RATEL_ENGINE_ENUM_APPENDEX:
-                RatelPackageBuilderAppendDex.handleTask(workDir, param, buildParamMeta, cmd, zos);
+                RatelPackageBuilderAppendDex.handleTask(workDir, context, buildParamMeta, context.cmd, zos);
                 break;
             case Constants.RATEL_ENGINE_ENUM_REBUILD:
                 if (buildParamMeta.appEntryClassDex == null) {
                     //其他模式下，可以不存在 entry application
                     throw new RuntimeException("unsupported apk , no entry point application or entry point launch activity found");
                 }
-                RatelPackageBuilderRepackage.handleTask(workDir, param, buildParamMeta, ratelBuildProperties, zos, cmd);
+                RatelPackageBuilderRepackage.handleTask(workDir, context, buildParamMeta, ratelBuildProperties, zos, context.cmd);
                 break;
             case Constants.RATEL_ENGINE_ENUM_SHELL:
-                RatelPackageBuilderShell.handleTask(workDir, param, buildParamMeta, cmd, zos);
+                RatelPackageBuilderShell.handleTask(workDir, context, buildParamMeta, context.cmd, zos);
                 break;
             case Constants.RATEL_ENGINE_ENUM_ZELDA:
-                RatelPackageBuilderZelda.handleTask(workDir, param, buildParamMeta, cmd, zos);
+                RatelPackageBuilderZelda.handleTask(workDir, context, buildParamMeta, context.cmd, zos);
                 break;
             default:
                 throw new IllegalStateException("unknown ratel build engine type: " + engine);
@@ -335,17 +252,17 @@ public class Main {
 
 
         // now insert apk into assets directory
-        Util.copyAssets(zos, param.originApk, Constants.originAPKFileName);
-        if (param.xposedApk != null) {
-            Util.copyAssets(zos, param.xposedApk, Constants.xposedBridgeApkFileName);
+        Util.copyAssets(zos, context.infectApk.file, Constants.originAPKFileName);
+        if (context.xpModuleApk != null) {
+            Util.copyAssets(zos, context.xpModuleApk.file, Constants.xposedBridgeApkFileName);
         }
 
         Util.copyAssets(zos, BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.XPOSED_BRIDGE_JAR_FILE), Constants.xposedApiBridgeJarFileName);
         //请注意，shell模式下，不需要copy driver的资源
 
-        ratelBuildProperties.setProperty(Constants.hasEmbedXposedModuleKey, String.valueOf(param.xposedApk != null));
-        if (param.xposedApk != null) {
-            ApkFile xposedApkFile = new ApkFile(param.xposedApk);
+        ratelBuildProperties.setProperty(Constants.hasEmbedXposedModuleKey, String.valueOf(context.xpModuleApk != null));
+        if (context.xpModuleApk != null) {
+            ApkFile xposedApkFile = context.xpModuleApk.apkFile;
             ratelBuildProperties.setProperty(Constants.xposedModuleApkPackageNameKey, xposedApkFile.getApkMeta().getPackageName());
         }
 
@@ -353,8 +270,8 @@ public class Main {
         // if (xApkHandler == null || xApkHandler.originAPKSupportArch().isEmpty()) {
         // 普通模式，以及xapkso在主包的情况。so需要copy到主包
         // now copy native library
-        if (param.xposedApk != null) {
-            Util.copyLibrary(zos, supportArch, param.xposedApk);
+        if (context.xpModuleApk != null) {
+            Util.copyLibrary(zos, supportArch, context.xpModuleApk.file);
         }
         Util.copyLibrary(zos, supportArch, BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.RUNTIME_JAR_FILE));
 //        } else {
@@ -370,7 +287,7 @@ public class Main {
         insertRatelNativeLib(zos, BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.RUNTIME_JAR_FILE));
 
         //add dexmaker opt file if exist
-        File dexMakerOptFile = DexMakerOpt.genDexMakerOptFile(workDir());
+        File dexMakerOptFile = DexMakerOpt.genDexMakerOptFile(workDir);
         if (dexMakerOptFile != null && dexMakerOptFile.exists()) {
             Util.copyAssets(zos, dexMakerOptFile, Constants.dexmakerOptFileName);
         }
@@ -384,8 +301,8 @@ public class Main {
 
         //append certificate file
         String ratelCertificate = Constants.debugCertificate;
-        if (cmd.hasOption('c')) {
-            String certificateContent = cmd.getOptionValue('c');
+        if (context.cmd.hasOption('c')) {
+            String certificateContent = context.cmd.getOptionValue('c');
             //first think as a file
             File file = new File(certificateContent);
             if (file.exists() && file.canRead()) {
@@ -428,45 +345,45 @@ public class Main {
 
         zos.close();
         // FileUtils.deleteDirectory(workDir);
-        System.out.println("the new apk file ：" + outFile.getAbsolutePath());
+        System.out.println("the new apk file ：" + context.outFile.getAbsolutePath());
 
         if (hasRatelWrapper) {
             // if this is a rebuilded apk,we can insert addson resource (such as dex/assets) with RDP|APKTool
             // we need merge this resource into the final apk
-            mergeAddsOnFiles(rawOriginApk, param.originApk, outFile);
+            mergeAddsOnFiles(rawOriginApk, context.infectApk.file, context.outFile);
         }
 
-        if (cmd.hasOption('s') && !cmd.hasOption('D')) {
+        if (context.cmd.hasOption('s') && !context.cmd.hasOption('D')) {
             //do not need signature apk if create a decompile project
             try {
                 if (useV1Sign(buildParamMeta)) {
                     //7.0之前，走V1签名，所以要先签名再对齐
-                    signatureApk(outFile, signatureKeyFile, buildParamMeta);
-                    zipalign(outFile, workDir);
+                    signatureApk(context.outFile, signatureKeyFile, buildParamMeta);
+                    zipalign(context.outFile, workDir);
                 } else {
-                    zipalign(outFile, workDir);
-                    signatureApk(outFile, signatureKeyFile, buildParamMeta);
+                    zipalign(context.outFile, workDir);
+                    signatureApk(context.outFile, signatureKeyFile, buildParamMeta);
                 }
             } catch (Exception e) {
                 // we need remove final output apk if sign failed,because of out shell think a illegal apk format file as task success flag,
                 // android system think signed apk as really right apk,we can not install this apk on the android cell phone if rebuild success but sign failed
-                FileUtils.forceDelete(outFile);
+                FileUtils.forceDelete(context.outFile);
                 throw e;
             }
         }
 
 
-        ratelBuildProperties.store(new FileOutputStream(new File(outFile.getParentFile(), "ratelConfig.properties")), "auto generated by virjar@ratel");
+        ratelBuildProperties.store(new FileOutputStream(new File(context.outFile.getParentFile(), "ratelConfig.properties")), "auto generated by virjar@ratel");
 
-        if (cmd.hasOption('D')) {
-            createRatelDecompileProject(outFile, param, cmd, ratelBuildProperties);
+        if (context.cmd.hasOption('D')) {
+            createRatelDecompileProject(context.outFile, context, context.cmd, ratelBuildProperties);
         }
 
         if (xApkHandler == null) {
             System.out.println("clean working directory..");
             FileUtils.deleteDirectory(workDir);
         }
-        return outFile;
+        return context.outFile;
     }
 
     private static void insertRatelNativeLib(ZipOutputStream zos, File runtimeApkFile) throws IOException {
@@ -605,14 +522,15 @@ public class Main {
 
     private final static String SMALI_DIRNAME = "smali";
 
-    private static void createRatelDecompileProject(File outputApkFile, Param param, CommandLine cmd, Properties ratelBuildProperties) throws IOException {
+    private static void createRatelDecompileProject(File outputApkFile, BuilderContext context, CommandLine cmd, Properties ratelBuildProperties) throws IOException {
+        ApkMeta apkMeta = context.infectApk.apkMeta;
         //1. first calculate an output project directory
         File outProject;
         if (cmd.hasOption('o')) {
             outProject = new File(cmd.getOptionValue('o'));
         } else {
             outProject = new File(
-                    param.originApkMeta.getPackageName() + "_" + param.originApkMeta.getVersionName() + "_" + param.originApkMeta.getVersionCode() + "_ratel_decompile");
+                    apkMeta.getPackageName() + "_" + apkMeta.getVersionName() + "_" + apkMeta.getVersionCode() + "_ratel_decompile");
         }
 
         System.out.println("output project is:" + outProject.getAbsolutePath());
@@ -656,10 +574,10 @@ public class Main {
         File ratelConfigDir = new File(outProject, "ratel_resource");
         ratelConfigDir.mkdirs();
 
-        ratelBuildProperties.setProperty("app.packageName", param.originApkMeta.getPackageName());
-        ratelBuildProperties.setProperty("app.versionName", param.originApkMeta.getVersionName());
-        ratelBuildProperties.setProperty("app.versionCode", String.valueOf(param.originApkMeta.getVersionCode()));
-        ratelBuildProperties.setProperty("app.appName", param.originApkMeta.getName());
+        ratelBuildProperties.setProperty("app.packageName", apkMeta.getPackageName());
+        ratelBuildProperties.setProperty("app.versionName", apkMeta.getVersionName());
+        ratelBuildProperties.setProperty("app.versionCode", String.valueOf(apkMeta.getVersionCode()));
+        ratelBuildProperties.setProperty("app.appName", apkMeta.getName());
 
         ratelBuildProperties.store(new FileOutputStream(new File(ratelConfigDir, "ratelConfig.properties")), "auto generated by virjar@ratel");
 
@@ -830,29 +748,24 @@ public class Main {
         return buildParamMeta != null && NumberUtils.toInt(buildParamMeta.apkMeta.getMinSdkVersion(), 24) <= 23 && NumberUtils.toInt(buildParamMeta.apkMeta.getTargetSdkVersion()) < 30;
     }
 
-    private static boolean extractOriginApkFromRatelApkIfNeed(Param param) throws IOException {
-        if (param.originApk == null) {
+    private static boolean extractOriginApkFromRatelApkIfNeed(BuilderContext context) throws IOException {
+        java.util.zip.ZipEntry zipEntry = context.infectApk.zipFile.getEntry("assets/ratel_serialNo.txt");
+        if (zipEntry == null) {
+            //就是一个普通的apk
             return false;
         }
-        try (ZipFile zipFile = new ZipFile(param.originApk)) {
-            ZipEntry zipEntry = zipFile.getEntry("assets/ratel_serialNo.txt");
-            if (zipEntry == null) {
-                //就是一个普通的apk
-                return false;
-            }
 
-            File tempFile = File.createTempFile(param.originApk.getName(), ".apk");
-            System.out.println("this is a ratel repkg apk file, extract origin into : " + tempFile.getAbsolutePath() + " and process it");
-            FileUtils.forceDeleteOnExit(tempFile);
+        File tempFile = File.createTempFile(context.infectApk.file.getName(), ".apk");
+        System.out.println("this is a ratel repkg apk file, extract origin into : " + tempFile.getAbsolutePath() + " and process it");
+        FileUtils.forceDeleteOnExit(tempFile);
 
-            ZipEntry originApkEntry = zipFile.getEntry("assets/" + Constants.originAPKFileName);
-            FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
-
-            IOUtils.copy(zipFile.getInputStream(originApkEntry), fileOutputStream);
-            fileOutputStream.close();
-            param.originApk = tempFile;
-            return true;
+        ZipEntry originApkEntry = context.infectApk.zipFile.getEntry("assets/" + Constants.originAPKFileName);
+        try (final InputStream inputStream = context.infectApk.zipFile.getInputStream(originApkEntry)) {
+            FileUtils.copyInputStreamToFile(inputStream, tempFile);
         }
+        context.infectApk.close();
+        context.infectApk = BuilderContextParser.parseApkFile(tempFile);
+        return true;
     }
 
 
@@ -878,14 +791,13 @@ public class Main {
 
 
     //解析MainfestMetaData的数据
-    private static Properties parseManifestMetaData(File xposedApk) throws IOException, ParserConfigurationException, SAXException {
+    private static Properties parseManifestMetaData(BuilderContext context) throws IOException, ParserConfigurationException, SAXException {
         Properties metaDataProperties = new Properties();
-        if (xposedApk == null) {
+        if (context.xpModuleApk == null) {
             return metaDataProperties;
         }
 
-        String originAPKManifestXml = ApkParsers.getManifestXml(xposedApk);
-        Document document = loadDocument(new ByteArrayInputStream(originAPKManifestXml.getBytes()));
+        Document document = loadDocument(new ByteArrayInputStream(context.infectApk.manifestXml.getBytes()));
         Element applicationElement = (Element) document.getElementsByTagName("application").item(0);
 
         NodeList applicationChildNodes = applicationElement.getChildNodes();
@@ -1113,34 +1025,24 @@ public class Main {
 
     private static File theWorkDir = null;
 
-    static File workDir() {
-        if (theWorkDir == null) {
-            theWorkDir = new File("ratel_work_dir_repkg");
+
+    private static File cleanWorkDir() {
+        FileUtils.deleteQuietly(theWorkDir);
+        try {
+            FileUtils.forceMkdir(theWorkDir);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
         return theWorkDir;
     }
 
-    private static File cleanWorkDir() {
-        File workDir = workDir();
-        FileUtils.deleteQuietly(workDir);
-        try {
-            FileUtils.forceMkdir(workDir);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+
+    private static void extractOriginAPk(BuilderContext context) throws IOException {
+        ZipEntry zipEntry =
+                context.infectApk.zipFile.getEntry("assets/" + Constants.originAPKFileName);
+        try (InputStream inputStream = context.infectApk.zipFile.getInputStream(zipEntry)) {
+            FileUtils.copyInputStreamToFile(inputStream, context.outFile);
         }
-        return workDir;
-    }
-
-
-    private static void extractOriginAPk(Param param, File outFile) throws IOException {
-        File originApk = param.originApk;
-        byte[] bytes;
-        try (ZipFile zipFile = new ZipFile(originApk)) {
-            ZipEntry entry = zipFile.getEntry("assets/" + Constants.originAPKFileName);
-            bytes = IOUtils.toByteArray(zipFile.getInputStream(entry));
-        }
-        FileUtils.writeByteArrayToFile(outFile, bytes);
-
     }
 
     public static int copyAndClose(final InputStream input, final OutputStream output) throws IOException {
@@ -1186,5 +1088,9 @@ public class Main {
             }
             field.set(null, castValue);
         }
+    }
+
+    public static File workDir() {
+        return theWorkDir;
     }
 }

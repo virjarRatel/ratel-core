@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+@Deprecated
 public class BuildParamMeta {
     public String packageName;
     public String appEntryClass;

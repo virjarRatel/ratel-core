@@ -4,7 +4,6 @@ package com.virjar.ratel.builder.mode;
 import com.virjar.ratel.allcommon.ClassNames;
 import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.builder.BuildParamMeta;
-import com.virjar.ratel.builder.Param;
 import com.virjar.ratel.builder.ReNameEntry;
 import com.virjar.ratel.builder.Util;
 import com.virjar.ratel.builder.manifesthandler.AXmlEditorCmdHandler;
@@ -12,6 +11,7 @@ import com.virjar.ratel.builder.manifesthandler.EnableDebug;
 import com.virjar.ratel.builder.manifesthandler.ReplaceApplication;
 import com.virjar.ratel.builder.manifesthandler.ReplacePackage;
 import com.virjar.ratel.builder.manifesthandler.ZeldaManifestHandlers;
+import com.virjar.ratel.builder.ratelentry.BuilderContext;
 
 import net.dongliu.apk.parser.struct.ChunkType;
 
@@ -36,13 +36,13 @@ import java.util.Enumeration;
 import java.util.regex.Matcher;
 
 public class RatelPackageBuilderZelda {
-    public static void handleTask(File workDir, Param param, BuildParamMeta buildParamMeta,
+    public static void handleTask(File workDir, BuilderContext context, BuildParamMeta buildParamMeta,
                                   CommandLine cmd, ZipOutputStream zos
     ) throws IOException {
 
         genMeta(buildParamMeta);
 
-        ZipFile originAPKZip = new ZipFile(param.originApk);
+        ZipFile originAPKZip = context.infectApk.zipFile;
         Enumeration<ZipEntry> entries = originAPKZip.getEntries();
         while (entries.hasMoreElements()) {
             ZipEntry originEntry = entries.nextElement();
@@ -78,7 +78,7 @@ public class RatelPackageBuilderZelda {
 
         Util.copyAssets(zos, new File(workDir, Constants.RATEL_ENGINE_JAR), Constants.RATEL_ENGINE_JAR);
         System.out.println("copy ratel engine dex resources");
-        appendDex(zos, param.originApk, new File(workDir, Constants.ratelZeldaBootstrapJarPath));
+        appendDex(zos, context.infectApk.file, new File(workDir, Constants.ratelZeldaBootstrapJarPath));
     }
 
     private static void storeZeldaProperties(BuildParamMeta buildParamMeta) {

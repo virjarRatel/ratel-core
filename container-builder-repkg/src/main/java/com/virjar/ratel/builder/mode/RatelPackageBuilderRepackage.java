@@ -7,7 +7,6 @@ import com.virjar.ratel.builder.BootstrapCodeInjector;
 import com.virjar.ratel.builder.BuildParamMeta;
 import com.virjar.ratel.builder.DexMergeFailedException;
 import com.virjar.ratel.builder.DexSplitter;
-import com.virjar.ratel.builder.Param;
 import com.virjar.ratel.builder.ShellDetector;
 import com.virjar.ratel.builder.SmaliRebuildFailedException;
 import com.virjar.ratel.builder.Util;
@@ -15,6 +14,7 @@ import com.virjar.ratel.builder.manifesthandler.AXmlEditorCmdHandler;
 import com.virjar.ratel.builder.manifesthandler.EnableDebug;
 import com.virjar.ratel.builder.manifesthandler.RequestLegacyExternalStorage;
 import com.virjar.ratel.builder.ratelentry.BindingResourceManager;
+import com.virjar.ratel.builder.ratelentry.BuilderContext;
 
 import net.dongliu.apk.parser.utils.Pair;
 
@@ -44,7 +44,7 @@ import java.util.regex.Matcher;
 
 
 public class RatelPackageBuilderRepackage {
-    public static void handleTask(File workDir, Param param, BuildParamMeta buildParamMeta,
+    public static void handleTask(File workDir, BuilderContext context, BuildParamMeta buildParamMeta,
                                   Properties ratelBuildProperties,
                                   ZipOutputStream zos, CommandLine cmd
 
@@ -64,7 +64,7 @@ public class RatelPackageBuilderRepackage {
         if (StringUtils.isNotBlank(buildParamMeta.androidAppComponentFactory)) {
             // inject for android 10
             for (String dexIndex : buildParamMeta.dexClassesMap.keySet()) {
-                File dexImage = createOrGetDex(dexIndex, param.originApk, workDir);
+                File dexImage = createOrGetDex(dexIndex, context.infectApk.file, workDir);
                 DexBackedDexFile dexBackedDexFile = DexFileFactory.loadDexFile(dexImage, Opcodes.getDefault());
                 //Map<String, DexBackedClassDef> classDefMap = Maps.newHashMap();
                 for (DexBackedClassDef backedClassDef : dexBackedDexFile.getClasses()) {
@@ -108,7 +108,7 @@ public class RatelPackageBuilderRepackage {
         }
 
 
-        File dexImage = createOrGetDex(buildParamMeta.appEntryClassDex, param.originApk, workDir);
+        File dexImage = createOrGetDex(buildParamMeta.appEntryClassDex, context.infectApk.file, workDir);
 
 
         File entryDexImageFile = null;
@@ -136,13 +136,13 @@ public class RatelPackageBuilderRepackage {
         }
 
 
-        Pair<String, String> shellEntry = ShellDetector.findShellEntry(param.originApk);
+        Pair<String, String> shellEntry = ShellDetector.findShellEntry(context.infectApk.file);
         if (shellEntry != null) {
             ratelBuildProperties.setProperty(Constants.shellFeatureFileKey, shellEntry.getLeft());
             ratelBuildProperties.setProperty(Constants.shellName, shellEntry.getRight());
         }
 
-        ZipFile originAPKZip = new ZipFile(param.originApk);
+        ZipFile originAPKZip = new ZipFile(context.infectApk.file);
         Enumeration<ZipEntry> entries = originAPKZip.getEntries();
         int maxIndex = 1;
 
