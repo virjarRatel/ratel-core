@@ -93,7 +93,12 @@ public class BuilderJarToDex {
         // dex模式运行在Android的，所以可以删除mac和windows的资源
         add(NewConstants.BUILDER_RESOURCE_LAYOUT.ZIP_ALIGN_MAC.getNAME());
         add(NewConstants.BUILDER_RESOURCE_LAYOUT.ZIP_ALIGN_WINDOWS.getNAME());
-        add(NewConstants.BUILDER_RESOURCE_LAYOUT.RDP_JAR_FILE.getNAME());
+        // 排除整个rdp模块
+        for (NewConstants.BUILDER_RESOURCE_LAYOUT layout : NewConstants.BUILDER_RESOURCE_LAYOUT.values()) {
+            if (layout.getNAME().startsWith(NewConstants.BUILDER_RESOURCE_LAYOUT.RDP_BASE.getNAME())) {
+                add(layout.getNAME());
+            }
+        }
     }};
 
     private static void migrateResourceFromJar(File sourcePath, File destinationFile) throws IOException {
