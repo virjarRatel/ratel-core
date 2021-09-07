@@ -1,6 +1,5 @@
 package com.virjar.ratel.builder.ratelentry;
 
-import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
@@ -8,7 +7,6 @@ import com.google.common.collect.Sets;
 import com.virjar.ratel.allcommon.ClassNames;
 import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.allcommon.NewConstants;
-import com.virjar.ratel.allcommon.StandardEncryptor;
 import com.virjar.ratel.builder.BuildParamMeta;
 import com.virjar.ratel.builder.DexMakerOpt;
 import com.virjar.ratel.builder.Util;
@@ -138,10 +136,10 @@ public class Main {
             // xapk 模式下，首先解码外部的apk，外部为空，可以尝试内部apk
             supportArch = xApkHandler.originAPKSupportArch();
             if (supportArch.isEmpty()) {
-                supportArch = originAPKSupportArch(context.infectApk.file);
+                supportArch = originAPKSupportArch(context.infectApk.zipFile);
             }
         } else {
-            supportArch = originAPKSupportArch(context.infectApk.file);
+            supportArch = originAPKSupportArch(context.infectApk.zipFile);
         }
 
         String engine = Constants.RATEL_ENGINE_ENUM_REBUILD;
@@ -298,12 +296,11 @@ public class Main {
     }
 
 
-    private static Set<String> originAPKSupportArch(File originAPK) throws IOException {
+    private static Set<String> originAPKSupportArch(ZipFile zipFile) throws IOException {
         Set<String> ret = Sets.newHashSet();
         //ret.add("armeabi");
         //ret.add("armeabi-v7a");
 
-        ZipFile zipFile = new ZipFile(originAPK);
         Enumeration<ZipEntry> entries = zipFile.getEntries();
         while (entries.hasMoreElements()) {
             ZipEntry zipEntry = entries.nextElement();

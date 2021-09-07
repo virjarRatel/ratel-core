@@ -4,6 +4,7 @@ import com.beust.jcommander.internal.Sets;
 import com.google.common.io.Files;
 import com.virjar.ratel.allcommon.NewConstants;
 import com.virjar.ratel.builder.helper.apk2jar.APK2Jar;
+import com.virjar.ratel.builder.helper.proguard.OptimizeBuilderClass;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -156,10 +157,31 @@ public class OptimizeBuilderResource {
                 NewConstants.BUILDER_RESOURCE_LAYOUT.TEMPLATE_DEX_FILE,
                 new TemplateApkOptimizer(), optimizeData);
 
+        //RDP构建jar文件，进行一次代码优化，也是为了瘦身
+        handleResource(zipFile, NewConstants.BUILDER_RESOURCE_LAYOUT.RDP_JAR_FILE,
+                NewConstants.BUILDER_RESOURCE_LAYOUT.RDP_JAR_FILE,
+                OptimizeBuilderResource::optimizeRDPJar, optimizeData);
+
+        handleResource(zipFile, NewConstants.BUILDER_RESOURCE_LAYOUT.RDP_GIT_IGNORE_1,
+                NewConstants.BUILDER_RESOURCE_LAYOUT.RDP_GIT_IGNORE,
+                input -> input, optimizeData);
+
         // 模版文件解压为smali
         unpackTemplateSmali(optimizeData);
         return optimizeData;
 
+    }
+
+    private static byte[] optimizeRDPJar(byte[] input) throws Exception {
+        File tempFile = File.createTempFile("rdp-tmp", ".jar");
+        FileUtils.writeByteArrayToFile(tempFile, input);
+        OptimizeBuilderClass.main(new String[]{
+                "-i",
+                tempFile.getAbsolutePath(),
+                "-t",
+                "rdp"
+        });
+        return FileUtils.readFileToByteArray(tempFile);
     }
 
     private static void unpackTemplateSmali(Map<NewConstants.BUILDER_RESOURCE_LAYOUT, byte[]> optimizeData) throws IOException {
@@ -286,7 +308,7 @@ public class OptimizeBuilderResource {
             optimizeData.put(optimizedKey, IOUtils.toByteArray(zipFile.getInputStream(optimizeResource)));
             return;
         }
-        throw new IOException("can not find resource from jar file with key: (" + rowKey + "," + optimizedKey + ")");
+        throw new IOException("can not find resource from jar file with key: (" + rowKey.getNAME() + " , " + optimizedKey.getNAME() + ")");
 
     }
 

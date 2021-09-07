@@ -23,7 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-public class EngineBinTransformer {
+public class BuilderJarToDex {
     //java -jar /Users/virjar/git/ratel/ratel2/container-builder-transformer/build/libs/EngineBinTransformer-1.0.jar -s /Users/virjar/git/ratel/ratel2/script/dist/res/container-builder-repkg-1.2.9-SNAPSHOT.jar
     public static void main(String[] args) throws Exception {
         final Options options = new Options();
@@ -69,6 +69,11 @@ public class EngineBinTransformer {
             destinationFile = new File(sourcePath.getParentFile(), newFileName);
         }
 
+        //todo
+        // 确定有一些功能在Android环境下肯定不会执行，如rdp模块
+        // 所以我们这里可以对jar包的class进行修正，如删除rdp的代码
+        // 是的最终输出到的dex更小一些
+
         // File tempFile = cleanJavaXClass(sourcePath);
         D8.main(new String[]{
                 "--release",
@@ -88,7 +93,7 @@ public class EngineBinTransformer {
         // dex模式运行在Android的，所以可以删除mac和windows的资源
         add(NewConstants.BUILDER_RESOURCE_LAYOUT.ZIP_ALIGN_MAC.getNAME());
         add(NewConstants.BUILDER_RESOURCE_LAYOUT.ZIP_ALIGN_WINDOWS.getNAME());
-
+        add(NewConstants.BUILDER_RESOURCE_LAYOUT.RDP_JAR_FILE.getNAME());
     }};
 
     private static void migrateResourceFromJar(File sourcePath, File destinationFile) throws IOException {
@@ -152,7 +157,7 @@ public class EngineBinTransformer {
         File tempFile = File.createTempFile("android", ".jar");
         tempFile.deleteOnExit();
         FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
-        InputStream resourceAsStream = EngineBinTransformer.class.getClassLoader().getResourceAsStream("android-21-jar.bin");
+        InputStream resourceAsStream = BuilderJarToDex.class.getClassLoader().getResourceAsStream("android-21-jar.bin");
         assert resourceAsStream != null;
         IOUtils.copy(resourceAsStream, fileOutputStream);
         fileOutputStream.close();

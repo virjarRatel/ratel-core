@@ -33,7 +33,7 @@ public class Main {
                 APK2Jar.main(subArgs);
                 break;
             case "TRANSFORM_BUILDER_JAR":
-                EngineBinTransformer.main(subArgs);
+                BuilderJarToDex.main(subArgs);
                 break;
             case "OPTIMIZE_BUILDER_RESOURCE":
                 OptimizeBuilderResource.main(subArgs);

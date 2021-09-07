@@ -5,7 +5,7 @@
 -dontusemixedcaseclassnames
 
 # ratel 框架入口class
--keep  class ${{BUILDER_MAIN}} {
+-keep  class ${{RDP_MAIN}} {
     public static void main(java.lang.String[]);
 }
 

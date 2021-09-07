@@ -31,6 +31,7 @@ public class OptimizeBuilderClass {
     public static void main(String[] args) throws ParseException, IOException, InterruptedException {
         Options options = new Options();
         options.addOption(new Option("i", "input", true, "the builder jar file"));
+        options.addOption(new Option("t", "template", true, "the builder jar file"));
         options.addOption(new Option("h", "help", false, "show help message"));
 
         DefaultParser parser = new DefaultParser();
@@ -45,8 +46,11 @@ public class OptimizeBuilderClass {
 
         File buildOptimizeOutputJar = File.createTempFile("builder-opt", ".jar");
         File inputJarFile = new File(cmd.getOptionValue('i'));
-
-        File proguardRules = buildProguardRules(buildOptimizeOutputJar, inputJarFile);
+        String templateKey = "builder";
+        if (cmd.hasOption('t')) {
+            templateKey = cmd.getOptionValue('t');
+        }
+        File proguardRules = buildProguardRules(buildOptimizeOutputJar, inputJarFile, templateKey);
 
         // execute command
         String command = "java -jar " +
@@ -95,7 +99,7 @@ public class OptimizeBuilderClass {
                 }
                 duplicateEntries.add(dir);
 
-                System.out.println("create directory entry for :" + dir);
+                // System.out.println("create directory entry for :" + dir);
                 ZipEntry zipEntry = new ZipEntry(dir);
                 zipOutputStream.putNextEntry(zipEntry);
             }
@@ -104,7 +108,7 @@ public class OptimizeBuilderClass {
         return byteArrayOutputStream.toByteArray();
     }
 
-    private static File buildProguardRules(File buildOptimizeOutputJar, File inputBuilderJarFile) throws IOException {
+    private static File buildProguardRules(File buildOptimizeOutputJar, File inputBuilderJarFile, String templateKey) throws IOException {
 
         StringBuilder sb = new StringBuilder();
         sb.append("# input and output").append(System.lineSeparator());
@@ -118,7 +122,7 @@ public class OptimizeBuilderClass {
         // 映射表
         sb.append("-printmapping  ").append(new File(inputBuilderJarFile.getParent(), "builder-proguard.map").getAbsolutePath()).append(System.lineSeparator());
 
-        InputStream inputStream = OptimizeBuilderClass.class.getClassLoader().getResourceAsStream("builder.pro.template");
+        InputStream inputStream = OptimizeBuilderClass.class.getClassLoader().getResourceAsStream(templateKey + ".pro.template");
         if (inputStream == null) {
             throw new IOException("can not find binding resource: builder.pro.template");
         }

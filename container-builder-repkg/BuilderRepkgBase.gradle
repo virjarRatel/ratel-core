@@ -104,7 +104,7 @@ task injectRDPJar(type: Copy) {
     from '../container-builder-rdp/build/libs/RDP-1.0.jar'
     into 'src/main/resources/'
     rename {
-        Constants.RDP_BIN_JAR_NAME
+        NewConstants.BUILDER_RESOURCE_LAYOUT.RDP_JAR_FILE.NAME
     }
 }
 
