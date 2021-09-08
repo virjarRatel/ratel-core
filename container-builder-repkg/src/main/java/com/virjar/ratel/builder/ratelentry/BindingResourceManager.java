@@ -1,5 +1,6 @@
 package com.virjar.ratel.builder.ratelentry;
 
+import com.virjar.ratel.allcommon.BuildEnv;
 import com.virjar.ratel.allcommon.ClassNames;
 import com.virjar.ratel.allcommon.NewConstants;
 import com.virjar.ratel.allcommon.ReflectUtil;
@@ -34,8 +35,12 @@ public class BindingResourceManager {
         URL runtimeUrl = BindingResourceManager.class.getClassLoader().getResource(NewConstants.BUILDER_RESOURCE_LAYOUT.RUNTIME_JAR_FILE.getNAME());
         if (runtimeUrl == null) {
             // 请注意，这个分支只有AndroidStudio调试的时候才会走
-            // 发布版本和dex
-            doOptimizeExtract(workDir);
+            if (BuildEnv.DEBUG) {
+                // 生产环境理论上这个代码分支会被优化掉
+                doOptimizeExtract(workDir);
+            } else {
+                throw new IllegalStateException("can not run doOptimizeExtract on production env");
+            }
             return;
         }
         directExtract(workDir);
