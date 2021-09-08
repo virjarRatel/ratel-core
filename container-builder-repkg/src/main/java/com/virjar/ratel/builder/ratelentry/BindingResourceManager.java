@@ -36,7 +36,7 @@ public class BindingResourceManager {
         if (runtimeUrl == null) {
             // 请注意，这个分支只有AndroidStudio调试的时候才会走
             if (BuildEnv.DEBUG) {
-                // 生产环境理论上这个代码分支会被优化掉
+                // 生产环境这个代码分支会被优化掉
                 doOptimizeExtract(workDir);
             } else {
                 throw new IllegalStateException("can not run doOptimizeExtract on production env");

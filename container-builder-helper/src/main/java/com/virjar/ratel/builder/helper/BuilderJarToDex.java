@@ -1,7 +1,9 @@
 package com.virjar.ratel.builder.helper;
 
 import com.android.tools.r8.D8;
+import com.virjar.ratel.allcommon.BuildEnv;
 import com.virjar.ratel.allcommon.NewConstants;
+import com.virjar.ratel.builder.helper.buildenv.BuildInfoEditor;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -53,6 +55,9 @@ public class BuilderJarToDex {
             System.out.println("can not read builderJar");
             return;
         }
+
+        insertBuildInfoClass(sourcePath);
+
         File destinationFile;
         if (cmd.hasOption('d')) {
             destinationFile = new File(cmd.getOptionValue('d'));
@@ -68,6 +73,7 @@ public class BuilderJarToDex {
 
             destinationFile = new File(sourcePath.getParentFile(), newFileName);
         }
+
 
         //todo
         // 确定有一些功能在Android环境下肯定不会执行，如rdp模块
@@ -85,6 +91,12 @@ public class BuilderJarToDex {
         // FileUtils.forceDelete(tempFile);
 
         migrateResourceFromJar(sourcePath, destinationFile);
+    }
+
+    private static void insertBuildInfoClass(File inputJarFile) throws IOException {
+        BuildEnv.DEBUG = false;
+        BuildEnv.ANDROID_ENV = true;
+        BuildInfoEditor.editBuildInfoInBuilderJar(inputJarFile);
     }
 
     private static final Set<String> notMigrateFilter = new HashSet<String>() {{
