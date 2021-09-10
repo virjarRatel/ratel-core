@@ -150,8 +150,8 @@ class StringItems extends ArrayList<StringItem> {
         if (utf8) {
             //  The lengths are encoded in the same way as for the 16-bit format
             // but using 8-bit rather than 16-bit integers.
-            int strLen = in.readLen16();
-            int bytesLen = in.readLen16();
+            int strLen = in.readLen();
+            int bytesLen = in.readLen();
             byte[] bytes = in.readBytes(bytesLen);// Buffers.readBytes(buffer, bytesLen);
             String str = new String(bytes, StandardCharsets.UTF_8);
             // zero
