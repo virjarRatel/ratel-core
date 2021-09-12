@@ -81,11 +81,11 @@ IF (CMAKE_BUILD_TYPE STREQUAL Release)
     # 开源以前，我们需要做ollvm混淆，但是现在开源了，所以我们关闭ollvm混淆
     # 如果您公司需要自行做保护，那么可以根据下面资料进行ollvm环境搭建
     # https://www.jianshu.com/p/e0637f3169a3
-    # set(CXX_APPEND_FLAGS "${CXX_APPEND_FLAGS} -fvisibility=hidden -mllvm -sub -mllvm -bcf_prob=5 -mllvm -fla ")
+    # set(CXX_APPEND_FLAGS "${CXX_APPEND_FLAGS} -fvisibility=hidden ")
 
     set(CXX_APPEND_FLAGS "${CXX_APPEND_FLAGS} -fvisibility=hidden ")
     #include_directories(env/release)
-    add_definitions(-DRATEL_BUILD_TYPE_RELEASE)
+    add_definitions(-DRATEL_BUILD_TYPE_DEBUG)
 ELSE ()
     add_definitions(-DRATEL_BUILD_TYPE_DEBUG)
     #include_directories(env/debug)
