@@ -95,7 +95,14 @@ public class RatelResourceInterfaceImpl implements RatelResourceInterface {
                 Display.DEFAULT_DISPLAY,
                 null, null
         );
-        Object resourcesImpl = RposedHelpers.callMethod(resourceManager, "createResourcesImpl", resourceKey);
+        Object resourcesImpl = null;
+        if(Build.VERSION.SDK_INT >= 30){
+            Object mApkAssetsSupplier = RposedHelpers.callMethod(resourceManager, "createApkAssetsSupplierNotLocked", resourceKey);
+            resourcesImpl = RposedHelpers.callMethod(resourceManager, "createResourcesImpl", resourceKey,mApkAssetsSupplier);
+        }else{
+            resourcesImpl = RposedHelpers.callMethod(resourceManager, "createResourcesImpl", resourceKey);
+        }
+
         Resources resources = (Resources) RposedHelpers.newInstance(Resources.class, moduleClassLoader);
         RposedHelpers.callMethod(resources, "setImpl", resourcesImpl);
         return resources;

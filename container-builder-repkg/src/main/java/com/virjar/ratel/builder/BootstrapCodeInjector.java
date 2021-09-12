@@ -107,6 +107,50 @@ public class BootstrapCodeInjector {
             );
         }
 
+        String helperSmaliFilePath = Util.classNameToSmaliPath(ClassNames.INJECT_TOOL_SMALI_Helper.getClassName());
+        FileUtils.copyFile(
+                new File(bootstrapAPKDecodeDir, helperSmaliFilePath),
+                new File(runtimeSmaliDir, helperSmaliFilePath)
+        );
+
+        String helperClassSmaliFilePath = Util.classNameToSmaliPath(ClassNames.INJECT_TOOL_SMALI_Helper_Class.getClassName());
+        FileUtils.copyFile(
+                new File(bootstrapAPKDecodeDir, helperClassSmaliFilePath),
+                new File(runtimeSmaliDir, helperClassSmaliFilePath)
+        );
+        String helperHandleInfoSmaliFilePath = Util.classNameToSmaliPath(ClassNames.INJECT_TOOL_SMALI_Helper_HandleInfo.getClassName());
+        FileUtils.copyFile(
+                new File(bootstrapAPKDecodeDir, helperHandleInfoSmaliFilePath),
+                new File(runtimeSmaliDir, helperHandleInfoSmaliFilePath)
+        );
+        String helperMethodHandleSmaliFilePath = Util.classNameToSmaliPath(ClassNames.INJECT_TOOL_SMALI_Helper_MethodHandle.getClassName());
+        FileUtils.copyFile(
+                new File(bootstrapAPKDecodeDir, helperMethodHandleSmaliFilePath),
+                new File(runtimeSmaliDir, helperMethodHandleSmaliFilePath)
+        );
+        String helperMethodHandleImplSmaliFilePath = Util.classNameToSmaliPath(ClassNames.INJECT_TOOL_SMALI_Helper_MethodHandleImpl.getClassName());
+        FileUtils.copyFile(
+                new File(bootstrapAPKDecodeDir, helperMethodHandleImplSmaliFilePath),
+                new File(runtimeSmaliDir, helperMethodHandleImplSmaliFilePath)
+        );
+        String helperNeverCallSmaliFilePath = Util.classNameToSmaliPath(ClassNames.INJECT_TOOL_SMALI_Helper_NeverCall.getClassName());
+        FileUtils.copyFile(
+                new File(bootstrapAPKDecodeDir, helperNeverCallSmaliFilePath),
+                new File(runtimeSmaliDir, helperNeverCallSmaliFilePath)
+        );
+
+        String hiddenApiBypassSmaliFilePath = Util.classNameToSmaliPath(ClassNames.INJECT_TOOL_SMALI_HiddenApiBypass.getClassName());
+        FileUtils.copyFile(
+                new File(bootstrapAPKDecodeDir, hiddenApiBypassSmaliFilePath),
+                new File(runtimeSmaliDir, hiddenApiBypassSmaliFilePath)
+        );
+
+        String logSmaliFilePath = Util.classNameToSmaliPath(ClassNames.INJECT_TOOL_SMALI_LOG.getClassName());
+        FileUtils.copyFile(
+                new File(bootstrapAPKDecodeDir, logSmaliFilePath),
+                new File(runtimeSmaliDir, logSmaliFilePath)
+        );
+
         injectIntoContextEntry(runtimeSmaliDir, bootstrapAPKDecodeDir, buildParamMeta.appEntryClass, classDefMap, dexImage, decodeAllSmali);
 
         File rebuildDex = new File(workDir, "injected.dex");

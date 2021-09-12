@@ -29,6 +29,13 @@ public enum ClassNames {
     // smali工具类集合
     INJECT_TOOL_SMALI_LOG("com.virjar.ratel.inject.template.RatelSmaliLog"),
     INJECT_TOOL_EVENT_NOTIFIER("com.virjar.ratel.inject.template.EventNotifier"),
+    INJECT_TOOL_SMALI_Helper("com.virjar.ratel.inject.template.hidebypass.Helper"),
+    INJECT_TOOL_SMALI_Helper_Class("com.virjar.ratel.inject.template.hidebypass.Helper$Class"),
+    INJECT_TOOL_SMALI_Helper_HandleInfo("com.virjar.ratel.inject.template.hidebypass.Helper$HandleInfo"),
+    INJECT_TOOL_SMALI_Helper_MethodHandle("com.virjar.ratel.inject.template.hidebypass.Helper$MethodHandle"),
+    INJECT_TOOL_SMALI_Helper_MethodHandleImpl("com.virjar.ratel.inject.template.hidebypass.Helper$MethodHandleImpl"),
+    INJECT_TOOL_SMALI_Helper_NeverCall("com.virjar.ratel.inject.template.hidebypass.Helper$NeverCall"),
+    INJECT_TOOL_SMALI_HiddenApiBypass("com.virjar.ratel.inject.template.hidebypass.HiddenApiBypass"),
     ;
 
     ClassNames(String className) {

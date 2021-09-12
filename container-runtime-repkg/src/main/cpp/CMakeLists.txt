@@ -113,7 +113,7 @@ set(HIDDEN_NATIVE_SOURCE
         MapHide/pmparser.c
         MapHide/MapsHideHandler.cpp
         MapHide/nativeHideJni.cpp
-#        Jni/Helper.cpp
+        #        Jni/Helper.cpp
         )
 add_library("ratelhide" SHARED ${HIDDEN_NATIVE_SOURCE})
 
