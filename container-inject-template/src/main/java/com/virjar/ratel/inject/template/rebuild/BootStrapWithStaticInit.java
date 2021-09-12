@@ -4,13 +4,18 @@ import android.content.Context;
 import android.os.Build;
 import android.util.Log;
 
+import com.virjar.ratel.inject.template.hidebypass.HiddenApiBypass;
+
 import java.lang.reflect.Method;
 
 public class BootStrapWithStaticInit {
     public static void startup() {
         try {
-            if (isPie()) {
-                passApiCheck();
+//            if (isPie()) {
+//                passApiCheck();
+//            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                HiddenApiBypass.addHiddenApiExemptions("");
             }
             java.lang.Class activityThreadClass = java.lang.Class.forName("android.app.ActivityThread");
             java.lang.reflect.Method declaredMethod = activityThreadClass.getDeclaredMethod("currentActivityThread", new java.lang.Class[0]);
@@ -37,21 +42,21 @@ public class BootStrapWithStaticInit {
 
     private static Object vmRuntime;
 
-    static {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            try {
-                //高版本才需要执行这个
-                Method getMethodMethod = Class.class.getDeclaredMethod("getDeclaredMethod", String.class, Class[].class);
-                Method forNameMethod = Class.class.getDeclaredMethod("forName", String.class);
-                Class vmRuntimeClass = (Class) forNameMethod.invoke(null, "dalvik.system.VMRuntime");
-                addWhiteListMethod = (Method) getMethodMethod.invoke(vmRuntimeClass, "setHiddenApiExemptions", new Class[]{String[].class});
-                Method getVMRuntimeMethod = (Method) getMethodMethod.invoke(vmRuntimeClass, "getRuntime", null);
-                vmRuntime = getVMRuntimeMethod.invoke(null);
-            } catch (Exception e) {
-                Log.e("ReflectionUtils", "error get methods", e);
-            }
-        }
-    }
+//    static {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+//            try {
+//                //高版本才需要执行这个
+//                Method getMethodMethod = Class.class.getDeclaredMethod("getDeclaredMethod", String.class, Class[].class);
+//                Method forNameMethod = Class.class.getDeclaredMethod("forName", String.class);
+//                Class vmRuntimeClass = (Class) forNameMethod.invoke(null, "dalvik.system.VMRuntime");
+//                addWhiteListMethod = (Method) getMethodMethod.invoke(vmRuntimeClass, "setHiddenApiExemptions", new Class[]{String[].class});
+//                Method getVMRuntimeMethod = (Method) getMethodMethod.invoke(vmRuntimeClass, "getRuntime", null);
+//                vmRuntime = getVMRuntimeMethod.invoke(null);
+//            } catch (Exception e) {
+//                Log.e("ReflectionUtils", "error get methods", e);
+//            }
+//        }
+//    }
 
     private static void passApiCheck() {
         try {
