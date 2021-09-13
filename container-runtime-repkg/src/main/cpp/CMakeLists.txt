@@ -85,9 +85,9 @@ IF (CMAKE_BUILD_TYPE STREQUAL Release)
 
     set(CXX_APPEND_FLAGS "${CXX_APPEND_FLAGS} -fvisibility=hidden ")
     #include_directories(env/release)
-    add_definitions(-DRATEL_BUILD_TYPE_DEBUG)
+    add_definitions(-CMAKE_BUILD_TYPE)
 ELSE ()
-    add_definitions(-DRATEL_BUILD_TYPE_DEBUG)
+    add_definitions(-CMAKE_BUILD_TYPE)
     #include_directories(env/debug)
 ENDIF ()
 
