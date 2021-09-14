@@ -128,6 +128,7 @@ public class BuilderContext implements Closeable {
         }
         infectApk.close();
         infectApk = BuilderContextParser.parseApkFile(tempFile);
+        rawOriginApk = infectApk.file;
         hasRatelWrapper = true;
     }
 

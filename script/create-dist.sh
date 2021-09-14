@@ -72,7 +72,7 @@ cd ${root_dir}
 builder_helper_jar=${root_dir}/container-builder-helper/build/libs/BuilderHelper-1.0.jar
 
 # jar包内置资源的优化
-java -jar ${builder_helper_jar} OPTIMIZE_BUILDER_RESOURCE -i ${script_dir}/dist/res/${builder_jar_file_name}  -o ${script_dir}/dist/res/${builder_jar_file_name}
+java -jar ${builder_helper_jar} OPTIMIZE_BUILDER_RESOURCE --rdp -i ${script_dir}/dist/res/${builder_jar_file_name}  -o ${script_dir}/dist/res/${builder_jar_file_name}
 
 
 # jar包代码本身代码优化

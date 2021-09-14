@@ -41,6 +41,7 @@ public class OptimizeBuilderResource {
         options.addOption(new Option("i", "input", true, "input apk file"));
         options.addOption(new Option("o", "output", true, "output jar file"));
         options.addOption(new Option("h", "help", false, "show help message"));
+        options.addOption(new Option("", "rdp", false, "if optimize rdp jar"));
 
         DefaultParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args, false);
@@ -56,7 +57,7 @@ public class OptimizeBuilderResource {
         Map<NewConstants.BUILDER_RESOURCE_LAYOUT, byte[]> optimizeData = null;
         ByteArrayOutputStream byteArrayOutputStream;
         try (ZipFile zipFile = new ZipFile(builderJarInputFile)) {
-            optimizeData = handleJarInput(zipFile);
+            optimizeData = handleJarInput(zipFile, cmd.hasOption("rdp"));
 
             if (output.endsWith("/")) {
                 writeDataToDir(output, zipFile, optimizeData);
@@ -135,7 +136,7 @@ public class OptimizeBuilderResource {
         }
     }
 
-    private static Map<NewConstants.BUILDER_RESOURCE_LAYOUT, byte[]> handleJarInput(ZipFile zipFile) throws Exception {
+    private static Map<NewConstants.BUILDER_RESOURCE_LAYOUT, byte[]> handleJarInput(ZipFile zipFile, boolean optimizeRDPJar) throws Exception {
         Map<NewConstants.BUILDER_RESOURCE_LAYOUT, byte[]> optimizeData = new HashMap<>();
 
         // runtime 核心文件
@@ -160,7 +161,7 @@ public class OptimizeBuilderResource {
         //RDP构建jar文件，进行一次代码优化，也是为了瘦身
         handleResource(zipFile, NewConstants.BUILDER_RESOURCE_LAYOUT.RDP_JAR_FILE,
                 NewConstants.BUILDER_RESOURCE_LAYOUT.RDP_JAR_FILE,
-                OptimizeBuilderResource::optimizeRDPJar, optimizeData);
+                optimizeRDPJar ? OptimizeBuilderResource::optimizeRDPJar : input -> input, optimizeData);
 
         handleResource(zipFile, NewConstants.BUILDER_RESOURCE_LAYOUT.RDP_GIT_IGNORE_1,
                 NewConstants.BUILDER_RESOURCE_LAYOUT.RDP_GIT_IGNORE,

@@ -107,10 +107,10 @@ public class AssertFixer {
 //            oldAssets.close();
 
             Object newResourceImpl = null;
-            if(Build.VERSION.SDK_INT >= 30){
+            if (Build.VERSION.SDK_INT >= 30) {
                 Object mApkAssetsSupplier = RposedHelpers.callMethod(resourceManager, "createApkAssetsSupplierNotLocked", resourceKey);
-                newResourceImpl = RposedHelpers.callMethod(resourceManager, "createResourcesImpl", resourceKey,mApkAssetsSupplier);
-            }else{
+                newResourceImpl = RposedHelpers.callMethod(resourceManager, "createResourcesImpl", resourceKey, mApkAssetsSupplier);
+            } else {
                 newResourceImpl = RposedHelpers.callMethod(resourceManager, "createResourcesImpl", resourceKey);
             }
             //Object newResourceImpl = RposedHelpers.callMethod(resourceManager, "createResourcesImpl", resourceKey);

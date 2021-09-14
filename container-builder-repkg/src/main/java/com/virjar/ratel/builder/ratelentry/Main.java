@@ -90,8 +90,6 @@ public class Main {
     }
 
     private static File ratelMain(String[] args, XApkHandler xApkHandler) throws Exception {
-        System.out.println("ratel build param: " + Joiner.on(" ").join(args));
-
         restoreConstants();
 
         try (BuilderContext context = BuilderContextParser.parse(args, xApkHandler != null)) {
@@ -106,6 +104,7 @@ public class Main {
                 System.out.println(context.outFile.getAbsolutePath());
                 return null;
             }
+            System.out.println("ratel build param: " + Joiner.on(" ").join(args));
             return ratelMain(context, xApkHandler);
         }
     }
