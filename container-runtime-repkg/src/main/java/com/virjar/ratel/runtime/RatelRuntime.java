@@ -184,16 +184,16 @@ public class RatelRuntime {
 
         RatelConfig.init();
 
-        String ratelCertificateId = RatelConfig.getConfig("ratel_certificate_id");
-        if (TextUtils.isEmpty(ratelCertificateId)) {
-            //TODO 这里是一个bug，configFile被删除了，暂时不确定为啥
-            File file = RatelEnvironment.ratelConfigFile();
-            if (file.exists()) {
-                FileUtils.forceDelete(file);
-            }
-            RatelEnvironment.releaseApkFiles();
-            RatelConfig.init();
-        }
+//        String ratelCertificateId = RatelConfig.getConfig("ratel_certificate_id");
+//        if (TextUtils.isEmpty(ratelCertificateId)) {
+//            //TODO 这里是一个bug，configFile被删除了，暂时不确定为啥
+//            File file = RatelEnvironment.ratelConfigFile();
+//            if (file.exists()) {
+//                FileUtils.forceDelete(file);
+//            }
+//            RatelEnvironment.releaseApkFiles();
+//            RatelConfig.init();
+//        }
 
         //and then some flag need reset for ratel config
         resetRatelStatusIfEngineUpgrade();
