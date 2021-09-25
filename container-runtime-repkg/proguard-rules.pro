@@ -23,8 +23,7 @@
 # 这个暂时加上，测试没问题的时候关闭他
 #-keepattributes SourceFile,LineNumberTable
 
-# 不能优化代码，sandhook有一些空调用。优化后代码可能被remove
--dontoptimize
+
 
 #这是因为，我们的class需要注入到apk中，如果单纯混淆，有一定可能导致和原生app的混淆重名，这会导致重复类发生
 -flattenpackagehierarchy com.virjar.ratel.runtime.other
@@ -123,26 +122,18 @@
 -keep class com.virjar.ratel.shellengine.ShellJumpActivity{*;}
 
 
-
-#-keep class com.virjar.ratel.authorize.**{*;}
-
-
-#-keep class com.virjar.ratel.core.**{*;}
-
-
 #需要混淆
 -keep class com.virjar.ratel.NativeBridge{*;}
 
-#-keep class com.virjar.ratel.RatelLog{*;}
 
-#-keep class com.virjar.ratel.AntiDebug{*;}
+-dontwarn
+-dontnote
+-ignorewarnings
 
-#-keep class com.virjar.ratel.RatelVersion{*;}
-
-
-
-
+# 开源环境，我们不做混淆
+-dontobfuscate
 
 
-
-
+# 不能优化代码，sandhook有一些空调用。优化后代码可能被remove
+# todo 这可以后续处理
+-dontoptimize

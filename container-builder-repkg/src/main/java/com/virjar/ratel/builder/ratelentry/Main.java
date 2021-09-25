@@ -1,9 +1,7 @@
 package com.virjar.ratel.builder.ratelentry;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.virjar.ratel.allcommon.BuildEnv;
 import com.virjar.ratel.allcommon.ClassNames;
 import com.virjar.ratel.allcommon.Constants;
@@ -47,12 +45,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.Enumeration;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -131,16 +126,7 @@ public class Main {
         //inject bootstrap code into origin apk
         BuildParamMeta buildParamMeta = parseManifest(context.infectApk.file);
 
-        Set<String> supportArch;
-        if (xApkHandler != null) {
-            // xapk 模式下，首先解码外部的apk，外部为空，可以尝试内部apk
-            supportArch = xApkHandler.originAPKSupportArch();
-            if (supportArch.isEmpty()) {
-                supportArch = originAPKSupportArch(context.infectApk.zipFile);
-            }
-        } else {
-            supportArch = originAPKSupportArch(context.infectApk.zipFile);
-        }
+        context.resolveArch(xApkHandler);
 
         String engine = Constants.RATEL_ENGINE_ENUM_REBUILD;
         if (context.cmd.hasOption('e')) {
@@ -210,12 +196,12 @@ public class Main {
             context.ratelBuildProperties.setProperty(Constants.xposedModuleApkPackageNameKey, xposedApkFile.getApkMeta().getPackageName());
         }
 
-        context.ratelBuildProperties.setProperty("supportArch", Joiner.on(",").join(supportArch));
+        context.ratelBuildProperties.setProperty("supportArch", Joiner.on(",").join(context.arch));
 
         if (context.xpModuleApk != null) {
-            Util.copyLibrary(zos, supportArch, context.xpModuleApk.file);
+            Util.copyLibrary(zos, context.arch, context.xpModuleApk.file);
         }
-        Util.copyLibrary(zos, supportArch, BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.RUNTIME_JAR_FILE));
+        Util.copyLibrary(zos, context.arch, BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.RUNTIME_JAR_FILE));
 
         //so文件需要插入到asset目录，因为 execve 注入会依赖so，且依赖多个版本
         insertRatelNativeLib(zos, BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.RUNTIME_JAR_FILE));
@@ -293,26 +279,6 @@ public class Main {
             IOUtils.closeQuietly(inputStream);
 
         }
-    }
-
-
-    private static Set<String> originAPKSupportArch(ZipFile zipFile) throws IOException {
-        Set<String> ret = Sets.newHashSet();
-        //ret.add("armeabi");
-        //ret.add("armeabi-v7a");
-
-        Enumeration<ZipEntry> entries = zipFile.getEntries();
-        while (entries.hasMoreElements()) {
-            ZipEntry zipEntry = entries.nextElement();
-            if (zipEntry.getName().startsWith("lib/")) {
-                List<String> pathSegment = Splitter.on("/").splitToList(zipEntry.getName());
-                ret.add(pathSegment.get(1));
-            }
-
-        }
-        zipFile.close();
-
-        return ret;
     }
 
 

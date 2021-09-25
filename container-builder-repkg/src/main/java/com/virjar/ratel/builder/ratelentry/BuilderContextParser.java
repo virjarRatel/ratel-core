@@ -161,7 +161,7 @@ public class BuilderContextParser {
         options.addOption(new Option("s", "signature", false, "signature apk with ratel default KeyStore"));
         options.addOption(new Option("D", "decompile", false, "create a RDP(ratel decompile project) like \"apktool output project\"," +
                 "this project only contains smali files and with capability to bypass signature check with ratel framework"));
-
+        options.addOption(new Option("", "abi", true, "设置ABI，可以可以指定app运行在32位机器上，或者运行在64位机器上。可选值: armeabi-v7a/arm64-v8a"));
         return options;
     }
 }

@@ -178,12 +178,25 @@ public class RatelPackageBuilderRepackage {
             if (originEntry.getName().equals(buildParamMeta.appEntryClassDex)) {
                 ZipEntry zipEntry = new ZipEntry(buildParamMeta.appEntryClassDex);
                 zos.putNextEntry(zipEntry);
-
                 byte[] dexClassesFile = FileUtils.readFileToByteArray(entryDexImageFile);
                 zos.write(dexClassesFile);
             } else {
-                zos.putNextEntry(new ZipEntry(originEntry));
-                zos.write(IOUtils.toByteArray(originAPKZip.getInputStream(originEntry)));
+                String entryName = originEntry.getName();
+                // 可能用户排除一些arch
+                boolean needCopy = false;
+                if (!entryName.startsWith("lib") || context.arch.isEmpty()) {
+                    needCopy = true;
+                } else {
+                    for (String str : context.arch) {
+                        if (entryName.startsWith("lib/" + str)) {
+                            needCopy = true;
+                        }
+                    }
+                }
+                if (needCopy) {
+                    zos.putNextEntry(new ZipEntry(originEntry));
+                    zos.write(IOUtils.toByteArray(originAPKZip.getInputStream(originEntry)));
+                }
             }
         }
 

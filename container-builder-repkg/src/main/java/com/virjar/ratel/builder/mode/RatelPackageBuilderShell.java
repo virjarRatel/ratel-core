@@ -57,8 +57,21 @@ public class RatelPackageBuilderShell {
                 zos.write(bytes);
                 continue;
             }
-            zos.putNextEntry(new ZipEntry(originEntry));
-            zos.write(IOUtils.toByteArray(originAPKZip.getInputStream(originEntry)));
+            // 可能用户排除一些arch
+            boolean needCopy = false;
+            if (!entryName.startsWith("lib") || context.arch.isEmpty()) {
+                needCopy = true;
+            } else {
+                for (String str : context.arch) {
+                    if (entryName.startsWith("lib/" + str)) {
+                        needCopy = true;
+                    }
+                }
+            }
+            if (needCopy) {
+                zos.putNextEntry(new ZipEntry(originEntry));
+                zos.write(IOUtils.toByteArray(originAPKZip.getInputStream(originEntry)));
+            }
         }
         //close
         originAPKZip.close();

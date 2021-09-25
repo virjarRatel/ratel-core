@@ -1,5 +1,7 @@
 package com.virjar.ratel.builder.ratelentry;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Sets;
 import com.virjar.ratel.allcommon.Constants;
 
 import net.dongliu.apk.parser.ApkFile;
@@ -24,8 +26,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -51,6 +56,8 @@ public class BuilderContext implements Closeable {
     public File rawOriginApk;
     public boolean hasRatelWrapper;
     public Properties ratelBuildProperties = new Properties();
+
+    public Set<String> arch;
 
     @Override
     public void close() throws IOException {
@@ -158,4 +165,41 @@ public class BuilderContext implements Closeable {
         }
     }
 
+    public void resolveArch(XApkHandler xApkHandler) throws IOException {
+        Set<String> supportArch;
+        if (xApkHandler != null) {
+            // xapk 模式下，首先解码外部的apk，外部为空，可以尝试内部apk
+            supportArch = xApkHandler.originAPKSupportArch();
+            if (supportArch.isEmpty()) {
+                supportArch = originAPKSupportArch(infectApk.zipFile);
+            }
+        } else {
+            supportArch = originAPKSupportArch(infectApk.zipFile);
+        }
+        if (cmd.hasOption("abi")) {
+            // 命令行参数指定使用abi，那么手动控制下
+            String[] cmdAbis = cmd.getOptionValue("abi").split(",");
+            supportArch.retainAll(Arrays.asList(cmdAbis));
+        }
+        arch = supportArch;
+    }
+
+    private static Set<String> originAPKSupportArch(ZipFile zipFile) throws IOException {
+        Set<String> ret = Sets.newHashSet();
+        //ret.add("armeabi");
+        //ret.add("armeabi-v7a");
+
+        Enumeration<ZipEntry> entries = zipFile.getEntries();
+        while (entries.hasMoreElements()) {
+            ZipEntry zipEntry = entries.nextElement();
+            if (zipEntry.getName().startsWith("lib/")) {
+                List<String> pathSegment = Splitter.on("/").splitToList(zipEntry.getName());
+                ret.add(pathSegment.get(1));
+            }
+
+        }
+        zipFile.close();
+
+        return ret;
+    }
 }
