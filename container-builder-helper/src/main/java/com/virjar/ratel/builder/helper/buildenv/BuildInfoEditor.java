@@ -33,9 +33,10 @@ public class BuildInfoEditor {
                         }
                     }
                 }
-                FileUtils.forceDelete(inputJarFile);
-                FileUtils.moveFile(tempFile, inputJarFile);
             }
         }
+        FileUtils.forceDelete(inputJarFile);
+        FileUtils.moveFile(tempFile, inputJarFile);
     }
+
 }
