@@ -1,7 +1,6 @@
 package com.virjar.ratel.builder.ratelentry;
 
 import com.virjar.ratel.allcommon.Constants;
-import com.virjar.ratel.allcommon.ReflectUtil;
 
 import net.dongliu.apk.parser.ApkFile;
 
@@ -33,8 +32,9 @@ public class BuilderContextParser {
 
         // 在最后做一次参数合法性检查
         check(builderContext);
-
-        resolveOutputFile(builderContext, isXApk);
+        if (!builderContext.cmd.hasOption('h')) {
+            resolveOutputFile(builderContext, isXApk);
+        }
 
         return builderContext;
     }
