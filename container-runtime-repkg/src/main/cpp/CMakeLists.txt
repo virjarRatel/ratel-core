@@ -117,4 +117,42 @@ set(HIDDEN_NATIVE_SOURCE
         )
 add_library("ratelhide" SHARED ${HIDDEN_NATIVE_SOURCE})
 
+
 target_link_libraries("ratelhide" log)
+
+include_directories(zipalign)
+set(ZIP_ALIGN_SOURCE
+        zipalign/ziparchive/zip_archive.cc
+        zipalign/ziparchive/zip_writer.cc
+
+        zipalign/zopfli/blocksplitter.c
+        zipalign/zopfli/cache.c
+        zipalign/zopfli/deflate.c
+        zipalign/zopfli/gzip_container.c
+        zipalign/zopfli/hash.c
+        zipalign/zopfli/katajainen.c
+        zipalign/zopfli/lz77.c
+        zipalign/zopfli/squeeze.c
+        zipalign/zopfli/tree.c
+        zipalign/zopfli/util.c
+        zipalign/zopfli/zlib_container.c
+        zipalign/zopfli/zopfli_bin.c
+
+        zipalign/utils/FileMap.cpp
+        zipalign/utils/SharedBuffer.cpp
+        zipalign/utils/VectorImpl.cpp
+        zipalign/utils/safe_iop.c
+
+        zipalign/android-base/file.cpp
+        zipalign/android-base/logging.cpp
+        zipalign/android-base/strings.cpp
+        zipalign/android-base/utf8.cpp
+
+        zipalign/ZipAlign.cpp
+        zipalign/ZipEntry.cpp
+        zipalign/ZipFile.cpp
+        )
+
+add_executable("zipalign.so" ${ZIP_ALIGN_SOURCE})
+target_link_libraries("zipalign.so" log)
+target_link_libraries("zipalign.so" z)
