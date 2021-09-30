@@ -23,11 +23,6 @@
 # 这个暂时加上，测试没问题的时候关闭他
 #-keepattributes SourceFile,LineNumberTable
 
-
-
-#这是因为，我们的class需要注入到apk中，如果单纯混淆，有一定可能导致和原生app的混淆重名，这会导致重复类发生
--flattenpackagehierarchy com.virjar.ratel.runtime.other
-
 # lody的反射工具类，使用名称反射的方式。需要keep
 -keepclassmembernames class mirror.** {
     public static <fields>;
@@ -50,34 +45,13 @@
 -keep class android.content.pm.**{*;}
 
 
+-keep class com.virjar.ratel.api.**{*;}
 #-keep class com.virjar.ratel.hook.**{*;}
 -keep class com.virjar.ratel.hook.sandcompat.hookstub.MethodHookerStubs32{*;}
 -keep class com.virjar.ratel.hook.sandcompat.hookstub.MethodHookerStubs64{*;}
 -keep class com.virjar.ratel.hook.sandcompat.hookstub.HookStubManager{*;}
 -keep class com.virjar.ratel.hook.sandcompat.RposedAdditionalHookInfo{*;}
 -keep class com.virjar.ratel.hook.sandcompat.utils.DexLog{*;}
-
-
--keep class com.virjar.ratel.api.**{*;}
-
-
-#-keep class com.virjar.ratel.sandhook.**{*;}
--keepclassmembers class com.virjar.ratel.sandhook.SandHook{
-    native <methods>;
-    public static int testAccessFlag;
-    public static long getThreadId();
-}
--keepclassmembers class com.virjar.ratel.sandhook.ClassNeverCall{*;}
--keepclassmembers class com.virjar.ratel.sandhook.ArtMethodSizeTest{*;}
--keepclassmembers class com.virjar.ratel.sandhook.SandHookMethodResolver{*;}
--keepclassmembers class com.virjar.ratel.sandhook.wrapper.BackupMethodStubs{*;}
--keepclassmembers class com.virjar.ratel.sandhook.SandHookConfig{
-    public volatile static boolean compiler;
-}
--keepclassmembers class com.virjar.ratel.sandhook.PendingHookHandler{
-    public static void onClassInit(long);
-}
-
 
 #-keep class com.virjar.ratel.runtime.**{*;}
 -keep  class com.virjar.ratel.runtime.RatelRuntime {
@@ -97,34 +71,47 @@
     private static android.content.pm.PackageInfo h;
 }
 
-
+#-keep class com.virjar.ratel.envmock.**{*;}
 -keep class com.virjar.ratel.envmock.EnvMockController{
     #看起来是代码优化框架的bug，如果混淆了这个函数，部分手机上无法正常打开手机百度app
     public static void initEnvModel();
     public static void switchEnvIfNeed(android.content.Context);
 }
 
-#-keep class com.virjar.ratel.utils.**{*;}
+#-keep class com.virjar.ratel.sandhook.**{*;}
+-keepclassmembers class com.virjar.ratel.sandhook.SandHook{
+    native <methods>;
+    public static int testAccessFlag;
+    public static long getThreadId();
+}
+-keepclassmembers class com.virjar.ratel.sandhook.ClassNeverCall{*;}
+-keepclassmembers class com.virjar.ratel.sandhook.ArtMethodSizeTest{*;}
+-keepclassmembers class com.virjar.ratel.sandhook.SandHookMethodResolver{*;}
+-keepclassmembers class com.virjar.ratel.sandhook.wrapper.BackupMethodStubs{*;}
+-keepclassmembers class com.virjar.ratel.sandhook.SandHookConfig{
+    public volatile static boolean compiler;
+}
+-keepclassmembers class com.virjar.ratel.sandhook.PendingHookHandler{
+    public static void onClassInit(long);
+}
 
+#-keep class com.virjar.ratel.utils.**{*;}
+-keep class com.virjar.ratel.utils.HiddenApiBypass$*{*;}
 
 #-keep class com.virjar.ratel.manager.**{*;}
-#ipc接口不能混淆
 -keep class com.virjar.ratel.manager.bridge.**{*;}
 
-#-keep class com.virjar.ratel.RatelNative{*;}
-# 所有的native通信接口
--keepclassmembers class com.virjar.ratel.RatelNative{*;}
-
-
+#-keep class com.virjar.ratel.allcommon.**{*;}
 #-keep class com.virjar.ratel.shellengine.**{*;}
-# 套壳容器启动入口
 -keep class com.virjar.ratel.shellengine.ShellEngineEntryApplication{*;}
 -keep class com.virjar.ratel.shellengine.ShellJumpActivity{*;}
 
+# test
+#-keep class com.virjar.ratel.core.**{*;}
+-keep class com.virjar.ratel.nativehide.**{*;}
 
-#需要混淆
 -keep class com.virjar.ratel.NativeBridge{*;}
-
+-keepclassmembers class com.virjar.ratel.RatelNative{*;}
 
 -dontwarn
 -dontnote
