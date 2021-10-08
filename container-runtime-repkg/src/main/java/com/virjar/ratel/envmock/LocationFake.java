@@ -148,49 +148,77 @@ public class LocationFake {
                 if (!enable) {
                     return;
                 }
-                Bundle cellLocationBundle = (Bundle) param.getResult();
-                if (cellLocationBundle == null) {
-                    return;
+                Object result = param.getResult();
+                if (result instanceof Bundle) {
+                    handleCallLocationWithBundle((Bundle) result);
+                } else if (result instanceof CellIdentityGsm) {
+                    CellIdentityGsm cellIdentityGsm = (CellIdentityGsm) result;
+                    handleCallLocationWithCellIdentityGsm(cellIdentityGsm);
+                } else {
+                    Log.e(Constants.TAG, "can not handle cellLocation result: " + result);
                 }
 
-                //for gms network
-                int defaultInt = -1;
-                if (cellLocationBundle.containsKey("lac")) {
-                    int lac = cellLocationBundle.getInt("lac", defaultInt);
-                    int cid = cellLocationBundle.getInt("cid", defaultInt);
-                    if (cid != defaultInt) {
-                        //int psc = cellLocationBundle.getInt("psc", defaultInt);
-                        if (Integer.valueOf(cid).equals(RatelToolKit.fingerPrintModel.cid.getOrigin())) {
-                            cellLocationBundle.putInt("cid", RatelToolKit.fingerPrintModel.cid.replace(null, cid));
-                            cellLocationBundle.putInt("lac", RatelToolKit.fingerPrintModel.lac.replace(null, lac));
-                        } else if (Integer.valueOf(cid).equals(RatelToolKit.fingerPrintModel.cid2.getOrigin())) {
-                            cellLocationBundle.putInt("cid", RatelToolKit.fingerPrintModel.cid2.replace(null, cid));
-                            cellLocationBundle.putInt("lac", RatelToolKit.fingerPrintModel.lac2.replace(null, lac));
-                        } else {
-                            cellLocationBundle.putInt("cid", RatelToolKit.fingerPrintModel.cid.replace(null, cid));
-                            cellLocationBundle.putInt("lac", RatelToolKit.fingerPrintModel.lac.replace(null, lac));
-                        }
 
-                    }
-                }
-
-                //for CDMA network
-                if (cellLocationBundle.containsKey("baseStationLatitude")) {
-                    int baseStationLatitude = cellLocationBundle.getInt("baseStationLatitude", defaultInt);
-                    int baseStationLongitude = cellLocationBundle.getInt("baseStationLongitude", defaultInt);
-                    if (baseStationLatitude != defaultInt) {
-                        cellLocationBundle.putInt("baseStationLatitude", baseStationLatitude + (int) ((latitudeDiff + smallLatitudeDiff) * 2592000 / 180));
-                    }
-                    if (baseStationLongitude != defaultInt) {
-                        cellLocationBundle.putInt("baseStationLongitude", baseStationLongitude + (int) ((longitudeDiff + smallLongitudeDiff) * 2592000 / 180));
-                    }
-                }
             }
         });
 
         //TODO com.android.internal.telephony.ITelephony#getNeighboringCellInfo
     }
 
+    private static void handleCallLocationWithCellIdentityGsm(CellIdentityGsm cellIdentityGsm) {
+
+        int lac = cellIdentityGsm.getLac();
+        int cid = cellIdentityGsm.getCid();
+
+        //int psc = cellLocationBundle.getInt("psc", defaultInt);
+        if (Integer.valueOf(cid).equals(RatelToolKit.fingerPrintModel.cid.getOrigin())) {
+            RposedHelpers.setObjectField(cellIdentityGsm, "mCid", RatelToolKit.fingerPrintModel.cid.replace(null, cid));
+            RposedHelpers.setObjectField(cellIdentityGsm, "mLac", RatelToolKit.fingerPrintModel.lac.replace(null, lac));
+        } else if (Integer.valueOf(cid).equals(RatelToolKit.fingerPrintModel.cid2.getOrigin())) {
+            RposedHelpers.setObjectField(cellIdentityGsm, "mCid", RatelToolKit.fingerPrintModel.cid2.replace(null, cid));
+            RposedHelpers.setObjectField(cellIdentityGsm, "mLac", RatelToolKit.fingerPrintModel.lac2.replace(null, lac));
+        } else {
+            RposedHelpers.setObjectField(cellIdentityGsm, "mCid", RatelToolKit.fingerPrintModel.cid.replace(null, cid));
+            RposedHelpers.setObjectField(cellIdentityGsm, "mLac", RatelToolKit.fingerPrintModel.lac.replace(null, lac));
+        }
+
+
+    }
+
+    private static void handleCallLocationWithBundle(Bundle cellLocationBundle) {
+        //for gms network
+        int defaultInt = -1;
+        if (cellLocationBundle.containsKey("lac")) {
+            int lac = cellLocationBundle.getInt("lac", defaultInt);
+            int cid = cellLocationBundle.getInt("cid", defaultInt);
+            if (cid != defaultInt) {
+                //int psc = cellLocationBundle.getInt("psc", defaultInt);
+                if (Integer.valueOf(cid).equals(RatelToolKit.fingerPrintModel.cid.getOrigin())) {
+                    cellLocationBundle.putInt("cid", RatelToolKit.fingerPrintModel.cid.replace(null, cid));
+                    cellLocationBundle.putInt("lac", RatelToolKit.fingerPrintModel.lac.replace(null, lac));
+                } else if (Integer.valueOf(cid).equals(RatelToolKit.fingerPrintModel.cid2.getOrigin())) {
+                    cellLocationBundle.putInt("cid", RatelToolKit.fingerPrintModel.cid2.replace(null, cid));
+                    cellLocationBundle.putInt("lac", RatelToolKit.fingerPrintModel.lac2.replace(null, lac));
+                } else {
+                    cellLocationBundle.putInt("cid", RatelToolKit.fingerPrintModel.cid.replace(null, cid));
+                    cellLocationBundle.putInt("lac", RatelToolKit.fingerPrintModel.lac.replace(null, lac));
+                }
+
+            }
+        }
+
+        //for CDMA network
+        if (cellLocationBundle.containsKey("baseStationLatitude")) {
+            int baseStationLatitude = cellLocationBundle.getInt("baseStationLatitude", defaultInt);
+            int baseStationLongitude = cellLocationBundle.getInt("baseStationLongitude", defaultInt);
+            if (baseStationLatitude != defaultInt) {
+                cellLocationBundle.putInt("baseStationLatitude", baseStationLatitude + (int) ((latitudeDiff + smallLatitudeDiff) * 2592000 / 180));
+            }
+            if (baseStationLongitude != defaultInt) {
+                cellLocationBundle.putInt("baseStationLongitude", baseStationLongitude + (int) ((longitudeDiff + smallLongitudeDiff) * 2592000 / 180));
+            }
+        }
+    }
 
     private static void parseDiff() {
         PropertiesStoreHolder propertiesHolder = PropertiesStoreHolder.getPropertiesHolder(RatelEnvironment.telephonyFakeFile());

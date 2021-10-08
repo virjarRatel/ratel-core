@@ -1,5 +1,6 @@
 package com.virjar.ratel.envmock.binder;
 
+import android.app.AppOpsManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.IInterface;
@@ -29,6 +30,21 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class BinderHookManager {
+    public static int EX_HAS_NOTED_APPOPS_REPLY_HEADER = -127; // special; see below
+    private static int EX_HAS_STRICTMODE_REPLY_HEADER = -128;  // special; see below
+
+    static {
+        try {
+            if (Build.VERSION.SDK_INT >= 30) {
+                EX_HAS_NOTED_APPOPS_REPLY_HEADER = mirror.android.os.Parcel.EX_HAS_NOTED_APPOPS_REPLY_HEADER.get(null);
+                EX_HAS_STRICTMODE_REPLY_HEADER = mirror.android.os.Parcel.EX_HAS_STRICTMODE_REPLY_HEADER.get(null);
+            }else{
+                EX_HAS_STRICTMODE_REPLY_HEADER = mirror.android.os.Parcel.EX_HAS_REPLY_HEADER.get(null);
+            }
+        } catch (Throwable throwable) {
+            //ignore
+        }
+    }
 
 
     private static Map<String, ServiceHookRegistry> hookRegistry = new HashMap<>();
@@ -258,7 +274,7 @@ public class BinderHookManager {
                 } else {
                     Log.i(Constants.TAG, "hook binder success:" + descriptor);
                     Object invokeResult = binderHookParcelHandler.parseInvokeResult(newReply);
-                    Log.i(Constants.TAG,"parse binder InvokeResult:" + invokeResult);
+                    Log.i(Constants.TAG, "parse binder InvokeResult:" + invokeResult);
                     for (BindMethodHook bindMethodHook : binderMethodHookRegistry.hookRegistry) {
                         try {
                             invokeResult = bindMethodHook.afterIpcCall(objects, invokeResult);
@@ -289,7 +305,7 @@ public class BinderHookManager {
                     }
                     binderMethodHookRegistry.status = true;
                 } catch (Throwable throwable) {
-                    Log.w(Constants.TAG, "can not find ipcMethod: " + service + "." + method,throwable);
+                    Log.w(Constants.TAG, "can not find ipcMethod: " + service + "." + method, throwable);
                 }
             }
             return binderMethodHookRegistry;
@@ -386,7 +402,7 @@ public class BinderHookManager {
         if (Build.VERSION.SDK_INT == 29) {
             //https://www.androidos.net.cn/android/10.0.0_r6/xref/frameworks/native/libs/binder/Parcel.cpp
             parcel.readInt();//workSource
-        }else if(Build.VERSION.SDK_INT >= 30){
+        } else if (Build.VERSION.SDK_INT >= 30) {
             parcel.readInt();//workSource
             parcel.readInt();//vendorHeader
             // todo 理论上vendorHeader如果不等于kHeader后面可能会直接返回
@@ -408,8 +424,14 @@ public class BinderHookManager {
             return null;
         }
         BinderInvokeException invokeException = new BinderInvokeException();
+        if (Build.VERSION.SDK_INT >= 30) {
+            if (code == EX_HAS_NOTED_APPOPS_REPLY_HEADER) {
+                RposedHelpers.callStaticMethod(AppOpsManager.class, "readAndLogNotedAppops", parcel);
+                code = parcel.readInt();
+            }
+        }
         invokeException.exceptionCode = code;
-        if (code == RposedHelpers.getStaticIntField(Parcel.class, "EX_HAS_REPLY_HEADER")) {
+        if (code == EX_HAS_STRICTMODE_REPLY_HEADER) {
             // StrictMode stacks
             int headerSize = parcel.readInt();
             if (headerSize != 0) {
