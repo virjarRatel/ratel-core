@@ -265,13 +265,14 @@ int redirect_proc_maps(const char *const pathname, const int flags, const int mo
 //        return ret_fd;
 //    }
 
-#ifdef RATEL_BUILD_TYPE_DEBUG
-    return handle_redirect_meminfo_maps(s, pathname, flags, mode);
-#else
-    ALOGI("this is release build");
+// 滴滴加油，这里会导致weex框架加载失败，具体原因待分析，暂时禁用这个功能
+//#ifdef RATEL_BUILD_TYPE_DEBUG
+//    return handle_redirect_meminfo_maps(s, pathname, flags, mode);
+//#else
+//    ALOGI("this is release build");
+//    return 0;
+//#endif
     return 0;
-#endif
-    //return 0;
 }
 
 
