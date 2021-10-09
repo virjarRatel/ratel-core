@@ -4,6 +4,7 @@ import com.android.tools.r8.D8;
 import com.virjar.ratel.allcommon.BuildEnv;
 import com.virjar.ratel.allcommon.NewConstants;
 import com.virjar.ratel.builder.helper.buildenv.BuildInfoEditor;
+import com.virjar.ratel.builder.helper.proguard.OptimizeBuilderClass;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -56,7 +57,12 @@ public class BuilderJarToDex {
             return;
         }
 
-        insertBuildInfoClass(sourcePath);
+        File tmpFile = File.createTempFile("builder-dex", ".jar");
+        FileUtils.copyFile(sourcePath, tmpFile, true);
+
+        insertBuildInfoClass(tmpFile);
+        // 使用Android的环境进行代码优化
+        OptimizeBuilderClass.doOptimize("builder", tmpFile);
 
         File destinationFile;
         if (cmd.hasOption('d')) {
@@ -86,11 +92,11 @@ public class BuilderJarToDex {
                 "--min-api", "21",
                 "--output", destinationFile.getAbsolutePath(),
                 "--lib", androidLibJar().getAbsolutePath(),
-                sourcePath.getAbsolutePath()});
+                tmpFile.getAbsolutePath()});
 
         // FileUtils.forceDelete(tempFile);
 
-        migrateResourceFromJar(sourcePath, destinationFile);
+        migrateResourceFromJar(tmpFile, destinationFile);
     }
 
     private static void insertBuildInfoClass(File inputJarFile) throws IOException {

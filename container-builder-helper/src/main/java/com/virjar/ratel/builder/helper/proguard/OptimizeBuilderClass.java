@@ -47,15 +47,20 @@ public class OptimizeBuilderClass {
             hf.printHelp("OPTIMIZE_BUILDER_CLASS", options);
             return;
         }
-        File proguardJarFile = releaseProguardJar();
 
-        File buildOptimizeOutputJar = File.createTempFile("builder-opt", ".jar");
         File inputJarFile = new File(cmd.getOptionValue('i'));
         insertBuildInfoClass(inputJarFile);
         String templateKey = "builder";
         if (cmd.hasOption('t')) {
             templateKey = cmd.getOptionValue('t');
         }
+        doOptimize(templateKey, inputJarFile);
+    }
+
+    public static void doOptimize(String templateKey, File inputJarFile) throws IOException, InterruptedException {
+        File proguardJarFile = releaseProguardJar();
+
+        File buildOptimizeOutputJar = File.createTempFile("builder-opt", ".jar");
         File proguardRules = buildProguardRules(buildOptimizeOutputJar, inputJarFile, templateKey);
 
         // execute command

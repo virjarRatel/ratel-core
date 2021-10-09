@@ -74,12 +74,14 @@ builder_helper_jar=${root_dir}/container-builder-helper/build/libs/BuilderHelper
 # jar包内置资源的优化
 java -jar ${builder_helper_jar} OPTIMIZE_BUILDER_RESOURCE --rdp -i ${script_dir}/dist/res/${builder_jar_file_name}  -o ${script_dir}/dist/res/${builder_jar_file_name}
 
-
-# jar包代码本身代码优化
-java -jar ${builder_helper_jar} OPTIMIZE_BUILDER_CLASS -i ${script_dir}/dist/res/${builder_jar_file_name}
-## todo 上下两步需要一起做
 # jar包工具链转化为dex
 java -jar ${builder_helper_jar} TRANSFORM_BUILDER_JAR -s ${script_dir}/dist/res/${builder_jar_file_name}
+
+# 需要注意，需先行转化为dex，后面再进行class优化，因为class优化source和destination是相同的，这会导致jar文件被修改
+# jar包代码本身代码优化
+java -jar ${builder_helper_jar} OPTIMIZE_BUILDER_CLASS -i ${script_dir}/dist/res/${builder_jar_file_name}
+
+
 cd ${root_dir}
 
 
