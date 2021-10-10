@@ -289,6 +289,7 @@ public class WelcomeActivity extends XposedBaseActivity implements NavigationVie
         }
     }
 
+    private static boolean hasShowFloatWindow = false;
 
     /**
      * 设置一个应用外悬浮窗，因为安卓10之后对后台启动activity具有限制
@@ -298,6 +299,9 @@ public class WelcomeActivity extends XposedBaseActivity implements NavigationVie
      * {@link RatelManagerApp#canBackgroundStart(Context) 或者miui等在设置中给予后台启动Activity权限}
      */
     private void showRatelFloatWindow() {
+        if (hasShowFloatWindow) {
+            return;
+        }
         XXPermissions.with(this)
                 .permission(Permission.SYSTEM_ALERT_WINDOW)
                 .request(new OnPermissionCallback() {
@@ -312,6 +316,7 @@ public class WelcomeActivity extends XposedBaseActivity implements NavigationVie
                                 // 设置指定的拖拽规则
                                 .setDraggable(new SpringDraggable())
                                 .show();
+                        hasShowFloatWindow = true;
                     }
 
                     @Override
