@@ -158,6 +158,14 @@ public class StatusInstallerFragment extends Fragment {
             case 26:
             case 27:
                 return "Oreo";
+            case 28:
+                return "PIE";
+            case 29:
+                return "Q";
+            case 30:
+                return "R";
+            case 31:
+                return "S";
             default:
                 return "unknown";
         }

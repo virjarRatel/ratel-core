@@ -6,6 +6,8 @@ package com.virjar.ratel.allcommon;
 public interface NewConstants {
 
 
+    String DEX_BUILDER_ASSETS_NAME = "container-builder-repkg-dex.jar";
+
     /**
      * builder的资源文件名称定义
      */

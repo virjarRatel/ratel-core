@@ -85,6 +85,9 @@ java -jar ${builder_helper_jar} OPTIMIZE_BUILDER_CLASS -i ${script_dir}/dist/res
 
 
 # 拷贝到 rm assets 目录下
+if [ ! -d ${root_dir}/ratelmanager/src/main/assets ] ;then
+  mkdir ${root_dir}/ratelmanager/src/main/assets
+fi
 rm ${root_dir}/ratelmanager/src/main/assets/container-builder-repkg-dex.jar
 cp ${script_dir}/dist/res/${builder_dex_file_name} ${root_dir}/ratelmanager/src/main/assets/container-builder-repkg-dex.jar
 

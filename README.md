@@ -24,3 +24,8 @@
 ## 单步调试
 将命令行参数放到``container-builder-repkg/src/main/java/com/virjar/ratel/builder/ratelentry/Main.java``,然后单步调试main函数的执行流程即可
 
+
+## RatelManager apk构建(请注意，自2.0版本之后，RM构建需要使用脚本构建，否则无法支持app端进行重打包)：
+```
+./script/build_ratel_manager.sh
+```

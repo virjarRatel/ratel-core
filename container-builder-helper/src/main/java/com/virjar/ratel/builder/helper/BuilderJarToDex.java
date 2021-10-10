@@ -112,6 +112,7 @@ public class BuilderJarToDex {
         add(NewConstants.BUILDER_RESOURCE_LAYOUT.ZIP_ALIGN_MAC.getNAME());
         add(NewConstants.BUILDER_RESOURCE_LAYOUT.ZIP_ALIGN_WINDOWS.getNAME());
         add(NewConstants.BUILDER_RESOURCE_LAYOUT.ZIP_ALIGN_LINUX.getNAME());
+        add(NewConstants.BUILDER_RESOURCE_LAYOUT.ZIP_ALIGN_LINUX_LIB_CPP.getNAME());
         // 排除整个rdp模块
         for (NewConstants.BUILDER_RESOURCE_LAYOUT layout : NewConstants.BUILDER_RESOURCE_LAYOUT.values()) {
             if (layout.getNAME().startsWith(NewConstants.BUILDER_RESOURCE_LAYOUT.RDP_BASE.getNAME())) {

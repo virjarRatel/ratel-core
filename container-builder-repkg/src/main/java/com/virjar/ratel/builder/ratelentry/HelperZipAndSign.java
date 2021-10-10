@@ -21,7 +21,9 @@ import java.nio.file.StandardCopyOption;
 
 public class HelperZipAndSign {
     static void zipAndSign(BuilderContext context) throws Exception {
-        File signatureKeyFile = BindingResourceManager.get(BuildEnv.ANDROID_ENV ? NewConstants.BUILDER_RESOURCE_LAYOUT.DEFAULT_SIGN_KEY_ANDROID : NewConstants.BUILDER_RESOURCE_LAYOUT.DEFAULT_SIGN_KEY);
+        File signatureKeyFile = BindingResourceManager.get(BuildEnv.ANDROID_ENV ?
+                NewConstants.BUILDER_RESOURCE_LAYOUT.DEFAULT_SIGN_KEY_ANDROID :
+                NewConstants.BUILDER_RESOURCE_LAYOUT.DEFAULT_SIGN_KEY);
         try {
             if (useV1Sign(context)) {
                 //7.0之前，走V1签名，所以要先签名再对齐

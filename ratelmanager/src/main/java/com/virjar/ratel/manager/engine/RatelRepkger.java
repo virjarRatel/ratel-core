@@ -27,10 +27,10 @@ public class RatelRepkger {
         ReflectUtil.callStaticMethod(mainClass, "main", (Object) args);
     }
 
-    public static void mainShell(Context context, String workDir, String[] args, LogCallback logCallback) throws Exception {
-        String repkgDexPath = workDir + File.separator + "container-builder-repkg-dex.jar";
-        FileUtils.copyInputStreamToFile(context.getAssets().open("container-builder-repkg-dex.jar"), new File(repkgDexPath));
-        String command = "dalvikvm -cp " + repkgDexPath + " com.virjar.ratel.builder.ratelentry.Main " + TextUtils.join(" ", args);
+    public static void mainShell(Context context, String[] args, LogCallback logCallback) throws Exception {
+        File repkgDexFilePath = RatelEngineLoader.releaseReBuilderDexResource(context);
+
+        String command = "dalvikvm -cp " + repkgDexFilePath.getAbsolutePath() + " " + ClassNames.BUILDER_MAIN.getClassName() + " " + TextUtils.join(" ", args);
         Log.d("RatelRepkger", "command=" + command);
         Process process = Runtime.getRuntime().exec(command);
         InputStream errorStream = process.getErrorStream();

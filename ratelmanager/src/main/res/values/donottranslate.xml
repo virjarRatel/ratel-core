@@ -2,10 +2,10 @@
 <resources>
 
     <string name="app_name" translatable="false">Ratel</string>
-    <string name="support_faq_url" translatable="false">http://git.virjar.com/ratel/ratel-doc</string>
-    <string name="support_donate_url" translatable="false">http://git.virjar.com/ratel/ratel-doc</string>
-    <string name="about_source" translatable="false">http://git.virjar.com/ratel/ratel-doc</string>
-    <string name="about_support" translatable="false">http://git.virjar.com/ratel/ratel-doc</string>
+    <string name="support_faq_url" translatable="false">https://github.com/virjarRatel/ratel-core</string>
+    <string name="support_donate_url" translatable="false">https://github.com/virjarRatel/ratel-core</string>
+    <string name="about_source" translatable="false">https://github.com/virjarRatel/ratel-core</string>
+    <string name="about_support" translatable="false">https://github.com/virjarRatel/ratel-core</string>
     <string name="android_sdk" translatable="false">Android %1$s (%2$s, API %3$d)</string>
     <string name="ratel_group" translatable="false">powered by virjar@ratel</string>
 </resources>
