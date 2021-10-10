@@ -33,6 +33,7 @@ do
     if [[ ${file} =~ "container-builder-repkg" ]] && [[ ${file} =~ ".jar" ]] &&  [[ ${file} =~ ${engineVersionCode} ]];then
         builder_jar=${builder_jar_dir}${file}
         builder_jar_file_name=${file}
+        builder_dex_file_name=$(echo ${builder_jar_file_name} | sed 's/\.[^.]*$//')"-dex.jar"
     fi
 done
 
@@ -56,6 +57,7 @@ cp ${builder_jar} ${script_dir}/dist/res/
 
 
 cp ${script_dir}/hermes_key ${script_dir}/dist/res/
+cp ${script_dir}/hermes_bksv1_key ${script_dir}/dist/res/
 cp ${script_dir}/ratel.sh ${script_dir}/dist/
 cp ${script_dir}/ratel.bat ${script_dir}/dist/
 date > ${script_dir}/dist/res/build_timestamp.txt
@@ -75,11 +77,16 @@ builder_helper_jar=${root_dir}/container-builder-helper/build/libs/BuilderHelper
 java -jar ${builder_helper_jar} OPTIMIZE_BUILDER_RESOURCE --rdp -i ${script_dir}/dist/res/${builder_jar_file_name}  -o ${script_dir}/dist/res/${builder_jar_file_name}
 
 # jar包工具链转化为dex
-java -jar ${builder_helper_jar} TRANSFORM_BUILDER_JAR -s ${script_dir}/dist/res/${builder_jar_file_name}
+java -jar ${builder_helper_jar} TRANSFORM_BUILDER_JAR -s ${script_dir}/dist/res/${builder_jar_file_name} -d ${script_dir}/dist/res/${builder_dex_file_name}
 
 # 需要注意，需先行转化为dex，后面再进行class优化，因为class优化source和destination是相同的，这会导致jar文件被修改
 # jar包代码本身代码优化
 java -jar ${builder_helper_jar} OPTIMIZE_BUILDER_CLASS -i ${script_dir}/dist/res/${builder_jar_file_name}
+
+
+# 拷贝到 rm assets 目录下
+rm ${root_dir}/ratelmanager/src/main/assets/container-builder-repkg-dex.jar
+cp ${script_dir}/dist/res/${builder_dex_file_name} ${root_dir}/ratelmanager/src/main/assets/container-builder-repkg-dex.jar
 
 
 cd ${root_dir}

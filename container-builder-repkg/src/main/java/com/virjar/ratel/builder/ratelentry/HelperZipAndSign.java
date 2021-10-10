@@ -5,6 +5,7 @@ import com.android.apksig.apk.MinSdkVersionException;
 import com.android.apksigner.PasswordRetriever;
 import com.android.apksigner.SignerParams;
 import com.beust.jcommander.internal.Lists;
+import com.virjar.ratel.allcommon.BuildEnv;
 import com.virjar.ratel.allcommon.NewConstants;
 
 import org.apache.commons.io.FileUtils;
@@ -20,7 +21,7 @@ import java.nio.file.StandardCopyOption;
 
 public class HelperZipAndSign {
     static void zipAndSign(BuilderContext context) throws Exception {
-        File signatureKeyFile = BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.DEFAULT_SIGN_KEY);
+        File signatureKeyFile = BindingResourceManager.get(BuildEnv.ANDROID_ENV ? NewConstants.BUILDER_RESOURCE_LAYOUT.DEFAULT_SIGN_KEY_ANDROID : NewConstants.BUILDER_RESOURCE_LAYOUT.DEFAULT_SIGN_KEY);
         try {
             if (useV1Sign(context)) {
                 //7.0之前，走V1签名，所以要先签名再对齐
@@ -47,13 +48,15 @@ public class HelperZipAndSign {
             zipalignBinPath = BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.ZIP_ALIGN_MAC);//"zipalign/mac/zipalign";
         } else if (osName.startsWith("Windows".toLowerCase())) {
             zipalignBinPath = BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.ZIP_ALIGN_WINDOWS);
+        } else if (BuildEnv.ANDROID_ENV) {
+            zipalignBinPath = BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.ZIP_ALIGN_ANDROID);
         } else {
             zipalignBinPath = BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.ZIP_ALIGN_LINUX);
         }
 
         zipalignBinPath.setExecutable(true);
 
-        File tmpOutputApk = File.createTempFile("zipalign", ".apk");
+        File tmpOutputApk = File.createTempFile("zipalign", ".apk", theWorkDir);
         tmpOutputApk.deleteOnExit();
 
         String command = zipalignBinPath.getAbsolutePath() + " -f -p  4 " + outApk.getAbsolutePath() + " " + tmpOutputApk.getAbsolutePath();
@@ -97,14 +100,14 @@ public class HelperZipAndSign {
 
     public static void signatureApk(File outApk, File keyStoreFile, BuilderContext buildParamMeta) throws Exception {
         System.out.println("auto sign apk with ratel KeyStore");
-        File tmpOutputApk = File.createTempFile("apksigner", ".apk");
+        File tmpOutputApk = File.createTempFile("apksigner", ".apk", buildParamMeta.theWorkDir);
         tmpOutputApk.deleteOnExit();
 
         SignerParams signerParams = new SignerParams();
         signerParams.setKeystoreFile(keyStoreFile.getAbsolutePath());
         signerParams.setKeystoreKeyAlias("hermes");
         signerParams.setKeystorePasswordSpec("pass:hermes");
-        //signerParams.setKeyPasswordSpec("hermes");
+//        signerParams.setKeyPasswordSpec("hermes");
 
 
         signerParams.setName("ratelSign");

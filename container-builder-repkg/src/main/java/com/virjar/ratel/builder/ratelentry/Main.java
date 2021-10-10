@@ -60,28 +60,38 @@ import javax.xml.parsers.ParserConfigurationException;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        ClassNames.BUILDER_MAIN.check(Main.class);
-        int xApkIndex = -1;
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].endsWith(".xapk")) {
-                xApkIndex = i;
-                break;
+        try {
+            ClassNames.BUILDER_MAIN.check(Main.class);
+            System.out.println("ANDROID_ENV = " + BuildEnv.ANDROID_ENV);
+            int xApkIndex = -1;
+            for (int i = 0; i < args.length; i++) {
+                if (args[i].endsWith(".xapk")) {
+                    xApkIndex = i;
+                    break;
+                }
             }
-        }
-        if (xApkIndex <= 0) {
-            ratelMain(args, null);
-            return;
-        }
-        XApkHandler xApkHandler = new XApkHandler(new File(args[xApkIndex]));
+            if (xApkIndex <= 0) {
+                ratelMain(args, null);
+                System.out.println("task finish success");
+                return;
+            }
+            XApkHandler xApkHandler = new XApkHandler(new File(args[xApkIndex]));
 
-        args[xApkIndex] = xApkHandler.releasedBaseApkTempFile.getAbsolutePath();
-        File file = ratelMain(args, xApkHandler);
-        if (file == null || !file.exists()) {
-            //build失败的
-            return;
+            args[xApkIndex] = xApkHandler.releasedBaseApkTempFile.getAbsolutePath();
+            File file = ratelMain(args, xApkHandler);
+            if (file == null || !file.exists()) {
+                //build失败的
+                System.out.println("task finish error");
+                return;
+            }
+            xApkHandler.buildRatelInflectedSplitApk(file);
+            Main.cleanWorkDir();
+            System.out.println("task finish success");
+        } catch (Exception e) {
+            System.out.println("error " + e);
+            e.printStackTrace();
+            System.out.println("task finish error");
         }
-        xApkHandler.buildRatelInflectedSplitApk(file);
-        Main.cleanWorkDir();
     }
 
     private static File ratelMain(String[] args, XApkHandler xApkHandler) throws Exception {
@@ -460,8 +470,12 @@ public class Main {
             throws IOException, SAXException, ParserConfigurationException {
 
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        docFactory.setFeature(FEATURE_DISABLE_DOCTYPE_DECL, true);
-        docFactory.setFeature(FEATURE_LOAD_DTD, false);
+        try {
+            docFactory.setFeature(FEATURE_DISABLE_DOCTYPE_DECL, true);
+            docFactory.setFeature(FEATURE_LOAD_DTD, false);
+        } catch (Exception e) {
+            System.out.println("FEATURE_DISABLE_DOCTYPE_DECL err " + e.getMessage());
+        }
 
         try {
             docFactory.setAttribute(ACCESS_EXTERNAL_DTD, " ");

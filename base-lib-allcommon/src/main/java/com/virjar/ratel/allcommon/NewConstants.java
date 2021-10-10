@@ -45,9 +45,11 @@ public interface NewConstants {
         ZIP_ALIGN_LINUX_LIB_CPP(ZIP_ALIGN_BASE.NAME + "/linux/lib64/libc++.so", false),
         ZIP_ALIGN_WINDOWS(ZIP_ALIGN_BASE.NAME + "/windows/zipalign.exe", false),
         ZIP_ALIGN_MAC(ZIP_ALIGN_BASE.NAME + "/mac/zipalign", false),
+        ZIP_ALIGN_ANDROID(ZIP_ALIGN_BASE.NAME + "/android/zipalign.so", false),
 
         // 签名使用的默认证书
         DEFAULT_SIGN_KEY(LAYOUT_BASE.NAME + "/hermes_key", false),
+        DEFAULT_SIGN_KEY_ANDROID(LAYOUT_BASE.NAME + "/hermes_bksv1_key", false),
 
         // RDP模块工具
         RDP_BASE(LAYOUT_BASE.NAME + "/rdp", true, true),

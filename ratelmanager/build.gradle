@@ -1,9 +1,11 @@
 apply plugin: 'com.android.application'
 import com.virjar.ratel.allcommon.Constants
+
 android {
     compileSdkVersion 28
 
     defaultConfig {
+        multiDexEnabled true
         applicationId Constants.RATEL_MANAGER_PACKAGE
         minSdkVersion 19
         targetSdkVersion 27
@@ -42,6 +44,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    packagingOptions {
+        exclude 'META-INF/INDEX.LIST'
+    }
 }
 
 repositories {
@@ -71,7 +76,7 @@ dependencies {
     implementation 'com.jaredrummler:android-processes:1.1.1'
     implementation project(':managerbridge')
     implementation project(':base-lib-ratel-api')
-    implementation (name: 'base-lib-allcommon', ext: 'jar')
+    implementation(name: 'base-lib-allcommon', ext: 'jar')
 
     // shizukuk支持adb提权，即在非root模式下拥有shell权限
     api(group: 'dev.rikka.shizuku', name: "api", version: '11.0.2', ext: 'aar')
