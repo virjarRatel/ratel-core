@@ -62,7 +62,6 @@ public class Main {
     public static void main(String[] args) throws Exception {
         try {
             ClassNames.BUILDER_MAIN.check(Main.class);
-            System.out.println("ANDROID_ENV = " + BuildEnv.ANDROID_ENV);
             int xApkIndex = -1;
             for (int i = 0; i < args.length; i++) {
                 if (args[i].endsWith(".xapk")) {

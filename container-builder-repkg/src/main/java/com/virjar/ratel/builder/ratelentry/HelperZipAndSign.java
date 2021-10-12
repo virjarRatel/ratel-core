@@ -44,17 +44,22 @@ public class HelperZipAndSign {
     public static void zipalign(File outApk, File theWorkDir) throws IOException, InterruptedException {
         System.out.println("zip align output apk: " + outApk);
         //use different executed binary file with certain OS platforms
-        String osName = System.getProperty("os.name").toLowerCase();
         File zipalignBinPath;
-        if (osName.startsWith("Mac OS".toLowerCase())) {
-            zipalignBinPath = BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.ZIP_ALIGN_MAC);//"zipalign/mac/zipalign";
-        } else if (osName.startsWith("Windows".toLowerCase())) {
-            zipalignBinPath = BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.ZIP_ALIGN_WINDOWS);
-        } else if (BuildEnv.ANDROID_ENV) {
+        if (BuildEnv.ANDROID_ENV) {
             zipalignBinPath = BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.ZIP_ALIGN_ANDROID);
         } else {
-            zipalignBinPath = BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.ZIP_ALIGN_LINUX);
+            // 为什么这么写？ 因为在Android环境和非Android环境下，优化器只会保留一个分支的代码，
+            // 方便代码瘦身
+            String osName = System.getProperty("os.name").toLowerCase();
+            if (osName.startsWith("Mac OS".toLowerCase())) {
+                zipalignBinPath = BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.ZIP_ALIGN_MAC);//"zipalign/mac/zipalign";
+            } else if (osName.startsWith("Windows".toLowerCase())) {
+                zipalignBinPath = BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.ZIP_ALIGN_WINDOWS);
+            } else {
+                zipalignBinPath = BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.ZIP_ALIGN_LINUX);
+            }
         }
+
 
         zipalignBinPath.setExecutable(true);
 
