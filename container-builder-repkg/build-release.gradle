@@ -1,18 +1,13 @@
+import com.virjar.ratel.allcommon.Constants
+import com.virjar.ratel.allcommon.NewConstants
+
 buildscript {
     repositories {
         maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
-        maven {
-            credentials {
-                username '5fb7a10411b2334fb0005fb7'
-                password 'H_]pcyHQL4c7'
-            }
-            url 'https://packages.aliyun.com/maven/repository/2049610-release-qeKbaa/'
-        }
     }
 
     dependencies {
         classpath "com.github.jengelman.gradle.plugins:shadow:2.0.4"
-        classpath 'com.virjar:ratel-base:1.2'
     }
 }
 
@@ -20,56 +15,57 @@ Constants.devBuild = false
 
 apply from: 'BuilderRepkgBase.gradle'
 
-import com.virjar.ratel.buildsrc.Constants
-import proguard.gradle.ProGuardTask
+//import com.virjar.ratel.buildsrc.Constants
+//import proguard.gradle.ProGuardTask
 
 //runtime apk
 task injectRuntimeAPK(type: Copy) {
     from '../container-runtime-repkg/build/outputs/apk/release/container-runtime-repkg-release.apk'
     into 'src/main/resources/'
     rename {
-        Constants.RATEL_ENGINE_APK
+        NewConstants.BUILDER_RESOURCE_LAYOUT.RUNTIME_APK_FILE.NAME
     }
 }
 injectRuntimeAPK.dependsOn(':container-runtime-repkg:assembleRelease')
 processResources.dependsOn(injectRuntimeAPK)
 
-task proguardFiles(type: ProGuardTask, dependsOn: compileJava) {
-    // 取消混淆的话，注释下一句即可
-    compileJava.dependsOn.add(clean)
-    tasks.jar.dependsOn.add(proguardFiles)
-
-    def javaClassesDir = null;
-    sourceSets.main.output.classesDirs.each {
-        if (it.toString().endsWith("/java/main")) {
-            javaClassesDir = it;
-        }
-    }
-
-
-    println "proguarding"
-
-    printmapping "$buildDir/mapping.txt"
-    configuration 'proguard-rules.pro'
-
-    libraryjars files(configurations.compile.findAll { return true }.collect())
-    libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
-    libraryjars "${System.getProperty('java.home')}/lib/jce.jar"
-    if (javaClassesDir) {
-        injars sourceSets.main.output
-        outjars "$buildDir/libs/${project.name}"
-        delete "$buildDir/libs/${project.name}"
-
-        doLast {
-            delete javaClassesDir
-            copy {
-                from "$buildDir/libs/${project.name}"
-                into javaClassesDir
-            }
-        }
-    } else {
-        print "can not find java classes directory!!"
-    }
-
-}
+// gradle 插件做混淆或者优化是逻辑不是很直观，我们后续切换为直接调用命令行的方式进行代码优化，所以这里先注释
+//task proguardFiles(type: ProGuardTask, dependsOn: compileJava) {
+//    // 取消混淆的话，注释下一句即可
+//    compileJava.dependsOn.add(clean)
+//    tasks.jar.dependsOn.add(proguardFiles)
+//
+//    def javaClassesDir = null;
+//    sourceSets.main.output.classesDirs.each {
+//        if (it.toString().endsWith("/java/main")) {
+//            javaClassesDir = it;
+//        }
+//    }
+//
+//
+//    println "proguarding"
+//
+//    printmapping "$buildDir/mapping.txt"
+//    configuration 'proguard-rules.pro'
+//
+//    libraryjars files(configurations.compile.findAll { return true }.collect())
+//    libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
+//    libraryjars "${System.getProperty('java.home')}/lib/jce.jar"
+//    if (javaClassesDir) {
+//        injars sourceSets.main.output
+//        outjars "$buildDir/libs/${project.name}"
+//        delete "$buildDir/libs/${project.name}"
+//
+//        doLast {
+//            delete javaClassesDir
+//            copy {
+//                from "$buildDir/libs/${project.name}"
+//                into javaClassesDir
+//            }
+//        }
+//    } else {
+//        print "can not find java classes directory!!"
+//    }
+//
+//}
 

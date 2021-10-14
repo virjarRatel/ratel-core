@@ -1,9 +1,13 @@
 package com.virjar.ratel.manager.engine;
 
 import android.content.Context;
+import android.widget.Toast;
+
+import com.virjar.ratel.allcommon.NewConstants;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,9 +18,6 @@ import java.util.zip.ZipFile;
 
 public class RatelEngineLoader {
 
-    private static final String DEFAULT_BUILDER_JAR_NAME = "default-builder.jar.bin";
-
-    private static final String BUILDER_JAR_SAVE_PATH = "RatelBuilder.jar";
 
     public static String ratelEngineVersionName = null;
     public static String ratelEngineVersionCode = null;
@@ -24,13 +25,11 @@ public class RatelEngineLoader {
 
     public static void init(Context context) {
         File configFile = context.getFileStreamPath("ratel_engine.properties");
-        if (!configFile.exists() || !configFile.canRead() || configFile.length() == 0) {
-            try {
-                releaseDefault(context, configFile);
-                return;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        try {
+            releaseDefault(context, configFile);
+            return;
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         try {
             readConfig(configFile);
@@ -39,16 +38,26 @@ public class RatelEngineLoader {
         }
     }
 
+    public static File releaseReBuilderDexResource(Context context) throws IOException {
+        File fileStreamPath = context.getFileStreamPath(NewConstants.DEX_BUILDER_ASSETS_NAME);
+        if (fileStreamPath.exists()) {
+            return fileStreamPath;
+        }
+        try {
+            try (InputStream inputStream = context.getAssets().open(NewConstants.DEX_BUILDER_ASSETS_NAME)) {
+                try (FileOutputStream fileOutputStream = new FileOutputStream(fileStreamPath)) {
+                    copy(inputStream, fileOutputStream);
+                }
+            }
+        } catch (FileNotFoundException fileNotFoundException) {
+            Toast.makeText(context, "请使用脚本打包RM apk", Toast.LENGTH_LONG).show();
+            throw new IOException("Builder文件不存在，RM apk构建方式错误？", fileNotFoundException);
+        }
+        return fileStreamPath;
+    }
 
     private static void releaseDefault(Context context, File configFile) throws IOException {
-        InputStream inputStream = context.getAssets().open(DEFAULT_BUILDER_JAR_NAME);
-        File fileStreamPath = context.getFileStreamPath(BUILDER_JAR_SAVE_PATH);
-
-        FileOutputStream fileOutputStream = new FileOutputStream(fileStreamPath);
-        copy(inputStream, fileOutputStream);
-        inputStream.close();
-        fileOutputStream.close();
-
+        File fileStreamPath = releaseReBuilderDexResource(context);
         loadJar(fileStreamPath, configFile);
     }
 

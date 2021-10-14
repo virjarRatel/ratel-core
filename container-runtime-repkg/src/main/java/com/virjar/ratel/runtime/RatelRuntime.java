@@ -1,8 +1,6 @@
 package com.virjar.ratel.runtime;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Application;
 import android.app.Instrumentation;
 import android.content.ComponentCallbacks;
@@ -14,8 +12,6 @@ import android.content.pm.ProviderInfo;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.Process;
 import android.support.annotation.Keep;
 import android.text.TextUtils;
@@ -23,15 +19,13 @@ import android.util.Log;
 
 import com.virjar.ratel.NativeBridge;
 import com.virjar.ratel.RatelNative;
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.api.RatalStartUpCallback;
 import com.virjar.ratel.api.RatelEngine;
 import com.virjar.ratel.api.RatelEngineUpgradeEvent;
 import com.virjar.ratel.api.RatelToolKit;
 import com.virjar.ratel.api.SDK_VERSION_CODES;
 import com.virjar.ratel.api.rposed.RposedHelpers;
-import com.virjar.ratel.authorize.AuthorizeStatus;
-import com.virjar.ratel.authorize.Authorizer;
-import com.virjar.ratel.buildsrc.Constants;
 import com.virjar.ratel.core.runtime.BuildConfig;
 import com.virjar.ratel.envmock.EnvMockController;
 import com.virjar.ratel.hook.sandcompat.XposedCompat;
@@ -46,8 +40,6 @@ import com.virjar.ratel.runtime.fixer.SignatureFixer;
 import com.virjar.ratel.runtime.ipc.IPCControlHandler;
 import com.virjar.ratel.sandhook.SandHook;
 import com.virjar.ratel.utils.HiddenAPIEnforcementPolicyUtils;
-import com.virjar.ratel.utils.MainThreadRunner;
-import com.virjar.ratel.utils.ProcessUtil;
 import com.virjar.ratel.utils.SignatureKill;
 
 import java.io.File;
@@ -192,16 +184,16 @@ public class RatelRuntime {
 
         RatelConfig.init();
 
-        String ratelCertificateId = RatelConfig.getConfig("ratel_certificate_id");
-        if (TextUtils.isEmpty(ratelCertificateId)) {
-            //TODO 这里是一个bug，configFile被删除了，暂时不确定为啥
-            File file = RatelEnvironment.ratelConfigFile();
-            if (file.exists()) {
-                FileUtils.forceDelete(file);
-            }
-            RatelEnvironment.releaseApkFiles();
-            RatelConfig.init();
-        }
+//        String ratelCertificateId = RatelConfig.getConfig("ratel_certificate_id");
+//        if (TextUtils.isEmpty(ratelCertificateId)) {
+//            //TODO 这里是一个bug，configFile被删除了，暂时不确定为啥
+//            File file = RatelEnvironment.ratelConfigFile();
+//            if (file.exists()) {
+//                FileUtils.forceDelete(file);
+//            }
+//            RatelEnvironment.releaseApkFiles();
+//            RatelConfig.init();
+//        }
 
         //and then some flag need reset for ratel config
         resetRatelStatusIfEngineUpgrade();
@@ -214,9 +206,7 @@ public class RatelRuntime {
         NativeBridge.nativeBridgeInit();
         //just hide maps for libratelnative.so
         NativeHide.doHide();
-        //sync certificate data,from sdcard | ratel manager. note the app will exit if the certificate has expired even through we load a newest certificate
-        // ratel framework only use the first certificate file
-        Authorizer.loadCertificate();
+
 
         RatelNative.nativeInit(context, nowPackageName);
         initSandHook();
@@ -236,8 +226,6 @@ public class RatelRuntime {
 
         EnvMockController.initEnvModel();
 
-        checkCertificate();
-
         IPCControlHandler.initRatelManagerIPCClient();
     }
 
@@ -252,109 +240,6 @@ public class RatelRuntime {
         XposedCompat.classLoader = originContext.getClassLoader();
     }
 
-    private static void checkCertificate() {
-        AuthorizeStatus authorizeStatus = Authorizer.queryNowAuthorateStatus();
-        if (authorizeStatus == AuthorizeStatus.LicenceCheckPassed) {
-            //AuthorizeTypeSelfExplosion
-            if ((Authorizer.nowCertificateModel.licenceType & 0x0100) != 0) {
-                new Handler(Looper.getMainLooper()).postDelayed(
-                        ProcessUtil::killMe,
-                        25 * 60 * 1000
-                );
-            }
-            if (Authorizer.nowCertificateModel.expire - System.currentTimeMillis() < 7 * 24 * 60 * 60 * 1000) {
-                //证书快要过期了，弹出警告
-                MainThreadRunner.runOnFocusActivity(
-                        new MainThreadRunner.FocusActivityOccurEvent() {
-                            @Override
-                            public boolean onFocusActivityOccur(Activity activity) {
-                                long duration = Authorizer.nowCertificateModel.expire - System.currentTimeMillis();
-                                if (duration < 0) {
-                                    System.exit(0);
-                                    Process.killProcess(Process.myPid());
-                                    return false;
-                                }
-                                int days = (int) (duration / (24 * 60 * 60 * 1000));
-                                AlertDialog alertDialog = new AlertDialog.Builder(activity)
-                                        .setTitle("certificate expire soon")
-                                        .setMessage("you certificate will be expire after " + days + " days,please upgrade your licence")
-                                        .setNeutralButton("ok",
-                                                (dialog, which) -> {
-                                                })
-                                        .create();
-                                alertDialog.setCancelable(false);
-                                alertDialog.show();
-                                return false;
-                            }
-
-
-                            @Override
-                            public void onActivityEmpty() {
-
-                            }
-
-                            @Override
-                            public boolean onLostFocus() {
-                                return false;
-                            }
-                        });
-            }
-
-            return;
-        }
-        MainThreadRunner.runOnFocusActivity(
-                new MainThreadRunner.FocusActivityOccurEvent() {
-                    @Override
-                    public boolean onFocusActivityOccur(Activity activity) {
-                        if (BuildConfig.DEBUG) {
-                            Log.i(Constants.TAG, "register ApplicationOnCreateCallback,to show certificate check failed dialog");
-                        }
-                        String errorMessage;
-                        switch (authorizeStatus) {
-                            case LicenceCheckExpired:
-                                errorMessage = "your certificate has expired";
-                                break;
-                            case LicenceCheckPackageNotAllow:
-                                errorMessage = "this certificate not suitable for your app: " + nowPackageName;
-                                break;
-                            case LicenceCheckDeviceNotAllow:
-                                errorMessage = "this certificate not suitable for your device";
-                                break;
-                            case LicenceNotCheck:
-                                errorMessage = "ratel certificate load failed,please contact administrator";
-                                break;
-                            default:
-                                errorMessage = "certificate check,unknown error,please contact administrator";
-                                break;
-                        }
-                        AlertDialog alertDialog = new AlertDialog.Builder(activity)
-                                .setTitle("certificate error")
-                                .setMessage(errorMessage + ",the app will exit soon")
-                                .setNeutralButton("ok",
-                                        (dialog, which) -> {
-                                            System.exit(0);
-                                            Process.killProcess(Process.myPid());
-                                        })
-                                .create();
-                        alertDialog.setCancelable(false);
-                        alertDialog.show();
-                        return false;
-                    }
-
-
-                    @Override
-                    public void onActivityEmpty() {
-
-                    }
-
-                    @Override
-                    public boolean onLostFocus() {
-                        return false;
-                    }
-                }
-
-        );
-    }
 
     private static void resetRatelStatusIfEngineUpgrade() {
         if (!ratelEngineUpgrade) {

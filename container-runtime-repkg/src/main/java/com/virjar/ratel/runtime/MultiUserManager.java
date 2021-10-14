@@ -3,8 +3,8 @@ package com.virjar.ratel.runtime;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.api.VirtualEnv;
-import com.virjar.ratel.buildsrc.Constants;
 import com.virjar.ratel.utils.FileUtils;
 import com.virjar.ratel.utils.ProcessUtil;
 

@@ -8,31 +8,6 @@ ENABLE_LANGUAGE(ASM)
 set(LIBRARY_NAME ${LIB_NAME})
 
 
-set(DobbyHome Dobby)
-include_directories(
-        ${DobbyHome}/include
-        ${DobbyHome}/builtin-plugin
-        ${DobbyHome}/builtin-plugin/SymbolResolver
-        ${DobbyHome}/builtin-plugin/AndroidRestriction
-        ${DobbyHome}/external/logging
-)
-macro(SET_OPTION option value)
-    set(${option} ${value} CACHE INTERNAL "" FORCE)
-endmacro()
-IF (CMAKE_BUILD_TYPE STREQUAL Release)
-    SET_OPTION(DOBBY_DEBUG OFF)
-ELSE ()
-    SET_OPTION(DOBBY_DEBUG ON)
-ENDIF ()
-
-SET_OPTION(DOBBY_GENERATE_SHARED OFF)
-SET_OPTION(DynamicBinaryInstrument ON)
-SET_OPTION(NearBranch ON)
-SET_OPTION(Plugin.SymbolResolver ON)
-add_subdirectory(${DobbyHome} dobby)
-
-include_directories(${DobbyHome}/source)
-
 
 set(RATEL_NATIVE_SOURCE
         Jni/VAJni.cpp
@@ -66,11 +41,6 @@ set(RATEL_NATIVE_SOURCE
         arthook/offset.cpp
         arthook/arch/arm32.S
         arthook/arch/arm64.S
-        # 加密算法库
-        authorize/DES.cpp
-        authorize/RatelLicence.cpp
-        authorize/Base64.cpp
-        authorize/RSA.cpp
         # xhook from https://github.com/iqiyi/xHook
         xhook/xhook.c
         xhook/xh_core.c
@@ -92,8 +62,7 @@ set(RATEL_NATIVE_SOURCE
         MapHide/pmparser.c
         MapHide/MapsHideHandler.cpp
 
-        ele7enxxh/inlineHook.c
-        ele7enxxh/relocate.c
+
         )
 include_directories(Foundation)
 include_directories(Jni)
@@ -109,12 +78,12 @@ add_definitions(-DCORE_SO_NAME="${LIBRARY_NAME}")
 set(CXX_APPEND_FLAGS "-funwind-tables -g -Wgcc-compat")
 
 IF (CMAKE_BUILD_TYPE STREQUAL Release)
-    # release 模式下，对native代码进行ollvm混淆
-    message("enable ollvm obfuscator")
+    # 开源以前，我们需要做ollvm混淆，但是现在开源了，所以我们关闭ollvm混淆
+    # 如果您公司需要自行做保护，那么可以根据下面资料进行ollvm环境搭建
     # https://www.jianshu.com/p/e0637f3169a3
-    set(CXX_APPEND_FLAGS "${CXX_APPEND_FLAGS} -fvisibility=hidden -mllvm -sub -mllvm -bcf_prob=5 -mllvm -fla ")
-    #暂时关闭ollvm
-    #set(CXX_APPEND_FLAGS "${CXX_APPEND_FLAGS} -fvisibility=hidden ")
+    # set(CXX_APPEND_FLAGS "${CXX_APPEND_FLAGS} -fvisibility=hidden -mllvm -sub -mllvm -bcf_prob=5 -mllvm -fla ")
+
+    set(CXX_APPEND_FLAGS "${CXX_APPEND_FLAGS} -fvisibility=hidden ")
     #include_directories(env/release)
     add_definitions(-DRATEL_BUILD_TYPE_RELEASE)
 ELSE ()
@@ -130,10 +99,60 @@ set(RATEL_SOURCE ${RATEL_NATIVE_SOURCE})
 
 add_library(${LIBRARY_NAME} SHARED ${RATEL_SOURCE})
 
-target_link_libraries(${LIBRARY_NAME} log dobby)
+target_link_libraries(${LIBRARY_NAME} log)
 
 
 ## anrdetector
 add_executable(libratelanr.so
         anr/anrDetector.cpp)
 target_link_libraries(libratelanr.so log)
+
+set(HIDDEN_NATIVE_SOURCE
+        MapHide/hide.cpp
+        MapHide/wrap.cpp
+        MapHide/pmparser.c
+        MapHide/MapsHideHandler.cpp
+        MapHide/nativeHideJni.cpp
+        #        Jni/Helper.cpp
+        )
+add_library("ratelhide" SHARED ${HIDDEN_NATIVE_SOURCE})
+
+
+target_link_libraries("ratelhide" log)
+
+include_directories(zipalign)
+set(ZIP_ALIGN_SOURCE
+        zipalign/ziparchive/zip_archive.cc
+        zipalign/ziparchive/zip_writer.cc
+
+        zipalign/zopfli/blocksplitter.c
+        zipalign/zopfli/cache.c
+        zipalign/zopfli/deflate.c
+        zipalign/zopfli/gzip_container.c
+        zipalign/zopfli/hash.c
+        zipalign/zopfli/katajainen.c
+        zipalign/zopfli/lz77.c
+        zipalign/zopfli/squeeze.c
+        zipalign/zopfli/tree.c
+        zipalign/zopfli/util.c
+        zipalign/zopfli/zlib_container.c
+        zipalign/zopfli/zopfli_bin.c
+
+        zipalign/utils/FileMap.cpp
+        zipalign/utils/SharedBuffer.cpp
+        zipalign/utils/VectorImpl.cpp
+        zipalign/utils/safe_iop.c
+
+        zipalign/android-base/file.cpp
+        zipalign/android-base/logging.cpp
+        zipalign/android-base/strings.cpp
+        zipalign/android-base/utf8.cpp
+
+        zipalign/ZipAlign.cpp
+        zipalign/ZipEntry.cpp
+        zipalign/ZipFile.cpp
+        )
+
+add_executable("zipalign.so" ${ZIP_ALIGN_SOURCE})
+target_link_libraries("zipalign.so" log)
+target_link_libraries("zipalign.so" z)

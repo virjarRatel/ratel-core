@@ -3,8 +3,8 @@ package com.virjar.ratel.hook;
 import android.content.Context;
 import android.util.Log;
 
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.api.rposed.RC_MethodHook;
-import com.virjar.ratel.buildsrc.Constants;
 import com.virjar.ratel.runtime.RatelRuntime;
 
 import java.lang.reflect.Method;

@@ -8,9 +8,9 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.api.RatelEngine;
 import com.virjar.ratel.api.rposed.RposedHelpers;
-import com.virjar.ratel.buildsrc.Constants;
 import com.virjar.ratel.core.runtime.BuildConfig;
 import com.virjar.ratel.runtime.RatelRuntime;
 import com.virjar.ratel.sandhook.SandHookConfig;

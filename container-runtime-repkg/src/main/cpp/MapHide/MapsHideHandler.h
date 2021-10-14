@@ -6,7 +6,7 @@
 #define RATEL2_MAPSHIDEHANDLER_H
 
 
-void doMapsHide();
+void doMapsHide(bool  isMainLib);
 
 
 

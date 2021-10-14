@@ -3,7 +3,8 @@ package com.virjar.ratel.utils;
 import android.os.Build;
 import android.util.Log;
 
-import com.virjar.ratel.buildsrc.Constants;
+
+import com.virjar.ratel.allcommon.Constants;
 
 import java.lang.reflect.Method;
 

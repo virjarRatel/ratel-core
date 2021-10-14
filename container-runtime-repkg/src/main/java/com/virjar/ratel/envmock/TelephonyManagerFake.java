@@ -6,13 +6,13 @@ import android.telephony.SubscriptionInfo;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.api.FingerPrintModel;
 import com.virjar.ratel.api.RatelToolKit;
 import com.virjar.ratel.api.rposed.RC_MethodHook;
 import com.virjar.ratel.api.rposed.RposedBridge;
 import com.virjar.ratel.api.rposed.RposedHelpers;
 import com.virjar.ratel.api.rposed.callbacks.RCallback;
-import com.virjar.ratel.buildsrc.Constants;
 import com.virjar.ratel.envmock.idfake.ActiveSubscriptionInfoListReplaceHandler;
 import com.virjar.ratel.envmock.idfake.DeviceIdReplaceHandler;
 import com.virjar.ratel.envmock.idfake.ImeiReplaceHandler;

@@ -23,8 +23,6 @@
 
 #include "CydiaSubstrate.h"
 #include <Substrate/And64InlineHook.hpp>
-#include <dobby.h>
-#include <ele7enxxh/inlineHook.h>
 
 #include <sys/mman.h>
 
@@ -984,26 +982,14 @@ SubstrateHookFunction(SubstrateProcessRef process, void *symbol, void *replace, 
 
 _extern void MSHookFunction(void *symbol, void *replace, void **result) {
     __make_rwx(symbol, __page_size);
-    if (USE_INLINE_HOOK_DOBBY) {
-        DobbyHook(symbol, replace, result);
-    } else {
+
 
 #ifdef __aarch64__
-        A64HookFunction(symbol, replace, result);
+    A64HookFunction(symbol, replace, result);
 #else
-        //        if (registerInlineHook((uint32_t) symbol, (uint32_t) replace,
-        //                               (uint32_t **) &result) != ELE7EN_OK) {
-        //            ALOGE("register hook failed");
-        //            return;
-        //        }
-        //
-        //        if (inlineHook((uint32_t) symbol) != ELE7EN_OK) {
-        //            ALOGE("register hook failed");
-        //            return;
-        //        }
-                SubstrateHookFunction(nullptr, symbol, replace, result);
+    SubstrateHookFunction(nullptr, symbol, replace, result);
 #endif
-    }
+
 }
 
 /**

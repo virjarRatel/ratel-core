@@ -15,7 +15,7 @@ import android.util.Log;
 
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.raizlabs.android.dbflow.structure.database.FlowCursor;
-import com.virjar.ratel.buildsrc.Constants;
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.manager.ManagerInitiazer;
 import com.virjar.ratel.manager.RatelManagerApp;
 import com.virjar.ratel.manager.model.FakeSignature;

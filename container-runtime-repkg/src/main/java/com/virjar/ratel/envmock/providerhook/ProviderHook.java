@@ -10,8 +10,8 @@ import android.os.IInterface;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.api.rposed.RposedHelpers;
-import com.virjar.ratel.buildsrc.Constants;
 import com.virjar.ratel.runtime.RatelRuntime;
 import com.virjar.ratel.utils.BuildCompat;
 

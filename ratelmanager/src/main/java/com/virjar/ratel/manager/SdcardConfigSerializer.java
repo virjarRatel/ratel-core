@@ -3,7 +3,7 @@ package com.virjar.ratel.manager;
 import android.os.Environment;
 import android.util.Log;
 
-import com.virjar.ratel.buildsrc.Constants;
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.manager.model.RatelApp;
 import com.virjar.ratel.manager.model.RatelModule;
 import com.virjar.ratel.manager.repo.RatelAppRepo;

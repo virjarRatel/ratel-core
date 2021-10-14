@@ -1,0 +1,5 @@
+images/ant_logo_large.gif
+org/antlr/stringtemplate
+org/apache/tools/ant
+META-INF/maven
+META-INF/services

@@ -6,9 +6,9 @@ import android.os.Trace;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.api.rposed.RC_MethodHook;
 import com.virjar.ratel.api.rposed.RposedBridge;
-import com.virjar.ratel.buildsrc.Constants;
 import com.virjar.ratel.core.runtime.BuildConfig;
 import com.virjar.ratel.hook.sandcompat.classloaders.ComposeClassLoader;
 import com.virjar.ratel.hook.sandcompat.hookstub.DexMakerOptConfig;

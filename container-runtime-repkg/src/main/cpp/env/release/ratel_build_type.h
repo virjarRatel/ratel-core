@@ -1,4 +1,0 @@
-#ifndef RATEL2_DEBUG_H
-#define RATEL2_DEBUG_H
-#define RATEL_BUILD_TYPE_RELEASE
-#endif

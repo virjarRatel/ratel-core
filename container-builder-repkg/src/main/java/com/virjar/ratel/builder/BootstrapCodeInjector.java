@@ -3,7 +3,11 @@ package com.virjar.ratel.builder;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.virjar.ratel.buildsrc.Constants;
+import com.virjar.ratel.allcommon.ClassNames;
+import com.virjar.ratel.allcommon.Constants;
+import com.virjar.ratel.builder.ratelentry.BuilderContext;
+import com.virjar.ratel.builder.utils.SDK_VERSION_CODES;
+import com.virjar.ratel.builder.utils.SmaliBuilder;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -27,10 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import brut.androlib.meta.MetaInfo;
-import brut.androlib.res.data.ResConfigFlags;
-import brut.androlib.src.SmaliBuilder;
-import brut.directory.ExtFile;
 import external.com.android.dex.Dex;
 import external.com.android.dx.command.dexer.DxContext;
 import external.com.android.dx.merge.CollisionPolicy;
@@ -38,21 +38,21 @@ import external.com.android.dx.merge.DexMerger;
 
 public class BootstrapCodeInjector {
 
-    static File injectCInit(File dexImage,
-                            File workDir,
-                            File bootstrapAPKDecodeDir,
-                            String className, boolean decodeAllSmali) throws IOException {
+    public static File injectCInit(File dexImage,
+                                   File workDir,
+                                   File bootstrapAPKDecodeDir,
+                                   String className, boolean decodeAllSmali) throws IOException {
         File runtimeSmaliDir = makeSureRuntimeSmaliDir(workDir);
         doStaticLink(className, smaliFile(runtimeSmaliDir, Util.descriptorToDot(className)), bootstrapAPKDecodeDir, runtimeSmaliDir, dexImage, decodeAllSmali, true);
         File rebuildDex = new File(workDir, "injected.dex");
         System.out.println("create inject entry dex info :" + rebuildDex.getAbsolutePath());
         try {
-            SmaliBuilder.build(new ExtFile(runtimeSmaliDir), rebuildDex, Opcodes.getDefault().api, !decodeAllSmali);
+            SmaliBuilder.build(runtimeSmaliDir, rebuildDex, Opcodes.getDefault().api, !decodeAllSmali);
         } catch (Exception e) {
             throw new SmaliRebuildFailedException(e);
         } finally {
             //这里可能build失败，上游会有失败复原机制，所以这里需要把工作空间清理干净
-            FileUtils.cleanDirectory(runtimeSmaliDir);
+            //FileUtils.cleanDirectory(runtimeSmaliDir);
         }
         System.out.println("last dex time" + dexImage.lastModified());
         System.out.println("path " + dexImage.getAbsolutePath() + ",update last dex time" + dexImage.lastModified());
@@ -71,13 +71,14 @@ public class BootstrapCodeInjector {
 
     }
 
-    static File injectBootstrapCode(File dexImage,
-                                    File workDir,
-                                    File bootstrapAPKDecodeDir,
-                                    BuildParamMeta buildParamMeta,
-                                    boolean injectLogComponent, boolean decodeAllSmali
+    public static File injectBootstrapCode(File dexImage,
+                                           File workDir,
+                                           File bootstrapAPKDecodeDir,
+                                           BuildParamMeta buildParamMeta,
+                                           BuilderContext context,
+                                           boolean injectLogComponent, boolean decodeAllSmali
     ) throws IOException, DexMergeFailedException {
-        if (buildParamMeta.apkMeta.getPackageName().equals(Constants.RATEL_MANAGER_PACKAGE)) {
+        if (context.infectApk.apkMeta.getPackageName().equals(Constants.RATEL_MANAGER_PACKAGE)) {
             //rm 进行代码注入
             File rebuildDex = new File(workDir, "not_inject_for_rm.dex");
             FileUtils.copyFile(dexImage, rebuildDex);
@@ -92,24 +93,70 @@ public class BootstrapCodeInjector {
 
 
         File runtimeSmaliDir = makeSureRuntimeSmaliDir(workDir);
-        FileUtils.copyFile(
-                new File(bootstrapAPKDecodeDir, "smali/com/virjar/container_runtimer_repkg_bootstrap/BootStrap.smali"),
-                new File(runtimeSmaliDir, "com/virjar/container_runtimer_repkg_bootstrap/BootStrap.smali")
+        String bootStrapSmaliFilePath = Util.classNameToSmaliPath(ClassNames.INJECT_REBUILD_BOOTSTRAP.getClassName());
+
+        FileUtils.copyFile(new File(bootstrapAPKDecodeDir, bootStrapSmaliFilePath),
+                new File(runtimeSmaliDir, bootStrapSmaliFilePath)
         );
         if (injectLogComponent) {
             System.out.println("inject ratel SmaliLog component!!");
+            String logSmaliFilePath = Util.classNameToSmaliPath(ClassNames.INJECT_TOOL_SMALI_LOG.getClassName());
             FileUtils.copyFile(
-                    new File(bootstrapAPKDecodeDir, "smali/com/virjar/container_runtimer_repkg_bootstrap/RatelSmaliLog.smali"),
-                    new File(runtimeSmaliDir, "com/virjar/container_runtimer_repkg_bootstrap/RatelSmaliLog.smali")
+                    new File(bootstrapAPKDecodeDir, logSmaliFilePath),
+                    new File(runtimeSmaliDir, logSmaliFilePath)
             );
         }
+
+        String helperSmaliFilePath = Util.classNameToSmaliPath(ClassNames.INJECT_TOOL_SMALI_Helper.getClassName());
+        FileUtils.copyFile(
+                new File(bootstrapAPKDecodeDir, helperSmaliFilePath),
+                new File(runtimeSmaliDir, helperSmaliFilePath)
+        );
+
+        String helperClassSmaliFilePath = Util.classNameToSmaliPath(ClassNames.INJECT_TOOL_SMALI_Helper_Class.getClassName());
+        FileUtils.copyFile(
+                new File(bootstrapAPKDecodeDir, helperClassSmaliFilePath),
+                new File(runtimeSmaliDir, helperClassSmaliFilePath)
+        );
+        String helperHandleInfoSmaliFilePath = Util.classNameToSmaliPath(ClassNames.INJECT_TOOL_SMALI_Helper_HandleInfo.getClassName());
+        FileUtils.copyFile(
+                new File(bootstrapAPKDecodeDir, helperHandleInfoSmaliFilePath),
+                new File(runtimeSmaliDir, helperHandleInfoSmaliFilePath)
+        );
+        String helperMethodHandleSmaliFilePath = Util.classNameToSmaliPath(ClassNames.INJECT_TOOL_SMALI_Helper_MethodHandle.getClassName());
+        FileUtils.copyFile(
+                new File(bootstrapAPKDecodeDir, helperMethodHandleSmaliFilePath),
+                new File(runtimeSmaliDir, helperMethodHandleSmaliFilePath)
+        );
+        String helperMethodHandleImplSmaliFilePath = Util.classNameToSmaliPath(ClassNames.INJECT_TOOL_SMALI_Helper_MethodHandleImpl.getClassName());
+        FileUtils.copyFile(
+                new File(bootstrapAPKDecodeDir, helperMethodHandleImplSmaliFilePath),
+                new File(runtimeSmaliDir, helperMethodHandleImplSmaliFilePath)
+        );
+        String helperNeverCallSmaliFilePath = Util.classNameToSmaliPath(ClassNames.INJECT_TOOL_SMALI_Helper_NeverCall.getClassName());
+        FileUtils.copyFile(
+                new File(bootstrapAPKDecodeDir, helperNeverCallSmaliFilePath),
+                new File(runtimeSmaliDir, helperNeverCallSmaliFilePath)
+        );
+
+        String hiddenApiBypassSmaliFilePath = Util.classNameToSmaliPath(ClassNames.INJECT_TOOL_SMALI_HiddenApiBypass.getClassName());
+        FileUtils.copyFile(
+                new File(bootstrapAPKDecodeDir, hiddenApiBypassSmaliFilePath),
+                new File(runtimeSmaliDir, hiddenApiBypassSmaliFilePath)
+        );
+
+        String logSmaliFilePath = Util.classNameToSmaliPath(ClassNames.INJECT_TOOL_SMALI_LOG.getClassName());
+        FileUtils.copyFile(
+                new File(bootstrapAPKDecodeDir, logSmaliFilePath),
+                new File(runtimeSmaliDir, logSmaliFilePath)
+        );
 
         injectIntoContextEntry(runtimeSmaliDir, bootstrapAPKDecodeDir, buildParamMeta.appEntryClass, classDefMap, dexImage, decodeAllSmali);
 
         File rebuildDex = new File(workDir, "injected.dex");
         System.out.println("create inject entry dex info :" + rebuildDex.getAbsolutePath());
         try {
-            SmaliBuilder.build(new ExtFile(runtimeSmaliDir), rebuildDex, Opcodes.getDefault().api, !decodeAllSmali);
+            SmaliBuilder.build(runtimeSmaliDir, rebuildDex, Opcodes.getDefault().api, !decodeAllSmali);
         } catch (Exception e) {
             throw new SmaliRebuildFailedException(e);
         } finally {
@@ -132,25 +179,17 @@ public class BootstrapCodeInjector {
     }
 
 
-    public static int getMinSdkVersionFromAndroidCodename(MetaInfo meta, String sdkVersion) {
-        int sdkNumber = mapSdkShorthandToVersion(sdkVersion);
-
-        if (sdkNumber == ResConfigFlags.SDK_BASE) {
-            return Integer.parseInt(meta.sdkInfo.get("minSdkVersion"));
-        }
-        return sdkNumber;
-    }
 
     private static int mapSdkShorthandToVersion(String sdkVersion) {
         switch (sdkVersion.toUpperCase()) {
             case "M":
-                return ResConfigFlags.SDK_MNC;
+                return SDK_VERSION_CODES.M;
             case "N":
-                return ResConfigFlags.SDK_NOUGAT;
+                return SDK_VERSION_CODES.N;
             case "O":
-                return ResConfigFlags.SDK_OREO;
+                return SDK_VERSION_CODES.O;
             case "P":
-                return ResConfigFlags.SDK_P;
+                return SDK_VERSION_CODES.P;
             default:
                 return Integer.parseInt(sdkVersion);
         }
@@ -291,9 +330,11 @@ public class BootstrapCodeInjector {
                                         File bootstrapAPKDecodeDir, File runtimeSmaliDir, File dexImage,
                                         boolean decodeAllSmali, boolean force
     ) throws IOException {
+        String bootStrapCintSmaliFilePath = Util.classNameToSmaliPath(ClassNames.INJECT_REBUILD_BOOTSTRAP_CINT.getClassName());
+        String bootStrapCintNativeName = ClassNames.INJECT_REBUILD_BOOTSTRAP_CINT.getClassName().replaceAll("\\.", "/");
         FileUtils.copyFile(
-                new File(bootstrapAPKDecodeDir, "smali/com/virjar/container_runtimer_repkg_bootstrap/BootStrapWithStaticInit.smali"),
-                new File(runtimeSmaliDir, "com/virjar/container_runtimer_repkg_bootstrap/BootStrapWithStaticInit.smali")
+                new File(bootstrapAPKDecodeDir, bootStrapCintSmaliFilePath),
+                new File(runtimeSmaliDir, bootStrapCintSmaliFilePath)
         );
 
         if (decodeAllSmali) {
@@ -339,7 +380,7 @@ public class BootstrapCodeInjector {
                 newCodeLines.add("    .line 0");
             }
             newCodeLines.add(".locals 0");
-            newCodeLines.add("    invoke-static {}, Lcom/virjar/container_runtimer_repkg_bootstrap/BootStrapWithStaticInit;->startup()V");
+            newCodeLines.add("    invoke-static {}, L" + bootStrapCintNativeName + ";->startup()V");
             newCodeLines.add("    ");
             newCodeLines.add("    return-void");
             newCodeLines.add(".end method");
@@ -357,7 +398,7 @@ public class BootstrapCodeInjector {
             if (hasLineDeclared) {
                 newCodeLines.add("    .line 0");
             }
-            newCodeLines.add("    invoke-static {}, Lcom/virjar/container_runtimer_repkg_bootstrap/BootStrapWithStaticInit;->startup()V");
+            newCodeLines.add("    invoke-static {}, L" + bootStrapCintNativeName + ";->startup()V");
             newCodeLines.add("    ");
 
             //copy after
@@ -489,6 +530,7 @@ public class BootstrapCodeInjector {
         } else {
             baksmali(applicationClassName, DexFileFactory.loadDexFile(dexImage, Opcodes.getDefault()), runtimeSmaliDir);
         }
+        String bootStrapNativeName = ClassNames.INJECT_REBUILD_BOOTSTRAP.getClassName().replaceAll("\\.", "/");
 
         boolean findAttacheBaseContextMethod = false;
         for (DexBackedMethod dexBackedMethod : dexClass.getMethods()) {
@@ -556,14 +598,14 @@ public class BootstrapCodeInjector {
                 if (hasLineDeclared) {
                     newCodeLines.add("    .line 2");
                 }
-                newCodeLines.add("    invoke-static {v8, v2}, Lcom/virjar/container_runtimer_repkg_bootstrap/BootStrap;->startUp(Landroid/content/Context;Landroid/content/Context;)V");
+                newCodeLines.add("    invoke-static {v8, v2}, L" + bootStrapNativeName + ";->startUp(Landroid/content/Context;Landroid/content/Context;)V");
                 newCodeLines.add("    ");
 
             } else {
                 if (hasLineDeclared) {
                     newCodeLines.add("    .line 0");
                 }
-                newCodeLines.add("    invoke-static {p1, p0}, Lcom/virjar/container_runtimer_repkg_bootstrap/BootStrap;->startUp(Landroid/content/Context;Landroid/content/Context;)V");
+                newCodeLines.add("    invoke-static {p1, p0}, L" + bootStrapNativeName + ";->startUp(Landroid/content/Context;Landroid/content/Context;)V");
                 newCodeLines.add("    ");
 
             }
@@ -586,7 +628,7 @@ public class BootstrapCodeInjector {
                     "    .param p1, \"base\"    # Landroid/content/Context;\n" +
                     "\n" +
                     "    .line 12\n" +
-                    "    invoke-static {p1,p0}, Lcom/virjar/container_runtimer_repkg_bootstrap/BootStrap;->startUp(Landroid/content/Context;Landroid/content/Context;)V\n" +
+                    "    invoke-static {p1,p0}, L" + bootStrapNativeName + ";->startUp(Landroid/content/Context;Landroid/content/Context;)V\n" +
                     "\n" +
                     "    .line 13\n" +
                     "    invoke-super {p0, p1}, " + superclass + "->attachBaseContext(Landroid/content/Context;)V\n" +

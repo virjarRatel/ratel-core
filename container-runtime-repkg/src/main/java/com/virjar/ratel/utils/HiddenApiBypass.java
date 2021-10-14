@@ -83,6 +83,8 @@ public final class HiddenApiBypass {
         long methods = unsafe.getLong(clazz, methodsOffset);
         int numMethods = unsafe.getInt(methods);
         if (BuildConfig.DEBUG) Log.d(TAG, clazz + " has " + numMethods + " methods");
+        boolean hasGetRuntime = false;
+        boolean hasSetHiddenApiExemptions = false;
         for (int i = 0; i < numMethods; i++) {
             long method = methods + i * size + bias;
             unsafe.putLong(mh, artOffset, method);
@@ -90,12 +92,21 @@ public final class HiddenApiBypass {
             try {
                 MethodHandles.lookup().revealDirect(mh);
             } catch (Throwable ignored) {
+                continue;
             }
             MethodHandleInfo info = (MethodHandleInfo) unsafe.getObject(mh, infoOffset);
             Executable member = (Executable) unsafe.getObject(info, memberOffset);
+            if (member.getName().contains("getRuntime")) {
+                hasGetRuntime = true;
+            } else if (member.getName().contains("setHiddenApiExemptions")) {
+                hasSetHiddenApiExemptions = true;
+            }
             if (BuildConfig.DEBUG) Log.v(TAG, "got " + clazz.getTypeName() + "." + member +
                     "(" + Arrays.stream(member.getTypeParameters()).map(Type::getTypeName).collect(Collectors.joining()) + ")");
             list.add(member);
+            if (hasGetRuntime && hasSetHiddenApiExemptions) {
+                break;
+            }
         }
         return list;
     }

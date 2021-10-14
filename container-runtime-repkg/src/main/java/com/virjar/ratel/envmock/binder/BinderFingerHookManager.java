@@ -8,9 +8,9 @@ import android.telephony.SubscriptionInfo;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.api.RatelToolKit;
 import com.virjar.ratel.api.inspect.Lists;
-import com.virjar.ratel.buildsrc.Constants;
 import com.virjar.ratel.envmock.MSAFake;
 import com.virjar.ratel.envmock.TimeFake;
 import com.virjar.ratel.envmock.binder.handlers.IPhoneSubInfoManagerHandler;

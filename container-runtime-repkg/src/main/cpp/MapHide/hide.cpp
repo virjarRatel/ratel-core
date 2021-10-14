@@ -5,7 +5,6 @@
 #include "wrap.h"
 
 #include "hide.h"
-#include <Helper.h>
 
 /**
  * https://github.com/RikkaApps/Riru/blob/master/core/src/main/cpp/hide.cpp
@@ -81,8 +80,26 @@ static int do_hide(hide_struct *data) {
     return 0;
 }
 
+bool start_with_1(const char *input, const char *preffix) {
+    int i = 0;
+    while (true) {
+        if (preffix[i] == '\0') {
+            return true;
+        }
+        if (input[i] == '\0') {
+            return false;
+        }
+
+        if (input[i] != preffix[i]) {
+            return false;
+        }
+        i++;
+    }
+}
+
+
 static bool is_data(char *line) {
-    return start_with(line, "/data/");
+    return start_with_1(line, "/data/");
 }
 
 
@@ -102,14 +119,14 @@ static bool filter_for_ratel(const char *mapsLine) {
     if (strstr(mapsLine, "ratel_container_origin_apk")) {
         return true;
     }
-    if (start_with(mapsLine, "/data/app/ratel.")) {
+    if (start_with_1(mapsLine, "/data/app/ratel.")) {
         //maybe ratel module
         return true;
     }
     return strstr(mapsLine, "ratel_container-driver") != nullptr;
 }
 
-int riru_hide() {
+int riru_hide(bool isMainLib) {
     MLOGI("call riru_hide");
     procmaps_iterator *maps = pmparser_parse(getpid());
     if (maps == nullptr) {
@@ -122,12 +139,21 @@ int riru_hide() {
     size_t data_count = 0;
     procmaps_struct *maps_tmp;
     while ((maps_tmp = pmparser_next(maps)) != nullptr) {
-        if (!start_with(maps_tmp->pathname, "/data/")) {
-            continue;
+        if (isMainLib) {
+            // 主lib中，隐藏除开自己的其他so文件
+            if (!start_with_1(maps_tmp->pathname, "/data/")) {
+                continue;
+            }
+            if (!filter_for_ratel(maps_tmp->pathname)) {
+                continue;
+            }
+        } else {
+            // 非主lib中，隐藏 libratelnative
+            if (!strstr(maps_tmp->pathname, "libratelnative")) {
+                continue;
+            }
         }
-        if (!filter_for_ratel(maps_tmp->pathname)) {
-            continue;
-        }
+
         MLOGI("find maps relate feature filed:%s", maps_tmp->pathname);
 
         auto start = (uintptr_t) maps_tmp->addr_start;

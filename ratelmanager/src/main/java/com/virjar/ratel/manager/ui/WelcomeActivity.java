@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,6 +20,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,9 +28,17 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.LinearLayout;
 
+import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.Permission;
+import com.hjq.permissions.XXPermissions;
+import com.hjq.xtoast.XToast;
+import com.hjq.xtoast.draggable.SpringDraggable;
 import com.virjar.ratel.manager.R;
+import com.virjar.ratel.manager.RatelManagerApp;
 import com.virjar.ratel.manager.repo.RatelModuleRepo;
 import com.virjar.ratel.manager.util.ThemeUtil;
+
+import java.util.List;
 
 import rikka.shizuku.Shizuku;
 
@@ -105,6 +115,8 @@ public class WelcomeActivity extends XposedBaseActivity implements NavigationVie
         requestPermissionAndSaveConfig();
 
         //RatelAccessibilityService.guideToAccessibilityPage(this);
+
+        showRatelFloatWindow();
     }
 
     private int externalStorageRequestFiledTimes = 0;
@@ -277,4 +289,40 @@ public class WelcomeActivity extends XposedBaseActivity implements NavigationVie
         }
     }
 
+    private static boolean hasShowFloatWindow = false;
+
+    /**
+     * 设置一个应用外悬浮窗，因为安卓10之后对后台启动activity具有限制
+     * https://developer.android.com/guide/components/activities/background-starts
+     * <p>
+     * {@link RatelManagerApp#checkFloatPermission(Context) 需要授予悬浮窗权限} (Context)}，
+     * {@link RatelManagerApp#canBackgroundStart(Context) 或者miui等在设置中给予后台启动Activity权限}
+     */
+    private void showRatelFloatWindow() {
+        if (hasShowFloatWindow) {
+            return;
+        }
+        XXPermissions.with(this)
+                .permission(Permission.SYSTEM_ALERT_WINDOW)
+                .request(new OnPermissionCallback() {
+
+                    @Override
+                    public void onGranted(List<String> granted, boolean all) {
+                        // 传入 Application 表示这个是一个全局的 Toast
+                        new XToast<>(RatelManagerApp.getInstance())
+                                .setView(R.layout.toast_phone)
+                                .setGravity(Gravity.END | Gravity.BOTTOM)
+                                .setYOffset(200)
+                                // 设置指定的拖拽规则
+                                .setDraggable(new SpringDraggable())
+                                .show();
+                        hasShowFloatWindow = true;
+                    }
+
+                    @Override
+                    public void onDenied(List<String> denied, boolean never) {
+
+                    }
+                });
+    }
 }

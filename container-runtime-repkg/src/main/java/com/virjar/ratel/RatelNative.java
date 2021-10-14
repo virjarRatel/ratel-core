@@ -5,7 +5,7 @@ import android.os.Build;
 import android.util.Log;
 import android.util.Pair;
 
-import com.virjar.ratel.buildsrc.Constants;
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.envmock.PropertiesMockItem;
 import com.virjar.ratel.envmock.binder.BinderHookManager;
 import com.virjar.ratel.runtime.RatelEnvironment;

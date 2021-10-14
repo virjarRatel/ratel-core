@@ -48,3 +48,4 @@ script/dist.zip
 container-builder-repkg/src/main/resources/ratel_engine.properties
 
 container-builder-repkg/src/main/resources/dex_maker_opt.zip
+src/main/assets/container-builder-repkg-dex.jar

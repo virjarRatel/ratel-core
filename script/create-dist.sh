@@ -33,6 +33,7 @@ do
     if [[ ${file} =~ "container-builder-repkg" ]] && [[ ${file} =~ ".jar" ]] &&  [[ ${file} =~ ${engineVersionCode} ]];then
         builder_jar=${builder_jar_dir}${file}
         builder_jar_file_name=${file}
+        builder_dex_file_name=$(echo ${builder_jar_file_name} | sed 's/\.[^.]*$//')"-dex.jar"
     fi
 done
 
@@ -56,41 +57,51 @@ cp ${builder_jar} ${script_dir}/dist/res/
 
 
 cp ${script_dir}/hermes_key ${script_dir}/dist/res/
+cp ${script_dir}/hermes_bksv1_key ${script_dir}/dist/res/
 cp ${script_dir}/ratel.sh ${script_dir}/dist/
 cp ${script_dir}/ratel.bat ${script_dir}/dist/
 date > ${script_dir}/dist/res/build_timestamp.txt
 echo ${builder_jar_file_name} > ${script_dir}/dist/res/ratel_version.txt
-cp ${script_dir}/monthly_temp_obt.txt ${script_dir}/dist/res/monthly_temp.txt
 
 # create obt realase files
 cd ${script_dir}/dist/
-zip -r ratel-engine-obt-${engineVersionCode}.zip ./*
-mv ratel-engine-obt-${engineVersionCode}.zip ../
+
 
 # release for super admin
 cp ${script_dir}/monthly_temp.txt ${script_dir}/dist/res/monthly_temp.txt
 
 cd ${root_dir}
-./gradlew container-builder-transformer:assemble
-transformer_jar=`pwd`/container-builder-transformer/build/libs/EngineBinTransformer-1.0.jar
-echo transform ratel builder format from jar to dex with transformer_jar ${transformer_jar}
-echo java -jar ${transformer_jar} -s ${script_dir}/dist/res/${builder_jar_file_name}
-java -jar ${transformer_jar} -s ${script_dir}/dist/res/${builder_jar_file_name}
+builder_helper_jar=${root_dir}/container-builder-helper/build/libs/BuilderHelper-1.0.jar
+
+# jar包内置资源的优化
+java -jar ${builder_helper_jar} OPTIMIZE_BUILDER_RESOURCE --rdp -i ${script_dir}/dist/res/${builder_jar_file_name}  -o ${script_dir}/dist/res/${builder_jar_file_name}
+
+# jar包工具链转化为dex
+java -jar ${builder_helper_jar} TRANSFORM_BUILDER_JAR -s ${script_dir}/dist/res/${builder_jar_file_name} -d ${script_dir}/dist/res/${builder_dex_file_name}
+
+# 需要注意，需先行转化为dex，后面再进行class优化，因为class优化source和destination是相同的，这会导致jar文件被修改
+# jar包代码本身代码优化
+java -jar ${builder_helper_jar} OPTIMIZE_BUILDER_CLASS -i ${script_dir}/dist/res/${builder_jar_file_name}
 
 
-# copy keygen
+# 拷贝到 rm assets 目录下
+if [ ! -d ${root_dir}/ratelmanager/src/main/assets ] ;then
+  mkdir ${root_dir}/ratelmanager/src/main/assets
+fi
+rm ${root_dir}/ratelmanager/src/main/assets/container-builder-repkg-dex.jar
+cp ${script_dir}/dist/res/${builder_dex_file_name} ${root_dir}/ratelmanager/src/main/assets/container-builder-repkg-dex.jar
+
+
 cd ${root_dir}
 
-./gradlew authorizer:shadowJar
-cp authorizer/build/libs/ratel-keygen-1.0.0.jar ${script_dir}/dist/res/
-cp ${script_dir}/ratel-keygen.sh ${script_dir}/dist/
 
 
-if [ ! -d /opt/ratel/ ] ;then
-    mkdir /opt/ratel/
-fi
-# 这里，放到系统指定目录，然后配置好环境变量，就可以直接命令行调用ratel了
-cp -r ${script_dir}/dist/* /opt/ratel/
+
+#if [ ! -d /opt/ratel/ ] ;then
+#    mkdir /opt/ratel/
+#fi
+## 这里，放到系统指定目录，然后配置好环境变量，就可以直接命令行调用ratel了
+#cp -r ${script_dir}/dist/* /opt/ratel/
 
 cd ${script_dir}/dist/
 zip -r dist.zip ./*

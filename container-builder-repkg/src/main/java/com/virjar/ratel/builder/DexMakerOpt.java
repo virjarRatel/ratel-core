@@ -1,7 +1,8 @@
 package com.virjar.ratel.builder;
 
 
-import com.virjar.ratel.buildsrc.Constants;
+
+import com.virjar.ratel.allcommon.Constants;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;

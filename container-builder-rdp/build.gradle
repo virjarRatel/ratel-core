@@ -1,3 +1,5 @@
+import com.virjar.ratel.allcommon.ClassNames
+
 buildscript {
     repositories {
         maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
@@ -21,6 +23,8 @@ dependencies {
     api 'commons-io:commons-io:2.6'
     api 'commons-cli:commons-cli:1.4'
     api 'org.apache.commons:commons-lang3:3.7'
+    api project(':base-lib-apksigner')
+    api(name: 'base-lib-allcommon', ext: 'jar')
 }
 
 sourceCompatibility = "8"
@@ -33,7 +37,7 @@ shadowJar {
     classifier = null
     version = 1.0
     manifest {
-        attributes 'Main-Class': 'com.virjar.ratel.rdp.RDPBuilder'
+        attributes 'Main-Class': ClassNames.RDP_MAIN
     }
 }
 assemble.dependsOn(shadowJar)

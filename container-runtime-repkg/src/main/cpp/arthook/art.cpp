@@ -5,7 +5,6 @@
 #include "art.h"
 #include "cast.h"
 #include "native_api.h"
-#include <authorize/RatelLicence.h>
 #include <Log.h>
 
 #include "VAJni.h"
@@ -195,17 +194,10 @@ bool ArtMethod::deCompile() {
 }
 
 void ArtMethod::flushCache() {
-    if (ratelLicenceGlobal == nullptr) {
-        return;
-    }
-
     flushCacheExt(reinterpret_cast<Size>(this), size());
 }
 
 void ArtMethod::backup(ArtMethod *backup) {
-    if (ratelLicenceGlobal == nullptr) {
-        return;
-    }
     memcpy(backup, this, size());
 }
 

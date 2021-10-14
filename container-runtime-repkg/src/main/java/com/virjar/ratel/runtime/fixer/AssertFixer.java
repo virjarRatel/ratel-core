@@ -14,9 +14,10 @@ import android.util.Log;
 import android.view.Display;
 
 import com.virjar.ratel.RatelNative;
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.api.rposed.RC_MethodHook;
 import com.virjar.ratel.api.rposed.RposedHelpers;
-import com.virjar.ratel.buildsrc.Constants;
+import com.virjar.ratel.api.ui.util.Constant;
 import com.virjar.ratel.runtime.RatelEnvironment;
 import com.virjar.ratel.runtime.RatelRuntime;
 import com.virjar.ratel.utils.BuildCompat;
@@ -24,6 +25,7 @@ import com.virjar.ratel.utils.BuildCompat;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.WeakHashMap;
 
@@ -106,8 +108,25 @@ public class AssertFixer {
 //            AssetManager oldAssets = RposedHelpers.getObjectField(resourceImpl, "mAssets");
 //            oldAssets.close();
 
+            Object newResourceImpl = null;
+            if (Build.VERSION.SDK_INT >= 30) {
+                Method method = RposedHelpers.findMethodExactIfExists(resourceManager.getClass(),
+                        "createApkAssetsSupplierNotLocked", "android.content.res.ResourcesKey");
+                if (method != null) {
+                    try {
+                        // 部分手机是通过这个方法创建对象的
+                        Object mApkAssetsSupplier = RposedHelpers.callMethod(resourceManager, "createApkAssetsSupplierNotLocked", resourceKey);
+                        newResourceImpl = RposedHelpers.callMethod(resourceManager, "createResourcesImpl", resourceKey, mApkAssetsSupplier);
+                    } catch (Exception e) {
+                        Log.e(Constants.TAG, "error", e);
+                    }
+                }
+            }
 
-            Object newResourceImpl = RposedHelpers.callMethod(resourceManager, "createResourcesImpl", resourceKey);
+            if (newResourceImpl == null) {
+                newResourceImpl = RposedHelpers.callMethod(resourceManager, "createResourcesImpl", resourceKey);
+            }
+            //Object newResourceImpl = RposedHelpers.callMethod(resourceManager, "createResourcesImpl", resourceKey);
             if (newResourceImpl == null) {
 
                 AssetManager assets = (AssetManager) RposedHelpers.callMethod(resourceManager, "createAssetManager", resourceKey);

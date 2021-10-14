@@ -14,8 +14,7 @@ import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.virjar.ratel.authorize.Authorizer;
-import com.virjar.ratel.buildsrc.Constants;
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.utils.ProcessUtil;
 
 import org.json.JSONArray;
@@ -108,7 +107,7 @@ public class HotModuleManager {
     private static void doRefreshConfig() throws IOException, JSONException {
         String url = hotModuleConfigURL();
         // 当前证书id
-        String licenceId = Authorizer.nowCertificateModel.licenceId;
+        String licenceId = RatelConfig.getConfig("licenceId");//Authorizer.nowCertificateModel.licenceId;
         String group = RatelConfig.getConfig(Constants.RATEL_KEY_HOT_MODULE_GROUP);
         String mPackage = RatelRuntime.originPackageName;
 

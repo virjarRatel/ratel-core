@@ -6,8 +6,8 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.util.LruCache;
 
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.api.scheduler.RatelTask;
-import com.virjar.ratel.buildsrc.Constants;
 import com.virjar.ratel.manager.ManagerInitiazer;
 import com.virjar.ratel.manager.bridge.IRatelRemoteControlHandler;
 import com.virjar.ratel.manager.component.AppWatchDogService;

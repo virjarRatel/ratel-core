@@ -1,0 +1,21 @@
+# builder 的优化规则
+-keepattributes *
+
+# 貌似大小写会出问题，导致文件名大写，对应class小写
+-dontusemixedcaseclassnames
+
+# ratel 框架入口class
+-keep  class ${{BUILDER_MAIN}} {
+    public static void main(java.lang.String[]);
+}
+
+-keep class org.jf.dexlib2.Opcode{*;}
+
+-keep class com.android.apksig.internal.**{*;}
+
+-dontwarn
+-dontnote
+-ignorewarnings
+
+# 开源环境，我们不做混淆
+-dontobfuscate

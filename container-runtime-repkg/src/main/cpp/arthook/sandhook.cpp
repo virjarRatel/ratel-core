@@ -6,7 +6,6 @@
 #include <jni.h>
 #include <Foundation/Log.h>
 #include <lock.h>
-#include <authorize/RatelLicence.h>
 
 SandHook::TrampolineManager &trampolineManager = SandHook::TrampolineManager::get();
 
@@ -89,10 +88,6 @@ bool doHookWithReplacement(JNIEnv *env,
         hookMethod->disableCompilable();
     }
 
-    if (hasParseCertificate != hasParseCertificateFlag) {
-        //暗桩
-        return true;
-    }
 
     if (SDK_INT > ANDROID_N && SDK_INT < ANDROID_Q) {
         forceProcessProfiles();

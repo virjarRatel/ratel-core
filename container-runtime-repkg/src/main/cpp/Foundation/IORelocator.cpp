@@ -23,11 +23,10 @@
 #include "Symbol.h"
 #include "Log.h"
 #include "MapsRedirector.h"
-#include "xhook.h"
-//#include "ratel_build_type.h"
 #include "ExecveHandler.h"
 #include "MacAddressFake.h"
 #include <MapsHideHandler.h>
+#include <xhook.h>
 
 #if defined(__LP64__)
 #define LINKER_PATH "/system/bin/linker64"
@@ -145,7 +144,7 @@ void IOUniformer::init_env_before_all() {
         startIOHook(api_level, false);
     }
     //子进程需要进行一次maps hide，否则子进程会有泄漏 libratelnative_64.so
-    doMapsHide();
+    doMapsHide(true);
 }
 
 static inline void

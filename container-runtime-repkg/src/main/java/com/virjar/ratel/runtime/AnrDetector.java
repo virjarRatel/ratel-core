@@ -6,7 +6,7 @@ import android.os.Looper;
 import android.os.Process;
 import android.util.Log;
 
-import com.virjar.ratel.buildsrc.Constants;
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.utils.FileUtils;
 
 import java.io.File;

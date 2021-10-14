@@ -1,19 +1,17 @@
 buildscript {
     repositories {
-        maven {
-            credentials {
-                username '5fb7a10411b2334fb0005fb7'
-                password 'H_]pcyHQL4c7'
+        repositories {
+            flatDir {
+                dir rootProject.file('base-lib-allcommon-lib')
             }
-            url 'https://packages.aliyun.com/maven/repository/2049610-release-qeKbaa/'
         }
     }
-
     dependencies {
-        classpath 'com.virjar:ratel-base:1.2'
+        classpath(name: 'base-lib-allcommon', ext: 'jar')
     }
 }
-import com.virjar.ratel.buildsrc.Constants
+import com.virjar.ratel.allcommon.Constants
+import com.virjar.ratel.allcommon.NewConstants
 
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
@@ -28,24 +26,25 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'org.apache.commons:commons-lang3:3.7'
     compile 'commons-io:commons-io:2.6'
-    //guava jar包有9M，太大了，不适合在这里使用
-    // compile 'com.google.guava:guava:23.4-android'
     //android版本的fastjson要小很多，可以节约500k的大小
     compile 'com.alibaba:fastjson:1.1.71.android'
     compile 'commons-cli:commons-cli:1.4'
-    compile 'com.virjar:ratel-base:1.2'
     compile project(':base-lib-dx')
-    // https://mvnrepository.com/artifact/org.apache.ant/ant
-    //这个里面代码太大了，为了精简最终apk，我们只把zip模块代码抽离出来
-    //compile group: 'org.apache.ant', name: 'ant', version: '1.10.5'
+    compile group: 'org.apache.ant', name: 'ant', version: '1.10.5'
     compile 'xmlunit:xmlunit:1.6'
     compile 'xpp3:xpp3:1.1.4c'
     compile 'commons-cli:commons-cli:1.4'
-    //compile 'org.smali:dexlib2:2.2.7'
+    compile 'org.smali:dexlib2:2.3.4'
+    compile 'org.smali:util:2.3.4'
+    compile 'org.smali:baksmali:2.3.4'
+    compile 'org.smali:smali:2.3.4'
     compile 'org.antlr:antlr-runtime:3.5.2'
     compile 'org.antlr:stringtemplate:3.2.1'
-    compile 'org.smali:util:2.2.7'
     compile 'org.yaml:snakeyaml:1.18:android'
+    compile group: 'net.dongliu', name: 'apk-parser', version: '2.6.10'
+    compile project(':base-lib-apksigner')
+    compile project(':base-lib-pxb-axml')
+    compile(name: 'base-lib-allcommon', ext: 'jar')
 }
 
 sourceCompatibility = 1.8
@@ -72,59 +71,9 @@ shadowJar {
     classifier = null
     version = rootProject.ext.ratelEngineVersion
     manifest {
-        attributes 'Main-Class': 'ratelentry.Main'
+        attributes 'Main-Class': 'com.virjar.ratel.builder.ratelentry.Main'
     }
 }
-
-// bootstrap module apk
-task injectBootstrapAPK(type: Copy) {
-    from '../container-runtime-repkg-bootstrap/build/outputs/apk/release/container-runtime-repkg-bootstrap-release.apk'
-    into 'src/main/resources/'
-    rename {
-        Constants.bootstrapAPKPath
-    }
-}
-
-injectBootstrapAPK.dependsOn(':container-runtime-repkg-bootstrap:assembleRelease')
-processResources.dependsOn(injectBootstrapAPK)
-
-//multi dex bootstrap apk
-task injectMultDexBootstrapApk(type: Copy) {
-    from '../container-multi-dex-bootstrap/build/outputs/apk/release/container-multi-dex-bootstrap-release.apk'
-    into 'src/main/resources/'
-    rename {
-        Constants.ratelMultiDexBootstrapApkPath
-    }
-}
-injectMultDexBootstrapApk.dependsOn(':container-multi-dex-bootstrap:assembleRelease')
-processResources.dependsOn(injectMultDexBootstrapApk)
-
-
-//zelda bootstrap apk
-task injectZeldaBootstrapApk(type: Copy) {
-    from '../container-zelda-bootstrap/build/outputs/apk/release/container-zelda-bootstrap-release.apk'
-    into 'src/main/resources/'
-    rename {
-        Constants.ratelZeldaBootstrapApkPath
-    }
-}
-injectZeldaBootstrapApk.dependsOn(':container-zelda-bootstrap:assembleRelease')
-processResources.dependsOn(injectZeldaBootstrapApk)
-
-//// xc_method_wrapper apk
-//task injectXCMethodWrapperAPK(type: Copy) {
-//    from '../container-xc-method-wrapper/build/outputs/apk/release/container-xc-method-wrapper-release.apk'
-//    into 'src/main/resources/'
-//    rename {
-//        'ratel_xcMethodWrapper.apk'
-//    }
-//}
-//
-//injectXCMethodWrapperAPK.dependsOn(':container-xc-method-wrapper:assembleRelease')
-//processResources.dependsOn(injectXCMethodWrapperAPK)
-//这个是兼容将xposed路由到原生xposed的实现（非Rposed路由Xposed，是在存在Xposed的机器上面运行Xposed模块，并和Ratel兼容），
-//在当前RatelAPI分支下，这个功能较难实现，并且这个功能在ratel设计之后仅有一两次尝试性质的使用。所以这个功能直接废弃
-
 
 //dexmaker-opt
 task injectDexMakerOptSource(type: Copy) {
@@ -140,7 +89,7 @@ task injectXposedBridgeAPK(type: Copy) {
     from '../base-lib-xposed-bridge/build/outputs/apk/release/base-lib-xposed-bridge-release.apk'
     into 'src/main/resources/'
     rename {
-        Constants.xposedApiBridgeAPKFileName
+        NewConstants.BUILDER_RESOURCE_LAYOUT.XPOSED_BRIDGE_APK_FILE.NAME
     }
 }
 
@@ -153,12 +102,38 @@ task injectRDPJar(type: Copy) {
     from '../container-builder-rdp/build/libs/RDP-1.0.jar'
     into 'src/main/resources/'
     rename {
-        Constants.RDP_BIN_JAR_NAME
+        NewConstants.BUILDER_RESOURCE_LAYOUT.RDP_JAR_FILE.NAME
     }
 }
 
 injectRDPJar.dependsOn(':container-builder-rdp:assemble')
 processResources.dependsOn(injectRDPJar)
+
+// 构建工具的优化器
+task injectBuilderHelperJar(type: Copy) {
+    from '../container-builder-helper/build/libs/BuilderHelper-1.0.jar'
+    into 'src/main/resources/'
+    rename {
+        NewConstants.BUILDER_RESOURCE_LAYOUT.BUILDER_HELPER_NAME.NAME
+    }
+}
+
+injectBuilderHelperJar.dependsOn(':container-builder-helper:assemble')
+processResources.dependsOn(injectBuilderHelperJar)
+
+// 注入代码模版工程
+task injectTemplateApk(type: Copy) {
+    from '../container-inject-template/build/outputs/apk/release/container-inject-template-release.apk'
+    into 'src/main/resources/'
+    rename {
+        NewConstants.BUILDER_RESOURCE_LAYOUT.TEMPLATE_APK_FILE.NAME
+    }
+}
+
+injectTemplateApk.dependsOn(':container-inject-template:assembleRelease')
+processResources.dependsOn(injectTemplateApk)
+
+
 
 task storeBuildConstantsProperties() {
 

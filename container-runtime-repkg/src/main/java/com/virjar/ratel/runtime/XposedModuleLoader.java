@@ -12,6 +12,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.virjar.ratel.RatelNative;
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.api.rposed.IRposedHookLoadPackage;
 import com.virjar.ratel.api.rposed.RposedBridge;
 import com.virjar.ratel.api.rposed.RposedHelpers;
@@ -19,7 +20,6 @@ import com.virjar.ratel.api.rposed.callbacks.RC_LoadPackage;
 import com.virjar.ratel.api.xposed.IRXposedHookInitPackageResources;
 import com.virjar.ratel.api.xposed.IRXposedHookLoadPackage;
 import com.virjar.ratel.api.xposed.IRXposedHookZygoteInit;
-import com.virjar.ratel.buildsrc.Constants;
 import com.virjar.ratel.core.runtime.BuildConfig;
 import com.virjar.ratel.hook.ContextAttachCollector;
 import com.virjar.ratel.utils.StringEtacsufbo;

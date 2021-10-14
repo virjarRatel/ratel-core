@@ -4,7 +4,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
-import com.virjar.ratel.buildsrc.Constants;
 import com.virjar.ratel.envmock.binder.BinderHookManager;
 import com.virjar.ratel.envmock.binder.BinderHookParcelHandler;
 

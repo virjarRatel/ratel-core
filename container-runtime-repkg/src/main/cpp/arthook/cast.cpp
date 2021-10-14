@@ -2,7 +2,6 @@
 // Created by swift on 2019/2/3.
 //
 
-#include <authorize/RatelLicence.h>
 #include "cast.h"
 #include "VAJni.h"
 #include "native_api.h"
@@ -229,10 +228,6 @@ namespace SandHook {
         hotnessCount = new CastHotnessCount();
         hotnessCount->init(env, m1, size);
 
-        if (hasCallRatelDecryptFunction != hasCallRatelDecryptFunctionFlag) {
-            //暗桩
-            return;
-        }
         jclass neverCallTestClass = env->FindClass(sandClassNeverCallClass);
 
 

@@ -4,8 +4,7 @@ import android.content.Context;
 import android.support.annotation.Keep;
 import android.util.Log;
 
-import com.virjar.ratel.authorize.Authorizer;
-import com.virjar.ratel.buildsrc.Constants;
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.core.runtime.BuildConfig;
 import com.virjar.ratel.envmock.PropertiesMockItem;
 import com.virjar.ratel.envmock.SystemPropertiesFake;
@@ -60,7 +59,7 @@ public class NativeBridge {
     }
 
 
-    private static native String bridgeInitNative(Map<String, String> bindData, Context context, String originPkgName, boolean useDobby);
+    private static native String bridgeInitNative(Map<String, String> bindData, Context context, String originPkgName);
 
     public static String onGetSystemProperties(String key, String value) {
         return SystemPropertiesFake.onGetSystemProperties(key, value);
@@ -76,13 +75,10 @@ public class NativeBridge {
         bindData.put("SAND_METHOD_RESOLVER", Types.getNativeClassName(SandHookMethodResolver.class));
         bindData.put("SAND_HOOK_CONFIG", Types.getNativeClassName(SandHookConfig.class));
         bindData.put("RAND_HOOK_PENDING_HOOK", Types.getNativeClassName(PendingHookHandler.class));
-        bindData.put("RATEL_AUTHORIZER", Types.getNativeClassName(Authorizer.class));
         bindData.put("RATEL_PROPERTIES_MOCK_ITEM", Types.getNativeClassName(PropertiesMockItem.class));
         bindData.put("RATEL_A", Types.getNativeClassName(SelfExplosion.class));
 
-        boolean useDobby = BooleanUtils.toBoolean(RatelConfig.getConfig("RATEL_INLINE_HOOK_DOBBY", "false"));
-
-        String errorMessage = bridgeInitNative(bindData, RatelRuntime.getOriginContext(), RatelRuntime.originPackageName, useDobby);
+        String errorMessage = bridgeInitNative(bindData, RatelRuntime.getOriginContext(), RatelRuntime.originPackageName);
         if (errorMessage == null) {
             return;
         }

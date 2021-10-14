@@ -2,6 +2,7 @@ package com.virjar.ratel.builder;
 
 import com.google.common.base.Defaults;
 import com.google.common.base.Splitter;
+import com.virjar.ratel.allcommon.ClassNames;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -10,6 +11,7 @@ import org.apache.tools.zip.ZipFile;
 import org.apache.tools.zip.ZipOutputStream;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -47,6 +49,12 @@ public class Util {
                 return "UNKNOWN";
         }
     }
+
+    public static String classNameToSmaliPath(String className) {
+        String nativeName = className.replaceAll("\\.", "/");
+        return nativeName + ".smali";
+    }
+
 
     /**
      * Converts a type descriptor to human-readable "dotted" form.  For
@@ -140,7 +148,7 @@ public class Util {
      * 永远为false，我们不能随便删除不支持的架构so文件，目前发现"全球骑士购"app，可能在读取某些so资源，然后导致app闪退
      */
     @Deprecated
-    static boolean isRatelUnSupportArch(String zipEntryName) {
+    public static boolean isRatelUnSupportArch(String zipEntryName) {
         return false;
 //        if (!zipEntryName.startsWith("lib/")) {
 //            return false;
@@ -156,7 +164,9 @@ public class Util {
 
     public static void copyAssets(ZipOutputStream zos, File from, String name) throws IOException {
         zos.putNextEntry(new ZipEntry("assets/" + name));
-        zos.write(FileUtils.readFileToByteArray(from));
+        try (FileInputStream fileInputStream = new FileInputStream(from)) {
+            IOUtils.copy(fileInputStream, zos);
+        }
     }
 
     public static final Pattern classesIndexPattern = Pattern.compile("classes(\\d+)\\.dex");

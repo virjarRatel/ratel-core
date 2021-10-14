@@ -3,10 +3,10 @@ package com.virjar.ratel.runtime.apibridge;
 import android.util.Log;
 
 import com.virjar.ratel.RatelNative;
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.api.RatelToolKit;
 import com.virjar.ratel.api.RatelUnpack;
 import com.virjar.ratel.api.inspect.Lists;
-import com.virjar.ratel.buildsrc.Constants;
 import com.virjar.ratel.hook.sandcompat.hookstub.DexMakerOptConfig;
 import com.virjar.ratel.runtime.RatelEnvironment;
 import com.virjar.ratel.runtime.unpack.DexFixer;

@@ -5,7 +5,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 
-import com.virjar.ratel.buildsrc.Constants;
+import com.virjar.ratel.allcommon.Constants;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

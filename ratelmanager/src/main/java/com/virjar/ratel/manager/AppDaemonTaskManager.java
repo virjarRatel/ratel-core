@@ -7,7 +7,7 @@ import android.content.pm.PackageManager;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.virjar.ratel.buildsrc.Constants;
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.manager.component.AppWatchDogService;
 import com.virjar.ratel.manager.model.RatelApp;
 import com.virjar.ratel.manager.repo.RatelAppRepo;

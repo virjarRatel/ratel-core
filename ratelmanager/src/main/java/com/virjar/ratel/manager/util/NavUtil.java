@@ -16,7 +16,6 @@ import android.text.util.Linkify;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.virjar.ratel.buildsrc.Constants;
 import com.virjar.ratel.manager.R;
 import com.virjar.ratel.manager.RatelManagerApp;
 import com.virjar.ratel.manager.ui.DefaultSharedPreferenceHolder;

@@ -3,9 +3,9 @@ package com.virjar.ratel.envmock.idfake;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.api.FingerPrintModel;
 import com.virjar.ratel.api.RatelToolKit;
-import com.virjar.ratel.buildsrc.Constants;
 import com.virjar.ratel.envmock.PropertiesStoreHolder;
 import com.virjar.ratel.runtime.RatelEnvironment;
 
