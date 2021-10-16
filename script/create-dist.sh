@@ -88,7 +88,9 @@ java -jar ${builder_helper_jar} OPTIMIZE_BUILDER_CLASS -i ${script_dir}/dist/res
 if [ ! -d ${root_dir}/ratelmanager/src/main/assets ] ;then
   mkdir ${root_dir}/ratelmanager/src/main/assets
 fi
-rm ${root_dir}/ratelmanager/src/main/assets/container-builder-repkg-dex.jar
+if [ -f ${root_dir}/ratelmanager/src/main/assets/container-builder-repkg-dex.jar ] ;then
+  rm ${root_dir}/ratelmanager/src/main/assets/container-builder-repkg-dex.jar
+fi
 cp ${script_dir}/dist/res/${builder_dex_file_name} ${root_dir}/ratelmanager/src/main/assets/container-builder-repkg-dex.jar
 
 
