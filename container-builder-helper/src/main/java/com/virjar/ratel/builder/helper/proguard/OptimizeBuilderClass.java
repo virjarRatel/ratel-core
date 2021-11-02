@@ -3,7 +3,6 @@ package com.virjar.ratel.builder.helper.proguard;
 import com.virjar.ratel.allcommon.BuildEnv;
 import com.virjar.ratel.allcommon.ClassNames;
 import com.virjar.ratel.builder.helper.buildenv.BuildInfoEditor;
-import com.virjar.ratel.builder.helper.buildenv.ReCompileClass;
 import com.virjar.ratel.builder.helper.utils.Shell;
 
 import org.apache.commons.cli.CommandLine;
@@ -17,10 +16,8 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.BufferUnderflowException;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -130,9 +127,15 @@ public class OptimizeBuilderClass {
         StringBuilder sb = new StringBuilder();
         sb.append("# input and output").append(System.lineSeparator());
         File javaHome = new File(System.getProperty("java.home"));
-        // 两个jdk的
-        sb.append("-libraryjars ").append(new File(javaHome, "lib/rt.jar")).append(System.lineSeparator());
-        sb.append("-libraryjars ").append(new File(javaHome, "lib/jce.jar")).append(System.lineSeparator());
+        // jdk的依赖
+        if (new File(javaHome, "lib/rt.jar").exists()) {
+            // java8以下
+            sb.append("-libraryjars ").append(new File(javaHome, "lib/rt.jar")).append(System.lineSeparator());
+            sb.append("-libraryjars ").append(new File(javaHome, "lib/jce.jar")).append(System.lineSeparator());
+        } else {
+            // java9以上
+            sb.append("-libraryjars ").append(new File(javaHome, "jmods/java.base.jmod(!**.jar;!module-info.class)")).append(System.lineSeparator());
+        }
         sb.append("-injars ").append(inputBuilderJarFile.getAbsolutePath()).append(System.lineSeparator());
         sb.append("-outjars ").append(buildOptimizeOutputJar.getAbsolutePath()).append(System.lineSeparator());
 
