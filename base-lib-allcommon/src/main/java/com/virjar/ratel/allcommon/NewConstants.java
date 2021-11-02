@@ -55,14 +55,14 @@ public interface NewConstants {
 
         // RDP模块工具
         RDP_BASE(LAYOUT_BASE.NAME + "/rdp", true, true),
-        RDP_JAR_FILE(RDP_BASE.NAME + "/rdp.jar.bin", false),
+
         RDP_GIT_IGNORE_1(RDP_BASE.NAME + "/gitignore", true),
         RDP_GIT_IGNORE(RDP_BASE.NAME + "/.gitignore", false),
 
-        RDP_SH(RDP_BASE.NAME + "/ratel_resource/rdp.sh", false),
-        RDP_BAT(RDP_BASE.NAME + "/ratel_resource/rdp.bat", false),
-
-
+        RDP_RESOURCE_DIR(RDP_BASE.NAME + "/ratel_resource", true, true),
+        RDP_SH(RDP_RESOURCE_DIR.NAME + "/rdp.sh", false),
+        RDP_BAT(RDP_RESOURCE_DIR.NAME + "/rdp.bat", false),
+        RDP_JAR_FILE(RDP_RESOURCE_DIR.NAME + "/rdp.jar.bin", false),
         ;
 
         private final String NAME;

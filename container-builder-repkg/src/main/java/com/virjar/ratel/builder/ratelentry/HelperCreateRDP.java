@@ -99,8 +99,11 @@ public class HelperCreateRDP {
             if (name.endsWith(".jar.bin")) {
                 name = name.substring(0, name.length() - 4);
             }
-            FileUtils.copyFile(BindingResourceManager.get(NewConstants.BUILDER_RESOURCE_LAYOUT.RDP_JAR_FILE),
-                    new File(outProject, name));
+            File outFile = new File(outProject, name);
+            FileUtils.copyFile(BindingResourceManager.get(layout), outFile);
+            if (name.endsWith(".sh")) {
+                outFile.setExecutable(true);
+            }
         }
     }
 

@@ -37,7 +37,7 @@ shadowJar {
     classifier = null
     version = 1.0
     manifest {
-        attributes 'Main-Class': ClassNames.RDP_MAIN
+        attributes 'Main-Class': ClassNames.RDP_MAIN.className
     }
 }
 assemble.dependsOn(shadowJar)
