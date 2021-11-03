@@ -22,7 +22,7 @@ dependencies {
     api project(":base-lib-dx")
     api 'commons-cli:commons-cli:1.4'
     api 'commons-io:commons-io:2.6'
-    api 'org.apache.ant:ant:1.10.5'
+    api project(':base-lib-apache-ant-zip')
     api 'org.smali:dexlib2:2.2.7'
     api 'org.smali:util:2.2.7'
     api 'org.smali:baksmali:2.2.7'

@@ -1,0 +1,12 @@
+apply plugin: 'java-library'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    compileOnly 'com.google.code.findbugs:jsr305:3.0.0'
+    compileOnly 'org.bouncycastle:bcprov-jdk15on:1.58'
+    compileOnly 'org.bouncycastle:bcpkix-jdk15on:1.58'
+    api project(':base-lib-apache-ant-zip')
+}
+
+sourceCompatibility = "8"
+targetCompatibility = "8"
