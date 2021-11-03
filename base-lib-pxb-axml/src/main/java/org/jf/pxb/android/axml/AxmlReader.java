@@ -232,7 +232,8 @@ public class AxmlReader {
                     }
                     break;
                 default:
-                    throw new RuntimeException("unknown chunk type");
+                    System.out.println("waning: unknown chunk type: " + type);
+                    //throw new RuntimeException("unknown chunk type");
             }
             input.move(position + size);
         }
