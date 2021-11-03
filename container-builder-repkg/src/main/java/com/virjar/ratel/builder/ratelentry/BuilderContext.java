@@ -3,6 +3,7 @@ package com.virjar.ratel.builder.ratelentry;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
 import com.virjar.ratel.allcommon.Constants;
+import com.virjar.ratel.builder.injector.DexFiles;
 
 import net.dongliu.apk.parser.ApkFile;
 import net.dongliu.apk.parser.bean.ApkMeta;
@@ -59,6 +60,8 @@ public class BuilderContext implements Closeable {
 
     public Set<String> arch;
 
+    public DexFiles dexFiles;
+
     @Override
     public void close() throws IOException {
         if (infectApk != null) {
@@ -80,7 +83,7 @@ public class BuilderContext implements Closeable {
         @Override
         public void close() throws IOException {
             apkFile.close();
-            zipFile.close();
+            //zipFile.close();
         }
     }
 
@@ -135,6 +138,7 @@ public class BuilderContext implements Closeable {
         }
         infectApk.close();
         infectApk = BuilderContextParser.parseApkFile(tempFile);
+        assert infectApk != null;
         rawOriginApk = infectApk.file;
         hasRatelWrapper = true;
     }

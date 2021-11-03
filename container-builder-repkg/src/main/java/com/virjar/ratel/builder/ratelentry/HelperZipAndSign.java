@@ -4,7 +4,7 @@ import com.android.apksig.ApkSigner;
 import com.android.apksig.apk.MinSdkVersionException;
 import com.android.apksigner.PasswordRetriever;
 import com.android.apksigner.SignerParams;
-import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Lists;
 import com.virjar.ratel.allcommon.BuildEnv;
 import com.virjar.ratel.allcommon.NewConstants;
 

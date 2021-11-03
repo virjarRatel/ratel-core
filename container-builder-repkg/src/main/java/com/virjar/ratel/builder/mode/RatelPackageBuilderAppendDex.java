@@ -28,8 +28,7 @@ import java.util.Enumeration;
 import java.util.regex.Matcher;
 
 public class RatelPackageBuilderAppendDex {
-    public static void handleTask(File workDir, BuilderContext context, BuildParamMeta buildParamMeta,
-                                  CommandLine cmd, ZipOutputStream zos
+    public static void handleTask(File workDir, BuilderContext context, BuildParamMeta buildParamMeta, ZipOutputStream zos
     ) throws IOException {
 
         ZipFile originAPKZip = context.infectApk.zipFile;
@@ -50,7 +49,7 @@ public class RatelPackageBuilderAppendDex {
                     !Constants.RATEL_MANAGER_PACKAGE.equals(context.infectApk.apkMeta.getPackageName())) {
                 zos.putNextEntry(new ZipEntry(originEntry));
                 System.out.println("edit androidManifest.xml entry");
-                zos.write(editManifestWithAXmlEditor(IOUtils.toByteArray(originAPKZip.getInputStream(originEntry)), cmd, buildParamMeta,context));
+                zos.write(editManifestWithAXmlEditor(IOUtils.toByteArray(originAPKZip.getInputStream(originEntry)), context.cmd, buildParamMeta, context));
                 continue;
             }
 

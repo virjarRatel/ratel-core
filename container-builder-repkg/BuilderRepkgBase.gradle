@@ -33,10 +33,10 @@ dependencies {
     compile 'xmlunit:xmlunit:1.6'
     compile 'xpp3:xpp3:1.1.4c'
     compile 'commons-cli:commons-cli:1.4'
-    compile 'org.smali:dexlib2:2.3.4'
-    compile 'org.smali:util:2.3.4'
-    compile 'org.smali:baksmali:2.3.4'
-    compile 'org.smali:smali:2.3.4'
+    compile 'org.smali:dexlib2:2.5.2'
+    compile 'org.smali:util:2.5.2'
+    compile 'org.smali:baksmali:2.5.2'
+    compile 'org.smali:smali:2.5.2'
     compile 'org.antlr:antlr-runtime:3.5.2'
     compile 'org.antlr:stringtemplate:3.2.1'
     compile 'org.yaml:snakeyaml:1.18:android'
@@ -44,6 +44,7 @@ dependencies {
     compile project(':base-lib-apk-parser')
     compile project(':base-lib-pxb-axml')
     compile(name: 'base-lib-allcommon', ext: 'jar')
+    compile 'com.google.guava:guava:18.0'
 }
 
 sourceCompatibility = 1.8

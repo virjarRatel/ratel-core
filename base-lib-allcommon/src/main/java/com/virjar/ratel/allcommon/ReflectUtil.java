@@ -33,6 +33,118 @@ public class ReflectUtil {
         return findField(object.getClass(), filedName);
     }
 
+    /**
+     * Returns the value of a {@code boolean} field in the given object instance. A class reference is not sufficient! See also {@link #findField}.
+     */
+    public static boolean getBooleanField(Object obj, String fieldName) {
+        try {
+            return findField(obj.getClass(), fieldName).getBoolean(obj);
+        } catch (IllegalAccessException e) {
+            // should not happen
+            throw new IllegalAccessError(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }
+    }
+
+    /**
+     * Returns the value of a {@code byte} field in the given object instance. A class reference is not sufficient! See also {@link #findField}.
+     */
+    public static byte getByteField(Object obj, String fieldName) {
+        try {
+            return findField(obj.getClass(), fieldName).getByte(obj);
+        } catch (IllegalAccessException e) {
+            // should not happen
+            throw new IllegalAccessError(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }
+    }
+
+    /**
+     * Returns the value of a {@code char} field in the given object instance. A class reference is not sufficient! See also {@link #findField}.
+     */
+    public static char getCharField(Object obj, String fieldName) {
+        try {
+            return findField(obj.getClass(), fieldName).getChar(obj);
+        } catch (IllegalAccessException e) {
+            // should not happen
+            throw new IllegalAccessError(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }
+    }
+
+    /**
+     * Returns the value of a {@code double} field in the given object instance. A class reference is not sufficient! See also {@link #findField}.
+     */
+    public static double getDoubleField(Object obj, String fieldName) {
+        try {
+            return findField(obj.getClass(), fieldName).getDouble(obj);
+        } catch (IllegalAccessException e) {
+            // should not happen
+            throw new IllegalAccessError(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }
+    }
+
+    /**
+     * Returns the value of a {@code float} field in the given object instance. A class reference is not sufficient! See also {@link #findField}.
+     */
+    public static float getFloatField(Object obj, String fieldName) {
+        try {
+            return findField(obj.getClass(), fieldName).getFloat(obj);
+        } catch (IllegalAccessException e) {
+            // should not happen
+            throw new IllegalAccessError(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }
+    }
+
+    /**
+     * Returns the value of an {@code int} field in the given object instance. A class reference is not sufficient! See also {@link #findField}.
+     */
+    public static int getIntField(Object obj, String fieldName) {
+        try {
+            return findField(obj.getClass(), fieldName).getInt(obj);
+        } catch (IllegalAccessException e) {
+            // should not happen
+            throw new IllegalAccessError(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }
+    }
+
+    /**
+     * Returns the value of a {@code long} field in the given object instance. A class reference is not sufficient! See also {@link #findField}.
+     */
+    public static long getLongField(Object obj, String fieldName) {
+        try {
+            return findField(obj.getClass(), fieldName).getLong(obj);
+        } catch (IllegalAccessException e) {
+            // should not happen
+            throw new IllegalAccessError(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }
+    }
+
+    /**
+     * Returns the value of a {@code short} field in the given object instance. A class reference is not sufficient! See also {@link #findField}.
+     */
+    public static short getShortField(Object obj, String fieldName) {
+        try {
+            return findField(obj.getClass(), fieldName).getShort(obj);
+        } catch (IllegalAccessException e) {
+            // should not happen
+            throw new IllegalAccessError(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }
+    }
+
     public static void setFieldValue(Object object, String fieldName, Object value) {
         try {
             findField(object.getClass(), fieldName).set(object, value);

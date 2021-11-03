@@ -1,12 +1,12 @@
 package com.virjar.ratel.builder.ratelentry;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Maps;
 import com.virjar.ratel.allcommon.BuildEnv;
 import com.virjar.ratel.allcommon.ClassNames;
 import com.virjar.ratel.allcommon.Constants;
 import com.virjar.ratel.allcommon.NewConstants;
 import com.virjar.ratel.builder.BuildParamMeta;
+import com.virjar.ratel.builder.injector.DexFiles;
 import com.virjar.ratel.builder.DexMakerOpt;
 import com.virjar.ratel.builder.Util;
 import com.virjar.ratel.builder.mode.RatelPackageBuilderAppendDex;
@@ -15,11 +15,7 @@ import com.virjar.ratel.builder.mode.RatelPackageBuilderShell;
 import com.virjar.ratel.builder.mode.RatelPackageBuilderZelda;
 
 import net.dongliu.apk.parser.ApkFile;
-import net.dongliu.apk.parser.ApkParsers;
 import net.dongliu.apk.parser.bean.DexClass;
-import net.dongliu.apk.parser.exception.ParserException;
-import net.dongliu.apk.parser.parser.DexParser;
-import net.dongliu.apk.parser.struct.AndroidConstants;
 
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.io.FileUtils;
@@ -43,9 +39,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
@@ -133,7 +127,7 @@ public class Main {
         Util.setupRatelSupportArch(context.ratelBuildProperties.getProperty("ratel_support_abis", "arm64-v8a,armeabi-v7a"));
 
         //inject bootstrap code into origin apk
-        BuildParamMeta buildParamMeta = parseManifest(context.infectApk.file);
+        BuildParamMeta buildParamMeta = parseManifest(context);
 
         context.resolveArch(xApkHandler);
 
@@ -170,14 +164,14 @@ public class Main {
 
         switch (engine) {
             case Constants.RATEL_ENGINE_ENUM_APPENDEX:
-                RatelPackageBuilderAppendDex.handleTask(workDir, context, buildParamMeta, context.cmd, zos);
+                RatelPackageBuilderAppendDex.handleTask(workDir, context, buildParamMeta, zos);
                 break;
             case Constants.RATEL_ENGINE_ENUM_REBUILD:
-                if (buildParamMeta.appEntryClassDex == null) {
+                if (buildParamMeta.appEntryClass == null) {
                     //其他模式下，可以不存在 entry application
                     throw new RuntimeException("unsupported apk , no entry point application or entry point launch activity found");
                 }
-                RatelPackageBuilderRepackage.handleTask(workDir, context, buildParamMeta, context.ratelBuildProperties, zos, context.cmd);
+                RatelPackageBuilderRepackage.handleTask(workDir, context, buildParamMeta, context.ratelBuildProperties, zos);
                 break;
             case Constants.RATEL_ENGINE_ENUM_SHELL:
                 RatelPackageBuilderShell.handleTask(workDir, context, buildParamMeta, context.cmd, zos);
@@ -291,9 +285,10 @@ public class Main {
     }
 
 
-    private static BuildParamMeta parseManifest(File originApk) throws ParserConfigurationException, SAXException, IOException {
-
-        String originAPKManifestXml = ApkParsers.getManifestXml(originApk);
+    private static BuildParamMeta parseManifest(BuilderContext context) throws ParserConfigurationException, SAXException, IOException {
+        BuilderContext.ApkAsset infectApk = context.infectApk;
+        context.dexFiles = new DexFiles(infectApk.zipFile);
+        String originAPKManifestXml = infectApk.apkFile.getManifestXml();
         //
         Document document = loadDocument(new ByteArrayInputStream(originAPKManifestXml.getBytes(StandardCharsets.UTF_8)));
 
@@ -328,16 +323,16 @@ public class Main {
             buildParamMeta.appEntryClass = buildParamMeta.launcherActivityClass;
         }
 
-        ApkFile apkFile = new ApkFile(originApk);
-        buildParamMeta.dexClassesMap = parseDexClasses(apkFile);
-        buildParamMeta.appEntryClassDex = queryDexEntry(buildParamMeta.dexClassesMap, buildParamMeta.appEntryClass);
-
-        if (buildParamMeta.appEntryClassDex == null && !StringUtils.contains(buildParamMeta.appEntryClass, ".")) {
-            buildParamMeta.appEntryClassDex = queryDexEntry(buildParamMeta.dexClassesMap, buildParamMeta.packageName + "." + buildParamMeta.appEntryClass);
-            if (buildParamMeta.appEntryClassDex != null) {
-                buildParamMeta.appEntryClass = buildParamMeta.packageName + "." + buildParamMeta.appEntryClass;
-            }
-        }
+        // buildParamMeta.appEntryClassDex = queryDexEntry(buildParamMeta.dexClassesMap, buildParamMeta.appEntryClass);
+//
+//        buildParamMeta.appEntryClass = context.dexFiles.findClassInDex(buildParamMeta.appEntryClass);
+//
+//        if (buildParamMeta.appEntryClassDex == null && !StringUtils.contains(buildParamMeta.appEntryClass, ".")) {
+//            buildParamMeta.appEntryClassDex = queryDexEntry(buildParamMeta.dexClassesMap, buildParamMeta.packageName + "." + buildParamMeta.appEntryClass);
+//            if (buildParamMeta.appEntryClassDex != null) {
+//                buildParamMeta.appEntryClass = buildParamMeta.packageName + "." + buildParamMeta.appEntryClass;
+//            }
+//        }
 
         return buildParamMeta;
     }
@@ -359,38 +354,6 @@ public class Main {
         return null;
     }
 
-
-    private static Map<String, DexClass[]> parseDexClasses(ApkFile apkFile) throws IOException {
-        Map<String, DexClass[]> ret = Maps.newHashMap();
-
-        byte[] firstDex = apkFile.getFileData(AndroidConstants.DEX_FILE);
-        if (firstDex == null) {
-            String msg = String.format("Dex file %s not found", AndroidConstants.DEX_FILE);
-            throw new ParserException(msg);
-        }
-        ByteBuffer buffer = ByteBuffer.wrap(firstDex);
-        DexParser dexParser = new DexParser(buffer);
-        DexClass[] parse = dexParser.parse();
-        ret.put(AndroidConstants.DEX_FILE, parse);
-
-
-        for (int i = 2; i < 1000; i++) {
-            try {
-                String path = String.format(Locale.ENGLISH, AndroidConstants.DEX_ADDITIONAL, i);
-                byte[] fileData = apkFile.getFileData(path);
-                if (fileData == null) {
-                    break;
-                }
-                buffer = ByteBuffer.wrap(fileData);
-                dexParser = new DexParser(buffer);
-                parse = dexParser.parse();
-                ret.put(path, parse);
-            } catch (Exception e) {
-                //ignore because of entry point class can not be encrypted
-            }
-        }
-        return ret;
-    }
 
     private static String findLaunchActivityClass(NodeList activityNodeList) {
         //find launcher activity

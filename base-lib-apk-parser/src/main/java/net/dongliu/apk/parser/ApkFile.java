@@ -6,9 +6,11 @@ import net.dongliu.apk.parser.utils.Inputs;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 
-import javax.annotation.Nullable;
-
-import java.io.*;
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
@@ -16,6 +18,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
+import javax.annotation.Nullable;
 
 
 /**
@@ -127,4 +131,7 @@ public class ApkFile extends AbstractApkFile implements Closeable {
         }
     }
 
+    public ZipFile getZipFile() {
+        return zf;
+    }
 }

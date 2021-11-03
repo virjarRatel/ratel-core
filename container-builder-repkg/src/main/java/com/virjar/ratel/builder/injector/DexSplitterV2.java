@@ -1,23 +1,22 @@
-package com.virjar.ratel.builder;
+package com.virjar.ratel.builder.injector;
 
 import com.google.common.collect.Sets;
+import com.virjar.ratel.builder.AndroidJarUtil;
+import com.virjar.ratel.builder.BuildParamMeta;
+import com.virjar.ratel.builder.Util;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jf.dexlib2.Opcodes;
 import org.jf.dexlib2.dexbacked.DexBackedClassDef;
 import org.jf.dexlib2.dexbacked.DexBackedDexFile;
 import org.jf.dexlib2.iface.ClassDef;
 import org.jf.dexlib2.iface.Field;
-import org.jf.dexlib2.writer.io.FileDataStore;
 import org.jf.dexlib2.writer.pool.DexPool;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,83 +30,73 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-public class DexSplitter {
-    public static File splitDex(File originDex, File workDir, BuildParamMeta buildParamMeta) {
+public class DexSplitterV2 {
+    public static void splitDex(DexFiles.DexFile dexFile, BuildParamMeta buildParamMeta, Set<String> mainClasses) {
 
         Set<String> classes = extractClasses(buildParamMeta);
+        classes.addAll(mainClasses);
         classes.add(buildParamMeta.appEntryClass);
         if (StringUtils.isNotBlank(buildParamMeta.androidAppComponentFactory)) {
             classes.add(buildParamMeta.androidAppComponentFactory);
         }
 
-        try {
-            DexBackedDexFile dexBackedDexFile = new DexBackedDexFile(Opcodes.getDefault(), FileUtils.readFileToByteArray(originDex));// DexFileFactory.loadDexFile(originDex, Opcodes.getDefault());
-            Set<? extends DexBackedClassDef> allClasses = dexBackedDexFile.getClasses();
+        DexBackedDexFile dexBackedDexFile = dexFile.getDexBackedDexFile();
+        Set<? extends DexBackedClassDef> allClasses = dexBackedDexFile.getClasses();
 
-            Map<String, ClassDef> classDefMap = new HashMap<>();
-            for (ClassDef classDef : allClasses) {
-                classDefMap.put(classDef.getType(), classDef);
-            }
-
-
-            DexPool mainDexPool = new DexPool(Opcodes.getDefault());
-
-            DexPool otherDexPool = new DexPool(Opcodes.getDefault());
-
-
-            Set<ClassDef> mainDexClassDefs = new CopyOnWriteArraySet<>();
-
-            ClassDef entryClassDef = null;
-
-            for (ClassDef classDef : allClasses) {
-                if (classes.contains(Util.descriptorToDot(classDef.getType()))) {
-                    mainDexClassDefs.add(classDef);
-                }
-                if (Util.descriptorToDot(classDef.getType()).equals(buildParamMeta.appEntryClass)) {
-                    entryClassDef = classDef;
-                }
-            }
-
-            //首先做一次application的supper class合并，保证application能够放到同一个dex
-            if (entryClassDef != null) {
-                Set<String> supperClass = new HashSet<>();
-                extractSuperClass(entryClassDef, supperClass, classDefMap);
-                for (String supperClassDefStr : supperClass) {
-                    mainDexClassDefs.add(classDefMap.get(supperClassDefStr));
-                }
-            }
-
-
-            //根据优先级规则，将dex拆分为两部分，使得的一个dex的代码在安装后最容易被执行
-            moveDef(mainDexClassDefs, classDefMap, buildParamMeta.packageName);
-
-            for (ClassDef classDef : allClasses) {
-                if (mainDexClassDefs.contains(classDef)) {
-                    mainDexPool.internClass(classDef);
-                } else {
-                    otherDexPool.internClass(classDef);
-                }
-            }
-
-            // otherDexPool需要加入特殊标记，否则会在下次build的时候，和addOnDexMerge冲突
-            // 因为addsOnDex就是依靠文件名称判定的
-            otherDexPool.internClass(createSplitterFeatureFlagClass());
-
-            FileDataStore originDexFileDataStore = new FileDataStore(originDex);
-            mainDexPool.writeTo(originDexFileDataStore);
-            originDexFileDataStore.close();
-
-            File overflowDexFile = new File(workDir, "overflow.dex");
-
-            FileDataStore splitDexFileDataStore = new FileDataStore(overflowDexFile);
-
-            otherDexPool.writeTo(splitDexFileDataStore);
-            splitDexFileDataStore.close();
-            return overflowDexFile;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+        Map<String, ClassDef> classDefMap = new HashMap<>();
+        for (ClassDef classDef : allClasses) {
+            classDefMap.put(classDef.getType(), classDef);
         }
+
+
+        DexPool mainDexPool = new DexPool(Opcodes.getDefault());
+
+        DexPool otherDexPool = new DexPool(Opcodes.getDefault());
+
+
+        Set<ClassDef> mainDexClassDefs = new CopyOnWriteArraySet<>();
+
+        ClassDef entryClassDef = null;
+
+        for (ClassDef classDef : allClasses) {
+            if (classes.contains(Util.descriptorToDot(classDef.getType()))) {
+                mainDexClassDefs.add(classDef);
+            }
+            if (Util.descriptorToDot(classDef.getType()).equals(buildParamMeta.appEntryClass)) {
+                entryClassDef = classDef;
+            }
+        }
+
+        //首先做一次application的supper class合并，保证application能够放到同一个dex
+        if (entryClassDef != null) {
+            Set<String> supperClass = new HashSet<>();
+            extractSuperClass(entryClassDef, supperClass, classDefMap);
+            for (String supperClassDefStr : supperClass) {
+                mainDexClassDefs.add(classDefMap.get(supperClassDefStr));
+            }
+        }
+
+
+        //根据优先级规则，将dex拆分为两部分，使得的一个dex的代码在安装后最容易被执行
+        moveDef(mainDexClassDefs, classDefMap, buildParamMeta.packageName);
+        int mainClassSize = 0, otherClassSize = 0;
+        for (ClassDef classDef : allClasses) {
+            if (mainDexClassDefs.contains(classDef)) {
+                mainDexPool.internClass(classDef);
+                mainClassSize++;
+            } else {
+                otherDexPool.internClass(classDef);
+                otherClassSize++;
+            }
+        }
+        System.out.println("main class size: " + mainClassSize + " other class size: " + otherClassSize);
+
+        // otherDexPool需要加入特殊标记，否则会在下次build的时候，和addOnDexMerge冲突
+        // 因为addsOnDex就是依靠文件名称判定的
+        otherDexPool.internClass(createSplitterFeatureFlagClass());
+
+        dexFile.setRawData(DexPoolUtils.encodeDex(mainDexPool));
+        dexFile.getDexFiles().appendDex(DexPoolUtils.encodeDex(otherDexPool));
 
 
     }

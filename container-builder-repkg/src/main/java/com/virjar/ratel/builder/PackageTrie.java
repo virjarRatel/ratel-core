@@ -104,9 +104,4 @@ public class PackageTrie {
         }
         return ret;
     }
-
-    public static void main(String[] args) {
-        PackageTrie packageTrie = new PackageTrie().addToTree("de.robv.android.xposed").addToTree("android.app.AndroidAppHelper");
-        System.out.println(packageTrie.isSubPackage("android.app.AndroidAppHelper"));
-    }
 }

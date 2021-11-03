@@ -1,21 +1,19 @@
 package com.virjar.ratel.builder;
 
-import net.dongliu.apk.parser.bean.DexClass;
-
 import org.w3c.dom.Document;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
+/**
+ * @deprecated 已经过期，我们讲这些参数逐步迁移到BuilderContext中
+ */
 @Deprecated
 public class BuildParamMeta {
     public String packageName;
     public String appEntryClass;
-    public String appEntryClassDex;
     public String originApplicationClass;
     public String launcherActivityClass;
-    public Map<String, DexClass[]> dexClassesMap;
     public String serialNo;
     public String buildTimestamp;
     public Document androidManifestXml;

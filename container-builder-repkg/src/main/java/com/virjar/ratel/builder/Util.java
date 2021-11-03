@@ -2,9 +2,7 @@ package com.virjar.ratel.builder;
 
 import com.google.common.base.Defaults;
 import com.google.common.base.Splitter;
-import com.virjar.ratel.allcommon.ClassNames;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
@@ -64,6 +62,9 @@ public class Util {
      * 这段代码是虚拟机里面抠出来的，c++转java
      */
     public static String descriptorToDot(String str) {
+        if (str == null) {
+            return null;
+        }
         int targetLen = str.length();
         int offset = 0;
         int arrayDepth = 0;
