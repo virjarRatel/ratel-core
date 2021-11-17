@@ -31,7 +31,22 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 public class DexSplitterV2 {
+
     public static void splitDex(DexFiles.DexFile dexFile, BuildParamMeta buildParamMeta, Set<String> mainClasses) {
+        splitDexInternal1(dexFile, buildParamMeta, mainClasses);
+        System.gc();
+        System.gc();
+    }
+
+    public static void splitDexInternal1(DexFiles.DexFile dexFile, BuildParamMeta buildParamMeta, Set<String> mainClasses) {
+        DexPool otherDexPool = splitDexInternal2(dexFile, buildParamMeta, mainClasses);
+        System.gc();
+        System.gc();
+        dexFile.getDexFiles().appendDex(DexPoolUtils.encodeDex(otherDexPool));
+
+    }
+
+    public static DexPool splitDexInternal2(DexFiles.DexFile dexFile, BuildParamMeta buildParamMeta, Set<String> mainClasses) {
 
         Set<String> classes = extractClasses(buildParamMeta);
         classes.addAll(mainClasses);
@@ -39,7 +54,7 @@ public class DexSplitterV2 {
         if (StringUtils.isNotBlank(buildParamMeta.androidAppComponentFactory)) {
             classes.add(buildParamMeta.androidAppComponentFactory);
         }
-
+        System.gc();
         DexBackedDexFile dexBackedDexFile = dexFile.getDexBackedDexFile();
         Set<? extends DexBackedClassDef> allClasses = dexBackedDexFile.getClasses();
 
@@ -95,9 +110,9 @@ public class DexSplitterV2 {
         // 因为addsOnDex就是依靠文件名称判定的
         otherDexPool.internClass(createSplitterFeatureFlagClass());
 
+        System.gc();
         dexFile.setRawData(DexPoolUtils.encodeDex(mainDexPool));
-        dexFile.getDexFiles().appendDex(DexPoolUtils.encodeDex(otherDexPool));
-
+        return otherDexPool;
 
     }
 

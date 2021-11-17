@@ -98,6 +98,11 @@ public class DexFiles {
         }
 
         public void setRawData(byte[] rawData) {
+            if (this.rawData != null) {
+                // 覆盖dex的时候，执行一次gc，释放部分空间，避免oom
+                System.gc();
+                System.gc();
+            }
             this.rawData = rawData;
             try {
                 dexBackedDexFile = loadDexFile(rawData, Opcodes.getDefault());
