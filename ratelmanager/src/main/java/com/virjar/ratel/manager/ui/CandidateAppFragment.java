@@ -232,7 +232,7 @@ public class CandidateAppFragment extends ListFragment implements RatelAppRepo.R
                     workDir.mkdirs();
                     File originApkFile = new File(ratelApp.getPackageInfo().applicationInfo.publicSourceDir);
                     File outFile = File.createTempFile("ratel_output", ".apk", new File(getActivity().getFilesDir().getAbsolutePath() + File.separator + "repkg"));
-                    RatelRepkger.mainShell(getActivity(), new String[]{"-s", "-d", "-w", workDir.getAbsolutePath(), "-e", "rebuildDex", "-o", outFile.getAbsolutePath(), originApkFile.getAbsolutePath()}, new RatelRepkger.LogCallback() {
+                    RatelRepkger.mainShell(getActivity(), new String[]{"-s", "-w", workDir.getAbsolutePath(), "-e", "rebuildDex", "-o", outFile.getAbsolutePath(), originApkFile.getAbsolutePath()}, new RatelRepkger.LogCallback() {
                         @Override
                         public void onLog(String msg) {
                             runOnUiThread(() -> {
