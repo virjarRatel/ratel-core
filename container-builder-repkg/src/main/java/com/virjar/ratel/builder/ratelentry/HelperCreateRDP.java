@@ -5,7 +5,6 @@ import com.virjar.ratel.builder.BootstrapCodeInjector;
 
 import net.dongliu.apk.parser.bean.ApkMeta;
 
-import org.apache.commons.cli.CommandLine;
 import org.apache.commons.io.FileUtils;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
@@ -66,6 +65,8 @@ public class HelperCreateRDP {
                             entryName, true, Opcodes.getDefault()
                     ).getDexFile();
                     BootstrapCodeInjector.baksmali(null, dexFile, smaliDir);
+                } else if (zipEntry.isDirectory()) {
+                    FileUtils.forceMkdir(new File(rawResource, entryName));
                 } else {
                     File destResourceFile = new File(rawResource, entryName);
                     FileUtils.forceMkdirParent(destResourceFile);
