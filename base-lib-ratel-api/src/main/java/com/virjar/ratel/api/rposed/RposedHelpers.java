@@ -348,9 +348,37 @@ public final class RposedHelpers {
             methodCache.put(fullMethodName, method);
             return method;
         } catch (NoSuchMethodException e) {
+            if (parameterTypes.length == 0) {
+                methodCache.put(fullMethodName, null);
+                throw new NoSuchMethodError(fullMethodName);
+            }
+            //  add by virjar： 当我们确定方法名字唯一的时候，可以降级为只提供名字
+            //           类似XposedBridge.hookAll,但是XposedBridge的api不够丰富
+            Method method = findMethodByName(clazz, methodName);
+            if (method != null) {
+                method.setAccessible(true);
+                methodCache.put(fullMethodName, method);
+                return method;
+            }
             methodCache.put(fullMethodName, null);
             throw new NoSuchMethodError(fullMethodName);
         }
+    }
+
+    private static Method findMethodByName(Class<?> clazz, String methodName) {
+        Method retMethod = null;
+        for (Method method : FreeReflection.getDeclaredMethods(clazz)) {
+            if (!method.getName().equals(methodName)) {
+                continue;
+            }
+            if (retMethod == null) {
+                retMethod = method;
+                continue;
+            }
+            // 发现了多个method，这个时候无法唯一定位，故需要报错
+            return null;
+        }
+        return retMethod;
     }
 
     /**
