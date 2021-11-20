@@ -320,4 +320,19 @@ public class Util {
             return null;
         }
     }
+
+    public static boolean isCertificateOrMANIFEST(String zipEntryName) {
+        if (!zipEntryName.startsWith("META-INF/")) {
+            return false;
+        }
+        // META-INF/MANIFEST.MF
+        // META-INF/*.RSA
+        // META-INF/*.DSA
+        // 请注意，META-INF 不能暴力删除，根据java规范，spi配置也会存在于META-INF中
+
+        if (zipEntryName.endsWith(".RSA") || zipEntryName.endsWith(".DSA")) {
+            return true;
+        }
+        return zipEntryName.equals("META-INF/MANIFEST.MF");
+    }
 }

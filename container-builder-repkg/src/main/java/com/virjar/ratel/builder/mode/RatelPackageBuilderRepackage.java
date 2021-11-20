@@ -84,7 +84,12 @@ public class RatelPackageBuilderRepackage {
 
         while (entries.hasMoreElements()) {
             ZipEntry originEntry = entries.nextElement();
-            if (originEntry.getName().startsWith("META-INF/")) {
+            // META-INF/MANIFEST.MF
+            // META-INF/*.RSA
+            // META-INF/*.DSA
+            // 请注意，META-INF 不能暴力删除，根据java规范，spi配置也会存在于META-INF中。在海外的标准app中，经常会存储SPI配置在META-INFO中
+            //
+            if (Util.isCertificateOrMANIFEST(originEntry.getName())) {
                 continue;
             }
             if (Util.isRatelUnSupportArch(originEntry.getName())) {

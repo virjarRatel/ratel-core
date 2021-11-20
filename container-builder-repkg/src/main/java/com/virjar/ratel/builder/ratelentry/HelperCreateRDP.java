@@ -1,5 +1,6 @@
 package com.virjar.ratel.builder.ratelentry;
 
+import com.google.common.collect.Lists;
 import com.virjar.ratel.allcommon.NewConstants;
 import com.virjar.ratel.builder.BootstrapCodeInjector;
 
@@ -16,14 +17,18 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.virjar.ratel.builder.ratelentry.Main.copyAndClose;
 
 public class HelperCreateRDP {
     private final static String SMALI_DIRNAME = "smali";
 
-    static void createRatelDecompileProject(BuilderContext context) throws IOException {
+    static void createRatelDecompileProject(BuilderContext context) throws IOException, InterruptedException {
         ApkMeta apkMeta = context.infectApk.apkMeta;
         File outputApkFile = context.outFile;
         Properties ratelBuildProperties = context.ratelBuildProperties;
@@ -43,6 +48,7 @@ public class HelperCreateRDP {
 
         File rawResource = new File(outProject, "raws");
 
+        List<Callable<String>> callableList = Lists.newLinkedList();
 
         //2. then decompile all *.dex file like apktool
         try (ZipFile zipFile = new ZipFile(outputApkFile)) {
@@ -60,11 +66,12 @@ public class HelperCreateRDP {
                     }
                     FileUtils.deleteDirectory(smaliDir);
                     smaliDir.mkdirs();
-                    System.out.println("Baksmaling " + entryName + "...");
+
                     DexBackedDexFile dexFile = DexFileFactory.loadDexEntry(outputApkFile,
                             entryName, true, Opcodes.getDefault()
                     ).getDexFile();
-                    BootstrapCodeInjector.baksmali(null, dexFile, smaliDir);
+                    callableList.add(new SmaliDecoder(dexFile, smaliDir, entryName));
+                    //BootstrapCodeInjector.baksmali(null, dexFile, smaliDir);
                 } else if (zipEntry.isDirectory()) {
                     FileUtils.forceMkdir(new File(rawResource, entryName));
                 } else {
@@ -74,6 +81,10 @@ public class HelperCreateRDP {
                 }
             }
         }
+
+        ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        threadPool.invokeAll(callableList);
+        threadPool.shutdown();
 
         //3. add rebuild script int the decompile project,ratel decompile project can be migrate to other computer event through there is no ratel environment
         File ratelConfigDir = new File(outProject, "ratel_resource");
@@ -108,4 +119,23 @@ public class HelperCreateRDP {
         }
     }
 
+    private static class SmaliDecoder implements Callable<String> {
+        private final DexBackedDexFile dexFile;
+        private final File smaliDir;
+        private final String entryName;
+
+        public SmaliDecoder(DexBackedDexFile dexFile, File smaliDir, String entryName) {
+            this.dexFile = dexFile;
+            this.smaliDir = smaliDir;
+            this.entryName = entryName;
+        }
+
+        @Override
+        public String call() {
+            System.out.println("Baksmaling " + entryName + "...");
+            BootstrapCodeInjector.baksmali(null, dexFile, smaliDir);
+            System.out.println("Baksmaling " + entryName + " finish");
+            return "";
+        }
+    }
 }
