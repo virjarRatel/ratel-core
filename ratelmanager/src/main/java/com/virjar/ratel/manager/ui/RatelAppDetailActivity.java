@@ -33,6 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.virjar.ratel.allcommon.Constants;
+import com.virjar.ratel.api.VirtualEnv;
 import com.virjar.ratel.manager.AppDaemonTaskManager;
 import com.virjar.ratel.manager.R;
 import com.virjar.ratel.manager.RatelManagerApp;
@@ -259,7 +260,6 @@ public class RatelAppDetailActivity extends XposedBaseActivity {
             } else {
                 view.findViewById(R.id.multi_user_container_card).setVisibility(View.GONE);
             }
-
             return view;
         }
 
@@ -273,6 +273,7 @@ public class RatelAppDetailActivity extends XposedBaseActivity {
 
             SwitchCompat apiSwitch = fragmentView.findViewById(R.id.ratel_disable_api_switch);
             SwitchCompat hotmoduleSwitch = fragmentView.findViewById(R.id.ratel_hotmodle_switch);
+            SwitchCompat switchEnvModel = fragmentView.findViewById(R.id.ratel_turn_on_multi);
 
             Button button = fragmentView.findViewById(R.id.ratel_add_devices);
 
@@ -281,7 +282,8 @@ public class RatelAppDetailActivity extends XposedBaseActivity {
                     ratelApp,
                     apiSwitch,
                     button,
-                    hotmoduleSwitch
+                    hotmoduleSwitch,
+                    switchEnvModel
             );
             recyclerView.setAdapter(myAdapter);
 
@@ -308,33 +310,57 @@ public class RatelAppDetailActivity extends XposedBaseActivity {
         private SwitchCompat apiSwitch;
         private MultiUserBundle multiUserBundle;
         private Button createDeviceBtn;
-        private SwitchCompat hotmoduleSwitch;
+        private SwitchCompat hotModuleSwitch;
+        private SwitchCompat switchEnvModel;
 
         public MyAdapter(Context context, CardView cardView, RatelApp ratelApp, SwitchCompat apiSwitch,
-                         Button createDeviceBtn, SwitchCompat hotmoduleSwitch) {
+                         Button createDeviceBtn, SwitchCompat hotModuleSwitch, SwitchCompat switchEnvModel) {
             this.context = context;
             this.cardView = cardView;
             this.ratelApp = ratelApp;
             this.apiSwitch = apiSwitch;
             this.createDeviceBtn = createDeviceBtn;
-            this.hotmoduleSwitch = hotmoduleSwitch;
+            this.hotModuleSwitch = hotModuleSwitch;
+            this.switchEnvModel = switchEnvModel;
 
-
-            hotmoduleSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    IRatelRemoteControlHandler iRatelRemoteControlHandler = AppWatchDogService.queryRemoteHandler(MyAdapter.this.ratelApp.getPackageName());
-                    if (iRatelRemoteControlHandler == null) {
-                        Toast.makeText(MyAdapter.this.context, "process detached", Toast.LENGTH_SHORT).show();
-                        buttonView.setChecked(!isChecked);
-                        return;
-                    }
+            switchEnvModel.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (!buttonView.isPressed()) {
+                    return;
+                }
+                IRatelRemoteControlHandler iRatelRemoteControlHandler = AppWatchDogService.queryRemoteHandler(MyAdapter.this.ratelApp.getPackageName());
+                if (iRatelRemoteControlHandler == null) {
+                    Toast.makeText(MyAdapter.this.context, "process detached", Toast.LENGTH_SHORT).show();
+                    buttonView.setChecked(!isChecked);
+                } else if (multiUserBundle == null) {
+                    Toast.makeText(MyAdapter.this.context, "Ratel Engine not match RatelManager", Toast.LENGTH_LONG).show();
+                    buttonView.setChecked(false);
+                } else if (!isChecked) {
+                    Toast.makeText(MyAdapter.this.context, "can't turn off multi", Toast.LENGTH_LONG).show();
+                    buttonView.setChecked(true);
+                } else {
                     try {
-                        iRatelRemoteControlHandler.updateHotmoduleStatus(!isChecked);
+                        iRatelRemoteControlHandler.switchEnvModel(VirtualEnv.VirtualEnvModel.MULTI.name());
+                        buttonView.setChecked(true);
+                        Toast.makeText(MyAdapter.this.context, "turn on multi success, restart the target app to take effect", Toast.LENGTH_LONG).show();
                     } catch (RemoteException e) {
                         Toast.makeText(MyAdapter.this.context, "operate failed:ratelEngine>5.0?", Toast.LENGTH_SHORT).show();
                         Log.e(Constants.TAG, "operate failed", e);
                     }
+                }
+            });
+
+            hotModuleSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                IRatelRemoteControlHandler iRatelRemoteControlHandler = AppWatchDogService.queryRemoteHandler(MyAdapter.this.ratelApp.getPackageName());
+                if (iRatelRemoteControlHandler == null) {
+                    Toast.makeText(MyAdapter.this.context, "process detached", Toast.LENGTH_SHORT).show();
+                    buttonView.setChecked(!isChecked);
+                    return;
+                }
+                try {
+                    iRatelRemoteControlHandler.updateHotmoduleStatus(!isChecked);
+                } catch (RemoteException e) {
+                    Toast.makeText(MyAdapter.this.context, "operate failed:ratelEngine>5.0?", Toast.LENGTH_SHORT).show();
+                    Log.e(Constants.TAG, "operate failed", e);
                 }
             });
 
@@ -407,7 +433,6 @@ public class RatelAppDetailActivity extends XposedBaseActivity {
 
         }
 
-
         private void doAddNewDevices(String newUserId) {
             if (multiUserBundle.getAvailableUserSet().contains(newUserId)) {
                 Toast.makeText(MyAdapter.this.context, "user existed", Toast.LENGTH_SHORT).show();
@@ -440,6 +465,8 @@ public class RatelAppDetailActivity extends XposedBaseActivity {
         private Set<String> newData = null;
 
         private String nowActiveUser = null;
+
+        private boolean multiModel = false;
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -549,17 +576,22 @@ public class RatelAppDetailActivity extends XposedBaseActivity {
             if (iRatelRemoteControlHandler == null) {
                 Log.w(RatelManagerApp.TAG, "iRatelRemoteControlHandler change to null!!");
                 newData = null;
+
             } else {
                 try {
                     multiUserBundle = iRatelRemoteControlHandler.multiUserStatus();
+                    if (multiUserBundle == null) {
+                        Log.w(Constants.TAG, "onRemoteHandlerStatusChange: Ratel Engine not match RatelManager");
+                        return;
+                    }
                     if (!multiUserBundle.isMultiVirtualEnv()) {
                         newData = null;
-
+                        multiModel = false;
                     } else {
                         List<String> availableUserSet = multiUserBundle.getAvailableUserSet();
                         newData = new HashSet<>(availableUserSet);
                         nowActiveUser = multiUserBundle.getNowUser();
-
+                        multiModel = true;
                     }
                 } catch (RemoteException e) {
                     Toast.makeText(context, "sync availableUserSet failed!!", Toast.LENGTH_LONG).show();
@@ -570,7 +602,7 @@ public class RatelAppDetailActivity extends XposedBaseActivity {
                 }
                 try {
                     boolean hotmoduleStatus = iRatelRemoteControlHandler.getHotmoduleStatus();
-                    hotmoduleSwitch.setChecked(!hotmoduleStatus);
+                    hotModuleSwitch.setChecked(!hotmoduleStatus);
                 } catch (RemoteException e) {
                     Toast.makeText(context, "sync hotmoduleStatus failed!!", Toast.LENGTH_LONG).show();
                     Log.w(RatelManagerApp.TAG, "sync hotmoduleStatus failed!!");
@@ -601,6 +633,7 @@ public class RatelAppDetailActivity extends XposedBaseActivity {
                             return col.compare(lhs, rhs);
                         }
                     });
+                    switchEnvModel.setChecked(multiModel);
                     MyAdapter.this.notifyDataSetChanged();
                 }
             });

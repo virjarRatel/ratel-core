@@ -12,6 +12,9 @@ interface IRatelRemoteControlHandler {
     String executeCmd(String cmd);
     ClientInfo getClientInfo();
 
+    // 切换模式
+    void switchEnvModel(String model);
+
     //多用户操作接口
     boolean switchEnv(String userId);
     boolean removeUser(String userId);

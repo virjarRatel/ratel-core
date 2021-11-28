@@ -165,6 +165,26 @@
                             android:layout_height="wrap_content"
                             android:checked="false" />
                     </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/turn_on_multi" />
+
+                        <android.support.v7.widget.SwitchCompat
+                            android:id="@+id/ratel_turn_on_multi"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false" />
+                    </LinearLayout>
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -213,13 +233,13 @@
         </android.support.v7.widget.CardView>
 
         <android.support.v7.widget.CardView
+            android:id="@+id/multi_user_container_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="6dp"
             app:cardBackgroundColor="?attr/list_download_item_color"
             app:cardElevation="2dp"
-            android:id="@+id/multi_user_container_card"
             app:cardUseCompatPadding="true">
 
             <LinearLayout

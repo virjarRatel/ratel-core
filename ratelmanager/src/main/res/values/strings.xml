@@ -148,6 +148,7 @@
     <string name="ratel_op_panel">operator panel</string>
     <string name="ratel_multi_account">MultiAccount</string>
     <string name="ratel_daemon">daemon</string>
+    <string name="turn_on_multi">multi</string>
     <string name="ratel_module_status">Module Status</string>
     <string name="ratel_disable_hotmodule">hotmodule</string>
     <string name="ratel_force_stop">stop process</string>
