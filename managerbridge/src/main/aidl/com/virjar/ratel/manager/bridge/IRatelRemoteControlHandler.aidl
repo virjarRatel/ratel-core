@@ -26,4 +26,7 @@ interface IRatelRemoteControlHandler {
     void updateHotmoduleStatus(boolean enable);
     // 获取热发插件开关状态
     boolean getHotmoduleStatus();
+
+    // 切换模式
+    boolean switchEnvModel(String model);
 }
