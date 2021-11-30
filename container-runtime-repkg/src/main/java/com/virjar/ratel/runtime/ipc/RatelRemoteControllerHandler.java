@@ -79,11 +79,11 @@ public class RatelRemoteControllerHandler extends IRatelRemoteControlHandler.Stu
      * 暂时只考虑从其他模式切换为 MULTI 模式，后续可能支持多种模式相互转换
      */
     @Override
-    public void switchEnvModel(String model) throws RemoteException {
+    public boolean switchEnvModel(String model) throws RemoteException {
         if (VirtualEnv.VirtualEnvModel.MULTI.name().equals(model)) {
             RatelConfig.setConfig(Constants.virtualEnvModel, VirtualEnv.VirtualEnvModel.MULTI.name());
-
         }
+        return true;
     }
 
     @Override

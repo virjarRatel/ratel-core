@@ -331,17 +331,18 @@ public class RatelAppDetailActivity extends XposedBaseActivity {
                 if (iRatelRemoteControlHandler == null) {
                     Toast.makeText(MyAdapter.this.context, "process detached", Toast.LENGTH_SHORT).show();
                     buttonView.setChecked(!isChecked);
-                } else if (multiUserBundle == null) {
-                    Toast.makeText(MyAdapter.this.context, "Ratel Engine not match RatelManager", Toast.LENGTH_LONG).show();
-                    buttonView.setChecked(false);
                 } else if (!isChecked) {
                     Toast.makeText(MyAdapter.this.context, "can't turn off multi", Toast.LENGTH_LONG).show();
                     buttonView.setChecked(true);
                 } else {
                     try {
-                        iRatelRemoteControlHandler.switchEnvModel(VirtualEnv.VirtualEnvModel.MULTI.name());
-                        buttonView.setChecked(true);
-                        Toast.makeText(MyAdapter.this.context, "turn on multi success, restart the target app to take effect", Toast.LENGTH_LONG).show();
+                        boolean success = iRatelRemoteControlHandler.switchEnvModel(VirtualEnv.VirtualEnvModel.MULTI.name());
+                        buttonView.setChecked(success);
+                        if (success) {
+                            Toast.makeText(MyAdapter.this.context, "turn on multi success, restart the target app to take effect", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(MyAdapter.this.context, "RatelManager not match RatelEngine, Please check!", Toast.LENGTH_LONG).show();
+                        }
                     } catch (RemoteException e) {
                         Toast.makeText(MyAdapter.this.context, "operate failed:ratelEngine>5.0?", Toast.LENGTH_SHORT).show();
                         Log.e(Constants.TAG, "operate failed", e);
@@ -468,6 +469,8 @@ public class RatelAppDetailActivity extends XposedBaseActivity {
 
         private boolean multiModel = false;
 
+        private boolean hotModuleStatus = false;
+
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_mult_account, parent, false);
@@ -571,19 +574,16 @@ public class RatelAppDetailActivity extends XposedBaseActivity {
             return accountList.size();
         }
 
+        Handler mainHandler = new Handler(Looper.getMainLooper());
+
         @Override
         public void onRemoteHandlerStatusChange(String appPackage, IRatelRemoteControlHandler iRatelRemoteControlHandler) {
             if (iRatelRemoteControlHandler == null) {
                 Log.w(RatelManagerApp.TAG, "iRatelRemoteControlHandler change to null!!");
                 newData = null;
-
             } else {
                 try {
                     multiUserBundle = iRatelRemoteControlHandler.multiUserStatus();
-                    if (multiUserBundle == null) {
-                        Log.w(Constants.TAG, "onRemoteHandlerStatusChange: Ratel Engine not match RatelManager");
-                        return;
-                    }
                     if (!multiUserBundle.isMultiVirtualEnv()) {
                         newData = null;
                         multiModel = false;
@@ -594,48 +594,49 @@ public class RatelAppDetailActivity extends XposedBaseActivity {
                         multiModel = true;
                     }
                 } catch (RemoteException e) {
-                    Toast.makeText(context, "sync availableUserSet failed!!", Toast.LENGTH_LONG).show();
+                    mainHandler.post(() -> {
+                        Toast.makeText(context, "sync availableUserSet failed!!", Toast.LENGTH_LONG).show();
+                    });
                     newData = null;
                     Log.w(RatelManagerApp.TAG, "sync availableUserSet failed!!");
                 } catch (Throwable throwable) {
                     Log.w(RatelManagerApp.TAG, "sync availableUserSet failed!!", throwable);
                 }
                 try {
-                    boolean hotmoduleStatus = iRatelRemoteControlHandler.getHotmoduleStatus();
-                    hotModuleSwitch.setChecked(!hotmoduleStatus);
+                    hotModuleStatus = iRatelRemoteControlHandler.getHotmoduleStatus();
                 } catch (RemoteException e) {
-                    Toast.makeText(context, "sync hotmoduleStatus failed!!", Toast.LENGTH_LONG).show();
-                    Log.w(RatelManagerApp.TAG, "sync hotmoduleStatus failed!!");
+                    mainHandler.post(() -> {
+                        Toast.makeText(context, "sync hotModuleStatus failed!!", Toast.LENGTH_LONG).show();
+                    });
+                    Log.w(RatelManagerApp.TAG, "sync hotModuleStatus failed!!");
                 } catch (Throwable throwable) {
-                    Log.w(RatelManagerApp.TAG, "sync hotmoduleStatus failed!!", throwable);
+                    Log.w(RatelManagerApp.TAG, "sync hotModuleStatus failed!!", throwable);
                 }
             }
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                @Override
-                public void run() {
-                    accountList = new ArrayList<>();
-                    if (newData != null) {
-                        if (cardView.getVisibility() == View.GONE) {
-                            cardView.setVisibility(View.VISIBLE);
-                        }
-                        accountList.addAll(newData);
-                        apiSwitch.setClickable(true);
-                        apiSwitch.setChecked(multiUserBundle.isDisableMultiUserAPiSwitch());
-                    } else {
-                        cardView.setVisibility(View.GONE);
-                        apiSwitch.setClickable(false);
+            mainHandler.post(() -> {
+                accountList = new ArrayList<>();
+                if (newData != null) {
+                    if (cardView.getVisibility() == View.GONE) {
+                        cardView.setVisibility(View.VISIBLE);
                     }
-
-                    final Collator col = Collator.getInstance(Locale.getDefault());
-                    Collections.sort(accountList, new Comparator<String>() {
-                        @Override
-                        public int compare(String lhs, String rhs) {
-                            return col.compare(lhs, rhs);
-                        }
-                    });
-                    switchEnvModel.setChecked(multiModel);
-                    MyAdapter.this.notifyDataSetChanged();
+                    accountList.addAll(newData);
+                    apiSwitch.setClickable(true);
+                    apiSwitch.setChecked(multiUserBundle.isDisableMultiUserAPiSwitch());
+                } else {
+                    cardView.setVisibility(View.GONE);
+                    apiSwitch.setClickable(false);
                 }
+
+                final Collator col = Collator.getInstance(Locale.getDefault());
+                Collections.sort(accountList, new Comparator<String>() {
+                    @Override
+                    public int compare(String lhs, String rhs) {
+                        return col.compare(lhs, rhs);
+                    }
+                });
+                switchEnvModel.setChecked(multiModel);
+                hotModuleSwitch.setChecked(!hotModuleStatus);
+                MyAdapter.this.notifyDataSetChanged();
             });
         }
 

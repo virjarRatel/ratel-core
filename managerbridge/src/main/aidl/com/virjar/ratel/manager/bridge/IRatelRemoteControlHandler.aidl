@@ -12,9 +12,6 @@ interface IRatelRemoteControlHandler {
     String executeCmd(String cmd);
     ClientInfo getClientInfo();
 
-    // 切换模式
-    void switchEnvModel(String model);
-
     //多用户操作接口
     boolean switchEnv(String userId);
     boolean removeUser(String userId);
@@ -29,4 +26,7 @@ interface IRatelRemoteControlHandler {
     void updateHotmoduleStatus(boolean enable);
     // 获取热发插件开关状态
     boolean getHotmoduleStatus();
+
+    // 切换模式
+    boolean switchEnvModel(String model);
 }
