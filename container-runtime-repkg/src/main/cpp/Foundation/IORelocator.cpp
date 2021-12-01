@@ -285,6 +285,7 @@ HOOK_DEF(int, __statfs64, const char *pathname, size_t size, struct statfs *stat
 HOOK_DEF(int, __open, const char *pathname, int flags, int mode) {
     char temp[PATH_MAX];
     const char *relocated_path = relocate_path(pathname, temp, sizeof(temp));
+    ALOGE("__open found %s -----> %s", pathname, relocated_path);
     if (relocated_path && !((flags & O_WRONLY || flags & O_RDWR) && isReadOnly(relocated_path))) {
         int fake_fd = redirect_proc_maps(relocated_path, flags, mode);
         if (fake_fd != 0) {
@@ -905,9 +906,6 @@ __END_DECLS
 // end IO DEF
 
 
-void onSoLoaded(const char *name, void *handle) {
-}
-
 bool relocate_linker(const char * linker_path) {
     intptr_t linker_addr, dlopen_off, symbol;
     if ((linker_addr = get_addr(linker_path)) == 0) {
@@ -1028,6 +1026,7 @@ bool on_found_linker_syscall_arch64(const char *path, int num, void *func) {
 bool on_found_linker_syscall_arm(const char *path, int num, void *func) {
     switch (num) {
         case __NR_openat:
+            ALOGE("dlopen found __NR_openat");
             MSHookFunction(func, (void *) new___openat, (void **) &orig___openat);
             break;
         case __NR_open:
@@ -1039,6 +1038,22 @@ bool on_found_linker_syscall_arm(const char *path, int num, void *func) {
 
 #endif
 
+
+
+void onSoLoaded(const char *name, void *handle) {
+    ALOGE("dlopen found so name: %s", name);
+    if (strstr(name, "/data/app/")){
+#if defined(__arm64__) || defined(__aarch64__)
+        findSyscalls(name, on_found_syscall_aarch64);
+#elif defined(__arm__)
+        findSyscalls(name, on_found_linker_syscall_arm);
+#else
+    #error "Not Support Architecture."
+#endif
+        ALOGE("hook svc from so name: %s, over", name);
+    }
+
+}
 
 int (*old__system_property_get)(const char *__name, char *__value);
 
@@ -1158,6 +1173,8 @@ FILE *new_popen(const char *command, const char *type) {
 
 //property name=gsm.version.baseband,value=MPSS-SDM710-0727_1333_2b0e169
 void startIOHook(int api_level, bool needHookProperties) {
+    ALOGE("hook start : startIOHook");
+
     if(api_level >= ANDROID_Q){
         if (BYTE_POINT == 8) {
             libc_path = "/apex/com.android.runtime/lib64/bionic/libc.so";
@@ -1216,6 +1233,9 @@ void startIOHook(int api_level, bool needHookProperties) {
         HOOK_SYMBOL(handle, fstatat64);
         findSyscalls(libc_path, on_found_syscall_aarch64);
         findSyscalls(linker_path, on_found_linker_syscall_arch64);
+
+        bool linker_result = relocate_linker(linker_path);
+        ALOGE("hook 64 linker_result : %d", linker_result);
 #else
         HOOK_SYMBOL(handle, faccessat);
         HOOK_SYMBOL(handle, __openat);
@@ -1256,7 +1276,9 @@ void startIOHook(int api_level, bool needHookProperties) {
             HOOK_SYMBOL(handle, symlink);
         }
 #ifdef __arm__
-        if (!relocate_linker(linker_path)) {
+        bool linker_result = relocate_linker(linker_path);
+        ALOGE("hook 32 linker_result : %d", linker_result);
+        if (!linker_result) {
             findSyscalls(linker_path, on_found_linker_syscall_arm);
         }
 #endif

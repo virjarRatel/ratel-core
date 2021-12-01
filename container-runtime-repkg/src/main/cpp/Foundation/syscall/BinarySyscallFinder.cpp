@@ -47,7 +47,7 @@ search_memory_syscall(const char *path, addr_t begin, addr_t end,
         if (insn[0] == 0xE1A0C007 && ARM_IS_MOV_R7_IMM(insn[1]) && insn[2] == 0xEF000000) {
             int32_t value = insn[1];
             int syscall = ((value & 0xF0000) >> 4) | (value & 0x00FFF);
-            (*callback)(path, syscall, NULL);
+            (*callback)(path, syscall, insn);
         }
         start += 1;
     } while (start < limit);
