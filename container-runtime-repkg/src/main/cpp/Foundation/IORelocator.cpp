@@ -1026,7 +1026,6 @@ bool on_found_linker_syscall_arch64(const char *path, int num, void *func) {
 bool on_found_linker_syscall_arm(const char *path, int num, void *func) {
     switch (num) {
         case __NR_openat:
-            ALOGE("dlopen found __NR_openat");
             MSHookFunction(func, (void *) new___openat, (void **) &orig___openat);
             break;
         case __NR_open:
