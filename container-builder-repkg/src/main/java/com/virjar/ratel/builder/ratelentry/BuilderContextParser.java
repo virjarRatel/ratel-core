@@ -62,6 +62,9 @@ public class BuilderContextParser {
             return;
         }
         if (builderContext.infectApk == null) {
+            if (builderContext.xpModuleApk != null) {
+                throw new IllegalStateException("can not infect xposed module!!");
+            }
             throw new IllegalStateException("no infect apk passed");
         }
     }
