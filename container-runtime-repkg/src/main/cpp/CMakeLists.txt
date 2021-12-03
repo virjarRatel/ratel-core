@@ -62,7 +62,31 @@ set(RATEL_NATIVE_SOURCE
         MapHide/pmparser.c
         MapHide/MapsHideHandler.cpp
 
-
+        # bytehook
+        bhook/bh_cfi.c
+        bhook/bh_core.c
+        bhook/bh_dl.c
+        bhook/bh_dl_iterate.c
+        bhook/bh_dl_monitor.c
+        bhook/bh_elf.c
+        bhook/bh_elf_manager.c
+        bhook/bh_hook.c
+        bhook/bh_hook_manager.c
+        bhook/bh_jni.c
+        bhook/bh_linker.c
+        bhook/bh_log.c
+        bhook/bh_recorder.c
+        bhook/bh_sleb128.c
+        bhook/bh_task.c
+        bhook/bh_task_manager.c
+        bhook/bh_trampo.c
+        bhook/bh_trampo_arm.c
+        bhook/bh_trampo_arm64.c
+        bhook/bh_trampo_x86.c
+        bhook/bh_trampo_x86_64.c
+        bhook/bh_util.c
+        bhook/bytehook.c
+        bhook/bytesig.c
         )
 include_directories(Foundation)
 include_directories(Jni)
@@ -70,6 +94,7 @@ include_directories(arthook)
 include_directories(xhook)
 include_directories(unpack)
 include_directories(MapHide)
+include_directories(bhook)
 include_directories(./)
 
 # add_definitions(-std=c++11)
