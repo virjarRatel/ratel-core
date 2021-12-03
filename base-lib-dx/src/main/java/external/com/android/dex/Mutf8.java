@@ -16,8 +16,9 @@
 
 package external.com.android.dex;
 
-import external.com.android.dex.util.ByteInput;
 import java.io.UTFDataFormatException;
+
+import external.com.android.dex.util.ByteInput;
 
 /**
  * Modified UTF-8 as described in the dex file format spec.
@@ -25,7 +26,8 @@ import java.io.UTFDataFormatException;
  * <p>Derived from libcore's MUTF-8 encoder at java.nio.charset.ModifiedUtf8.
  */
 public final class Mutf8 {
-    private Mutf8() {}
+    private Mutf8() {
+    }
 
     /**
      * Decodes bytes from {@code in} into {@code out} until a delimiter 0x00 is
@@ -107,7 +109,7 @@ public final class Mutf8 {
      * Returns an array containing the <i>modified UTF-8</i> form of {@code s}.
      */
     public static byte[] encode(String s) throws UTFDataFormatException {
-        int utfCount = (int) countBytes(s, true);
+        int utfCount = (int) countBytes(s, false);
         byte[] result = new byte[utfCount];
         encode(result, 0, s);
         return result;
