@@ -27,6 +27,7 @@
 #include "MacAddressFake.h"
 #include <MapsHideHandler.h>
 #include <xhook.h>
+#include <bytehook.h>
 
 #if defined(__LP64__)
 #define LINKER_PATH "/system/bin/linker64"
@@ -1074,6 +1075,44 @@ int new_SystemPropertiesGet(void *hidden_this, const char *__name, char *__value
     int result = old_SystemPropertiesGet(hidden_this, __name, __value);
     // ALOGI("get property name=%s,value=%s", __name, __value);
     // replace_property_if_need(__name, __value);
+    return result;
+}
+
+void bhook_callback(
+        bytehook_stub_t task_stub, //存根，全局唯一，用于unhook
+        int status_code, //hook执行状态码
+        const char *caller_path_name, //调用者的pathname或basename
+        const char *sym_name, //函数名
+        void *new_func, //新函数地址
+        void *prev_func, //原函数地址
+        void *arg){
+    ALOGI("bhook hook %s result: %d",sym_name,status_code);
+}
+
+int new_bhook_system_property_get(const char* __name, char *__value) {
+    // 每个 proxy 函数中都必须执行 ByteHook 的 stack 清理逻辑
+    BYTEHOOK_STACK_SCOPE();
+    ALOGD("__system_property_get: %s",__name);
+    int result = BYTEHOOK_CALL_PREV(new_bhook_system_property_get, __name, __value);
+    if (result < 0) {
+        //failed
+        return result;
+    }
+
+    PropertiesMockItem *propertiesMockItem = query_mock_properties(__name);
+    if (propertiesMockItem == nullptr) {
+        return result;
+    }
+
+    if (propertiesMockItem->properties_value == nullptr) {
+        result = -1;
+        __value[0] = '\0';
+        return result;
+    }
+
+    result = propertiesMockItem->value_length;
+    ALOGD("__system_property_get: %s , origin value:%s,replaced value:%s",__name,__value,propertiesMockItem->properties_value);
+    strcpy(__value, propertiesMockItem->properties_value);
     return result;
 }
 
