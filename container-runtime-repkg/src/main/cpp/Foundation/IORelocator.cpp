@@ -1040,17 +1040,20 @@ bool on_found_linker_syscall_arm(const char *path, int num, void *func) {
 
 
 void onSoLoaded(const char *name, void *handle) {
-    ALOGE("dlopen found so name: %s", name);
-    if (strstr(name, "/data/app/")){
+    if (name != nullptr){
+        ALOGE("dlopen found so name: %s", name);
+        if (strstr(name, "/data/app/")){
 #if defined(__arm64__) || defined(__aarch64__)
-        findSyscalls(name, on_found_syscall_aarch64);
+            findSyscalls(name, on_found_syscall_aarch64);
 #elif defined(__arm__)
-        findSyscalls(name, on_found_linker_syscall_arm);
+            findSyscalls(name, on_found_linker_syscall_arm);
 #else
     #error "Not Support Architecture."
 #endif
-        ALOGE("hook svc from so name: %s, over", name);
+            ALOGE("hook svc from so name: %s, over", name);
+        }
     }
+
 
 }
 
