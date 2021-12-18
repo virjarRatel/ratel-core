@@ -5,7 +5,6 @@ import com.virjar.ratel.allcommon.ClassNames;
 import org.jf.dexlib2.AccessFlags;
 import org.jf.dexlib2.Opcode;
 import org.jf.dexlib2.iface.Method;
-import org.jf.dexlib2.iface.MethodImplementation;
 import org.jf.dexlib2.iface.instruction.Instruction;
 import org.jf.dexlib2.iface.reference.MethodReference;
 import org.jf.dexlib2.immutable.ImmutableMethod;
@@ -16,7 +15,7 @@ import org.jf.dexlib2.immutable.reference.ImmutableMethodReference;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 /**
@@ -40,22 +39,30 @@ public class InjectMethodBuilder {
         return new ImmutableMethod(className, "<clinit>", new ArrayList<>(), "V", AccessFlags.STATIC.getValue() | AccessFlags.CONSTRUCTOR.getValue(), null, null, methodImpl);
     }
 
-    public static Method buildStaticContextMethod(String className, Method mehtod) {
-        ArrayList<Instruction> instructions = new ArrayList<>(Collections.singletonList(
-                ImmutableInstructionFactory.INSTANCE.makeInstruction35c(Opcode.INVOKE_STATIC, 0, 0, 0, 0, 0, 0, getStaticContextMethodRef())
-        ));
-        MethodImplementation implementation = mehtod.getImplementation();
-        MethodImplementation newImplementation = null;
-        if (implementation != null) {
-            int registerCount = implementation.getRegisterCount();
-            for (Instruction instruction : mehtod.getImplementation().getInstructions()) {
-                instructions.add(instruction);
-            }
-            newImplementation = new ImmutableMethodImplementation(registerCount, instructions, implementation.getTryBlocks(), implementation.getDebugItems());
-        }
+    public static Method renameOriginCInitMethod(Method origin) {
+        return new ImmutableMethod(origin.getDefiningClass(), "cinit_" + ThreadLocalRandom.current().nextInt(100),
+                new ArrayList<>(), "V", AccessFlags.STATIC.getValue(), null, null,
+                origin.getImplementation()
+        );
+    }
 
-        return new ImmutableMethod(className, mehtod.getName(), mehtod.getParameters(), mehtod.getReturnType(), mehtod.getAccessFlags(), mehtod.getAnnotations(),
-                mehtod.getHiddenApiRestrictions(), newImplementation);
+
+    public static Method buildStaticContextMethod(String className, Method backupCInitMethod) {
+        ArrayList<Instruction> instructions = new ArrayList<>();
+        // 调用平头哥的初始化
+        instructions.add(ImmutableInstructionFactory.INSTANCE.makeInstruction35c(
+                Opcode.INVOKE_STATIC, 0, 0, 0, 0, 0, 0, getStaticContextMethodRef())
+        );
+
+        // 调用原来的静态代码块
+        ImmutableMethodReference backupCInitMethodReference = new ImmutableMethodReference("L" + backupCInitMethod.getDefiningClass() + ";", "startup", null, "V");
+        instructions.add(ImmutableInstructionFactory.INSTANCE.makeInstruction35c(
+                Opcode.INVOKE_STATIC, 0, 0, 0, 0, 0, 0, backupCInitMethodReference)
+        );
+
+        ImmutableMethodImplementation methodImpl = new ImmutableMethodImplementation(0, instructions, null, null);
+        return new ImmutableMethod(className, backupCInitMethod.getName(), backupCInitMethod.getParameters(), backupCInitMethod.getReturnType(), backupCInitMethod.getAccessFlags(), backupCInitMethod.getAnnotations(),
+                backupCInitMethod.getHiddenApiRestrictions(), methodImpl);
     }
 
 

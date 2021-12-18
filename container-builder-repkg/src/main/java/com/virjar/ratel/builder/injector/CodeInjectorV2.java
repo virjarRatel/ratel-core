@@ -81,8 +81,11 @@ public class CodeInjectorV2 {
             originDirectMethods.add(InjectMethodBuilder.buildStaticContextMethod(classDef.getType()));
         } else {
             originDirectMethods.remove(cInitMethod);
+            // 备份之前的cinit
+            Method backupCInitMethod = InjectMethodBuilder.renameOriginCInitMethod(cInitMethod);
+            originDirectMethods.add(backupCInitMethod);
             originDirectMethods.add(
-                    InjectMethodBuilder.buildStaticContextMethod(classDef.getType(), cInitMethod)
+                    InjectMethodBuilder.buildStaticContextMethod(classDef.getType(), backupCInitMethod)
             );
         }
 
