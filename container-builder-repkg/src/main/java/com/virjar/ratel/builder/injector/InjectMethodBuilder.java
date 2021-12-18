@@ -40,8 +40,13 @@ public class InjectMethodBuilder {
     }
 
     public static Method renameOriginCInitMethod(Method origin) {
-        return new ImmutableMethod(origin.getDefiningClass(), "cinit_" + ThreadLocalRandom.current().nextInt(100),
-                new ArrayList<>(), "V", AccessFlags.STATIC.getValue(), null, null,
+        return new ImmutableMethod(origin.getDefiningClass(),
+                "cinit_" + ThreadLocalRandom.current().nextInt(100),
+                origin.getParameters(),
+                origin.getReturnType(),
+                AccessFlags.STATIC.getValue(),
+                origin.getAnnotations(),
+                origin.getHiddenApiRestrictions(),
                 origin.getImplementation()
         );
     }
@@ -56,14 +61,16 @@ public class InjectMethodBuilder {
 
         // 调用原来的静态代码块
         ImmutableMethodReference backupCInitMethodReference = new ImmutableMethodReference(
-                "L" + backupCInitMethod.getDefiningClass() + ";", backupCInitMethod.getName(), null, "V");
+                backupCInitMethod.getDefiningClass(), backupCInitMethod.getName(), null, "V");
         instructions.add(ImmutableInstructionFactory.INSTANCE.makeInstruction35c(
                 Opcode.INVOKE_STATIC, 0, 0, 0, 0, 0, 0, backupCInitMethodReference)
         );
 
+        // 函数返回
+        instructions.add(ImmutableInstructionFactory.INSTANCE.makeInstruction10x(Opcode.RETURN_VOID));
+
         ImmutableMethodImplementation methodImpl = new ImmutableMethodImplementation(0, instructions, null, null);
-        return new ImmutableMethod(className, backupCInitMethod.getName(), backupCInitMethod.getParameters(), backupCInitMethod.getReturnType(), backupCInitMethod.getAccessFlags(), backupCInitMethod.getAnnotations(),
-                backupCInitMethod.getHiddenApiRestrictions(), methodImpl);
+        return new ImmutableMethod(className, "<clinit>", new ArrayList<>(), "V", AccessFlags.STATIC.getValue() | AccessFlags.CONSTRUCTOR.getValue(), null, null, methodImpl);
     }
 
 
