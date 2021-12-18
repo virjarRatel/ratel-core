@@ -31,6 +31,8 @@ import external.com.android.dx.merge.DexMerger;
 public class CodeInjectorV2 {
     private static boolean hasCall = false;
 
+    private final static Set<String> classImplementsByAndroid = Sets.newHashSet("android.app.Application", "android.app.AppComponentFactory");
+
     public static void doInject(DexFiles dexFiles, String entryClassName, BuildParamMeta buildParamMeta) throws IOException {
         DexFiles.DexFile dex = dexFiles.findClassInDex(entryClassName);
         if (dex == null) {
@@ -45,7 +47,7 @@ public class CodeInjectorV2 {
             DexBackedClassDef classDef = dex.getClassDef(entryClassName);
             String supperClass = Util.descriptorToDot(classDef.getSuperclass());
             mainClasses.add(supperClass);
-            if (supperClass != null && !supperClass.equals("android.app.Application")) {
+            if (supperClass != null && !classImplementsByAndroid.contains(supperClass)) {
                 DexFiles.DexFile newDex = dexFiles.findClassInDex(supperClass);
                 if (newDex == null) {
                     System.out.println("warning: can not find class: " + supperClass);
