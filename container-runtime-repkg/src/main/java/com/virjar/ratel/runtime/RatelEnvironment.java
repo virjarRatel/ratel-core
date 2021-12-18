@@ -14,6 +14,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -230,27 +233,16 @@ public class RatelEnvironment {
     }
 
     public static int userIdentifierSeed() {
-        char[] chars = userIdentifier().toCharArray();
-        int retSeed = 0;
-        int i = 0;
-        do {
-            if (i < chars.length) {
-                retSeed += chars[i];
-                i++;
-            }
-            if (i < chars.length) {
-                retSeed += (chars[i] << 8);
-                i++;
-            }
-            if (i < chars.length) {
-                retSeed += (chars[i] << 16);
-                i++;
-            }
-            if (i < chars.length) {
-                retSeed += (chars[i] << 24);
-                i++;
-            }
-        } while (i < chars.length);
+        MessageDigest md;
+        try {
+            md = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException var3) {
+            throw new IllegalStateException("MD5 not supported", var3);
+        }
+
+        byte[] md5Bytes = md.digest(userIdentifier().getBytes(StandardCharsets.UTF_8));
+        int retSeed = (md5Bytes[0] & 0xFF) << 24 | (md5Bytes[1] << 16 & 0xFF) | (md5Bytes[2] << 8 & 0xFF) | (md5Bytes[3] & 0xFF);
+
         if (retSeed == -1) {
             // -1 有特殊标记
             retSeed = 1;
