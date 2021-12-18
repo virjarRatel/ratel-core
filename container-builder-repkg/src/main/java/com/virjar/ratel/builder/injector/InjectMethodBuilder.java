@@ -55,7 +55,8 @@ public class InjectMethodBuilder {
         );
 
         // 调用原来的静态代码块
-        ImmutableMethodReference backupCInitMethodReference = new ImmutableMethodReference("L" + backupCInitMethod.getDefiningClass() + ";", "startup", null, "V");
+        ImmutableMethodReference backupCInitMethodReference = new ImmutableMethodReference(
+                "L" + backupCInitMethod.getDefiningClass() + ";", backupCInitMethod.getName(), null, "V");
         instructions.add(ImmutableInstructionFactory.INSTANCE.makeInstruction35c(
                 Opcode.INVOKE_STATIC, 0, 0, 0, 0, 0, 0, backupCInitMethodReference)
         );
