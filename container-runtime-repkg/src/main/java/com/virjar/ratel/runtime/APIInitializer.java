@@ -69,20 +69,26 @@ class APIInitializer {
                 //不是所有都有权限
                 File sdcardRoot = new File(base);
                 if (!sdcardRoot.canRead()) {
+                    Log.i(Constants.TAG, "can not read sdcard root: " + sdcardRoot);
                     continue;
                 }
                 try {
                     File whiteDir = new File(base, "ratel_white_dir");
                     String ratelWhiteDir = new File(whiteDir, RatelToolKit.packageName).getCanonicalPath();
-                    if (XposedModuleLoader.testHasSDCardReadPermission()) {
+                    try {
                         FileUtils.forceMkdir(new File(ratelWhiteDir));
+                    } catch (IOException e) {
+                        // 请注意，Android11之后，内存卡机制发生了改变，内存卡根据文件夹路径进行授权，并且默认都具有权限
+                        // 路径为： /storage/emulated/0/Android/data/pkg/files/Download/ratel_white_dir/pkg
+                        // 此时不再需要检测内存卡的权限，所以这统一直接进行文件夹创建操作
+                        Log.i(Constants.TAG, "create white dir failed " + ratelWhiteDir, e);
                     }
                     if (new File(ratelWhiteDir).canRead() && new File(ratelWhiteDir).canWrite()) {
                         RatelToolKit.whiteSdcardDirPath = ratelWhiteDir;
                         RatelNative.whitelist(whiteDir.getCanonicalPath());
                         Log.i(Constants.TAG, "ratel white sdcard dir path:" + RatelToolKit.whiteSdcardDirPath);
-                    }else{
-                        Log.i(Constants.TAG, "ratel white sdcard dir path is no permission:" + RatelToolKit.whiteSdcardDirPath);
+                    } else {
+                        Log.i(Constants.TAG, "ratel white sdcard dir path is no permission");
                     }
                 } catch (IOException e) {
                     Log.e(Constants.TAG, "create ratel white dir failed", e);
