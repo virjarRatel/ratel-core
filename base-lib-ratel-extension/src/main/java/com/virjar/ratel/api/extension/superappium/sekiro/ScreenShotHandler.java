@@ -82,13 +82,13 @@ public class ScreenShotHandler implements SekiroRequestHandler {
                     return;
                 }
 
-                Bitmap bitmap = Bitmap.createBitmap(decorView.getWidth(), decorView.getHeight(), Bitmap.Config.RGB_565);
+                Bitmap bitmap = Bitmap.createBitmap(decorView.getWidth(), decorView.getHeight(), Bitmap.Config.ARGB_8888);
                 decorView.draw(new Canvas(bitmap));
 
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, quality, byteArrayOutputStream);
+                bitmap.compress(Bitmap.CompressFormat.PNG, quality, byteArrayOutputStream);
 
-                sekiroResponse.send("image/jpeg", byteArrayOutputStream.toByteArray());
+                sekiroResponse.send("image/png", byteArrayOutputStream.toByteArray());
             }
 
 
